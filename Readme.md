@@ -2,7 +2,7 @@
 
 ![ ](img/readme_pics/renderrob_deck_01.png)
 
-Render Rob is an Google Spreadsheet based Render manager for Blender. It gives you the possiblilty to easily manage your jobs, and change the settings from the sheet for better overview. No need for command line fiddling anymore!
+**Render Rob is an Google Spreadsheet based Render manager for Blender. It gives you the possiblilty to easily manage your jobs, and change the settings from the sheet for better overview. No need for command line fiddling anymore!**
 
 ![](img/readme_pics/screenshot.jpg)
 
