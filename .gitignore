@@ -1,0 +1,13 @@
+﻿/Blender
+/.vs/BlenderPython2/v16
+*.pyc
+/sketch
+/build/build
+/build/dist
+*.spec
+/key/*.json
+*__pycache__*
+*.pyc
+*.afpub
+/design
+*.afdesign
