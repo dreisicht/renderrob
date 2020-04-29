@@ -2,25 +2,18 @@
 
 ![ ](img/readme_pics/renderrob_deck_01.png)
 
-**Render Rob is an Google Spreadsheet based Render manager for Blender. It gives you the possiblilty to easily manage your jobs, and change the settings from the sheet for better overview. No need for command line fiddling anymore!**
+**Render Rob is a Google Spreadsheet based Render manager for Blender. It gives you the possiblilty to easily manage your jobs, and change the settings from the sheet itself for better overview. No need for command line fiddling anymore!**
+
+## Features
+
+- Overview of jobs and settings in a table
+- Only one click needed to start rendering your jobs
+- Usable for remote rendering too, since your UI is the spreadsheet
+- Warnings for unplausible render settings
 
 ![](img/readme_pics/screenshot.jpg)
 
 ## Setup
-
-### Spreadsheet
-
-1. Open this Spreadsheet:
-https://docs.google.com/spreadsheets/d/1ec6AT0q2bhoBhWivzLhM-wXOfM2kwrOK1VIMKbTqRrU/edit?usp=sharing
-
-2. Make a copy into your Drive of the sheet
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Descrp")
-
-
-1. Name it `Render Rob`. Correct naming is important!
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Descrp")
 
 ### Setting up Google api
 
@@ -33,7 +26,7 @@ https://docs.google.com/spreadsheets/d/1ec6AT0q2bhoBhWivzLhM-wXOfM2kwrOK1VIMKbTq
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20125300.jpg "Descrp")
 
-1. Name the project e.g. Render Rob and click on create
+3. Name the project e.g. Render Rob and click on create
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102359.jpg "Descrp")
 
@@ -43,28 +36,42 @@ https://docs.google.com/spreadsheets/d/1ec6AT0q2bhoBhWivzLhM-wXOfM2kwrOK1VIMKbTq
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20125407.jpg "Descrp")
 <!-- ![Text](img/readme_pics/Anmerkung%202020-04-26%20102553.jpg "Descrp") -->
 
-1. Same for **Google Sheets API**
+5. Same for **Google Sheets API**
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102550.jpg "Descrp")
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102636.jpg "Descrp")
 
-1. Click on Create Credentials
+6. Click on Create Credentials
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20125536.jpg "Descrp")
 
-1. fill out the form and click on `What credentials do I need?`
+7. fill out the form and click on `What credentials do I need?`
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102827.jpg "Descrp")
 
-1. continue filling out
+8. continue filling out
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102856.jpg "Descrp")
 
-1. save the json file you get in the `Render Rob\Key` Folder
+9. save the json file you get in the `Render Rob\Key` Folder
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102919.jpg "Descrp")
 
-1. Copy the E-Mail Address from the json File and share the Spreadsheet with this mail
+### Spreadsheet
+
+1. Open this spreadsheet:
+https://docs.google.com/spreadsheets/d/1WWVV_Iteum82jcmbp4dNShwJ-e1dlw42UG-UKvsKnwc
+
+1. Copy the sheet into your Drive 
+
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Descrp")
+
+
+3. Name it `Render Rob`. Correct naming is important!
+
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Descrp")
+
+4. Copy the e-mail address from step 8 (it's called Service account ID there) and share the sheet with the mail!
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20104113.jpg "Descrp")
 
@@ -129,5 +136,3 @@ Following things are being looked at:
 - Animation denoising, but exr is not selected
 - Single frame rendering (start and end frame have the same value), but animation denoising is activated
 - Single frame in high quality is being rendered, but Denoising is deactivated
-
-

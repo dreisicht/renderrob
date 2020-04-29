@@ -16,6 +16,22 @@ class jobs(object):
         self.renderpath = self.path_process(global_set[1][1])
         self.blendfolder = self.path_process(global_set[2][1])
         
+        # check if blender path is filled out correctly
+        if self.blenderpath == "C:/Path/To/Blender.exe":
+            print("___________________________________________________")
+            print("ERROR: Please fill the path to blender under globals!")
+            print("___________________________________________________")
+            sleep(10)
+            raise SystemExit(0)
+        
+        # check if render path is filled out correctly
+        if self.renderpath == "C:/Path/To/My/Renders":
+            print("___________________________________________________")
+            print("ERROR: Please fill the path to you render folder under globals!")
+            print("___________________________________________________")
+            sleep(10)
+            raise SystemExit(0)
+        
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
 
