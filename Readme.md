@@ -2,14 +2,20 @@
 
 ![ ](img/readme_pics/renderrob_deck_01.png)
 
-**Render Rob is a Google Spreadsheet based Render manager for Blender. It gives you the possiblilty to easily manage your jobs, and change the settings from the sheet itself for better overview. No need for command line fiddling anymore!**
+**Render Rob is a Google Spreadsheet based Render manager for Blender. It gives you the possibility to easily manage your render jobs and change the settings from the sheet itself for better overview. No need for command line fiddling anymore!**
 
 ## Features
 
 - Overview of jobs and settings in a table
 - Only one click needed to start rendering your jobs
-- Usable for remote rendering too, since your UI is the spreadsheet
-- Warnings for unplausible render settings
+- Usable for remote rendering too, since your UI is the sheet
+- Warnings for implausible render settings directly in the sheet
+
+## Requirements
+
+- Google account
+- 15 minutes of time for setup
+- Blender
 
 ![](img/readme_pics/screenshot.jpg)
 
@@ -84,51 +90,51 @@ After setting that up, fill in the global settings in the Sheet. The Blender Pat
 
 Now you only have to paste your attributes of your job to be rendered, and run `renderrob.exe`!
 
-## Features
+## Properties
 
-Feature list google doc:
+Property list of the spreadsheet
 
 | Property | Usage |
 |--- |:---|
 | active | Activates or deactivates job |
-| .blend file path | Path of blend file. Absolute path, aswell as relative path to file folder in globals is possible |
+| .blend file path | Path of blend file. Absolute path, as well as relative path to file folder in globals is possible |
 | camera | Name of camera to be activated, optional |
 | start frame | First frame to be rendered|
 | end frame | Last frame to be rendered|
 | X res | Horizontal resolution |
 | Y res | Vertical resolution|
-| samples | Number of cycles or eevee passes|
+| samples | Number of Cycles or Eevee passes|
 | file format | Output file format. Exr refers to multilayer exr|
-| cycles (eevee) | If activated, cycles is used, otherwise eevee|
-| cpu | Usage of cpu for rendering |
-| gpu | Usage of gpu for rendering |
+| Cycles (Eevee) | If activated, Cycles is used, otherwise Eevee|
+| CPU | Usage of CPU for rendering |
+| GPU | Usage of GPU for rendering |
 | motion blur | Usage of Motion blur |
 | read only | If activated, already rendered images don't get overwritten |
 | place-holder | Creating placeholders of images being rendered |
 | high-quality | If deactivated, preview settings from globals are used|
-| animation denoise | Usage of Post-Process Animation Denoising|
-| denoise | Usage of Image-Denoising|
+| animation denoise | Usage of post-process animation denoising|
+| denoise | Usage of image-denoising|
 | comments | Put your own comments of the shot here|
 
 ## Further explanations
 
 - If you want to abort all renders, you have to close all three command-line windows.
-- The reason motion blur is in Render Rob, is that I often experienced situations where motion blur had artefacts, so I needed few frames without it.
+- The reason motion blur is in Render Rob, is that I often experienced situations where motion blur had artifacts, so I needed few frames without it.
 - Column t is necessary. Please do not delete it.
 - Column a is a help for being able to select cells easier.
 - If read only is enabled, a new folder with a new version number is created and used as render output.
 - Jobs get rendered in the order, the are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
 - Border rendering gets disabled, if high quality is active.
 - Currently the rendering of multiple scenes and view layers is not supported. You will get a warning and it will only render the first scene and the first view layer.
-- You can put your own blender commands in the file called `rr_user_commands.py`. An example for this would be the activation of an addon.
-- If you disable cycles (and by that enbale eevee), the irrelevant settings get disabled.
+- You can put your own blender commands in the file called `rr_user_commands.py`. An example for this would be the activation of an add-on.
+- If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
 
 ## Warnings in the sheet
 
 If a property in the sheet gets marked yellow, this means, that a possible error is found. These are just warnings, so you still are able to start the job. In some cases it will work, in some it won't.
 Following things are being looked at:
 
-- Double occurences of jobs
+- Double occurrences of jobs
 - No render device selected
 - Both devices active, but no read only
 - Both devices active, but no placeholders
@@ -136,3 +142,7 @@ Following things are being looked at:
 - Animation denoising, but exr is not selected
 - Single frame rendering (start and end frame have the same value), but animation denoising is activated
 - Single frame in high quality is being rendered, but Denoising is deactivated
+
+## Support
+
+If you like the product and would like to support me, consider buying it on [Gumroad](https://gum.co/JXBgO) or [Blendermarket](https://blendermarket.com). Thanks a lot!
