@@ -11,57 +11,57 @@
 - Usable for remote rendering too, since your UI is the sheet
 - Warnings for implausible render settings directly in the sheet
 
+![Screenshot](img/readme_pics/screenshot.jpg)
+
 ## Requirements
 
 - Google account
 - 15 minutes of time for setup
 - Blender
 
-![](img/readme_pics/screenshot.jpg)
-
 ## Setup
 
 ### Setting up Google api
 
-1. Open up https://console.developers.google.com/, agree to terms and conditions and click on `Agree and continue`
+1. Open up https://console.developers.google.com, agree to terms and conditions and click on `Agree and continue`
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102222.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102222.jpg "Terms and Service")
 
 2. Click on create project
 
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125300.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20125300.jpg "Dashboard")
 
 3. Name the project e.g. Render Rob and click on create
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102359.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102359.jpg "Create Project")
 
 4. Search for **Google Drive API** and enable it
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125343.jpg "Descrp")
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125407.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20125343.jpg "Search API")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20125407.jpg "Drive API")
 <!-- ![Text](img/readme_pics/Anmerkung%202020-04-26%20102553.jpg "Descrp") -->
 
 5. Same for **Google Sheets API**
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102550.jpg "Descrp")
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102636.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102550.jpg "Search API")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102636.jpg "Sheet API")
 
 6. Click on Create Credentials
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125536.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20125536.jpg "Credentials")
 
 7. fill out the form and click on `What credentials do I need?`
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102827.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102827.jpg "Credentials")
 
 8. continue filling out
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102856.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102856.jpg "Credentials")
 
 9. save the json file you get in the `Render Rob\Key` Folder
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102919.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20102919.jpg "Credentials")
 
 ### Spreadsheet
 
@@ -70,16 +70,16 @@ https://docs.google.com/spreadsheets/d/1WWVV_Iteum82jcmbp4dNShwJ-e1dlw42UG-UKvsK
 
 1. Copy the sheet into your Drive 
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
 
 
 3. Name it `Render Rob`. Correct naming is important!
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Sheet")
 
 4. Copy the e-mail address from step 8 (it's called Service account ID there) and share the sheet with the mail!
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20104113.jpg "Descrp")
+![Text](img/readme_pics/Anmerkung%202020-04-26%20104113.jpg "Sheet")
 
 
 ### Filling the Spreadsheet
@@ -123,15 +123,18 @@ Property list of the spreadsheet
 - Column t is necessary. Please do not delete it.
 - Column a is a help for being able to select cells easier.
 - If read only is enabled, a new folder with a new version number is created and used as render output.
-- Jobs get rendered in the order, the are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
+- Jobs get rendered in the order, they are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
 - Border rendering gets disabled, if high quality is active.
-- Currently the rendering of multiple scenes and view layers is not supported. You will get a warning and it will only render the first scene and the first view layer.
-- You can put your own blender commands in the file called `rr_user_commands.py`. An example for this would be the activation of an add-on.
+- Currently the rendering of multiple scenes and view layers is not supported. You will get a warning and it will only render the first scene and the first view layer. If you need this functionality please open an issue and I will look what I can do.
+- You can put your own blender commands in the file called `rr_user_commands.py`. An example for this is be the activation of an add-on.
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
+- Standard settings for a render job is, that all checkboxes are activated apart from the last one. In this way it's easy to see what you're doing.
+- If you want to render a still image, fill start and endframe with same value.
 
 ## Warnings in the sheet
 
 If a property in the sheet gets marked yellow, this means, that a possible error is found. These are just warnings, so you still are able to start the job. In some cases it will work, in some it won't.
+
 Following things are being looked at:
 
 - Double occurrences of jobs
@@ -142,6 +145,7 @@ Following things are being looked at:
 - Animation denoising, but exr is not selected
 - Single frame rendering (start and end frame have the same value), but animation denoising is activated
 - Single frame in high quality is being rendered, but Denoising is deactivated
+- Single frame being rendered, but both CPU and GPU are selected
 
 ## Support
 
