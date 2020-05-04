@@ -178,9 +178,11 @@ class jobs(object):
         self.currentpath = os.path.dirname(sys.argv[0]).replace("\\", "/") + "/"
         # print(self.currentpath)
         self.get_shotname()
+        self.activate_collections = self.jobs_table[job_nr][20].replace(", ", ",").split(",")
+        self.deactivate_collections = self.jobs_table[job_nr][21].replace(", ", ",").split(",")
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}src') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})".format(
             self.currentpath,
             self.active_camera,
             device,
@@ -195,7 +197,9 @@ class jobs(object):
             self.samples,
             self.framestep,
             self.cycles,
-            self.border)
+            self.border,
+            self.activate_collections,
+            self.deactivate_collections)
         
         # print(inlinepython)
 
@@ -206,14 +210,14 @@ class jobs(object):
                           " -s " + self.startframe + " -e " + self.endframe +
                           " -F " + self.file_format_upper +
                           " -a ")
-        # print(command_string)
+        print(command_string)
         # return "None"
         print("Rendering {} on {}".format(self.shotname + str(self.shot_iteration_number), device.upper()))
         return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
         # subprocess.run(command_string)
 
     def denoise_job(self, job_nr):
-        inlinepython_denoise = "import sys ; sys.path.append('{}src') ; import rr_denoisescript ; rr_denoisescript.denoise_folder('{}/', {}, {})".format(
+        inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder('{}/', {}, {})".format(
             self.currentpath,
             self.frame_path + str(self.shot_iteration_number).zfill(2),
             self.startframe,

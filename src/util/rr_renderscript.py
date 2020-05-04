@@ -18,9 +18,57 @@ def tobool(string):
         return True
     else:
         raise TypeError
+    
+
+def inexclude_collection(collection_names, exclude, parent=""):
+    # check if first function being called first time
+
+    if parent == "":
+        counter = 0
+        for name in collection_names:
+            if name == "":
+                collection_names.pop(counter)
+            counter += 1
+        parent_collection = bpy.data.scenes[0].view_layers[0].layer_collection
+        # if function being called first time, reset number of changed
+    else:
+        parent_collection = parent
+
+    # iterate through immediate children of collection
+    for collection in parent_collection.children:
+        # check name
+        if collection.name in collection_names:
+            collection.exclude = exclude
+            collection_names.pop(collection_names.index(collection.name))
+        # check if has children
+        if len(collection.children) > 0:
+            inexclude_collection(
+                collection_names, exclude, parent=collection)
+        else:
+            continue
+    if parent == "" and len(collection_names) > 0:
+        print("ERROR: Couldn't find collection {}!".format(
+            " and ".join(collection_names)))
+        time.sleep(10)
 
 
-def set_settings(camera, device, mb, xres, yres, percres, an_denoise, denoise, overwrite, placeholder, samples, frame_step, cycles, border):
+
+def set_settings(camera,
+ device,
+ mb,
+ xres,
+ yres,
+ percres,
+ an_denoise,
+ denoise,
+ overwrite,
+ placeholder,
+ samples,
+ frame_step,
+ cycles,
+ border,
+ activate_collections,
+ deactivate_collections):
     print("____________________ Starting settings ____________________")
     
     try:
@@ -37,6 +85,10 @@ def set_settings(camera, device, mb, xres, yres, percres, an_denoise, denoise, o
     if len(bpy.data.scenes[0].view_layers) > 1:
         print("You are using more than one View Layer. This is not supported at the moment. Falling back to using first View Layer.")
         time.sleep(10)
+        
+    inexclude_collection(deactivate_collections, True)
+    inexclude_collection(activate_collections, False)
+
 
     # enable animation nodes
     # bpy.ops.preferences.addon_enable(module='animation_nodes')
