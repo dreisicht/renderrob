@@ -21,7 +21,12 @@
 
 ## Setup
 
-### Setting up Google api
+Click on the chapter to open it:
+
+<details>
+<summary>Setting up Google api</summary>
+
+<!-- ### Setting up Google api -->
 
 1. Open up https://console.developers.google.com, agree to terms and conditions and click on `Agree and continue`
 
@@ -62,8 +67,12 @@
 9. save the json file you get in the `Render Rob\Key` Folder
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20102919.jpg "Credentials")
+</details>
 
-### Spreadsheet
+<!-- ### Spreadsheet -->
+
+<details>
+<summary>Spreadsheet setup </summary>
 
 1. Open this spreadsheet:
 https://docs.google.com/spreadsheets/d/1WWVV_Iteum82jcmbp4dNShwJ-e1dlw42UG-UKvsKnwc
@@ -80,15 +89,21 @@ https://docs.google.com/spreadsheets/d/1WWVV_Iteum82jcmbp4dNShwJ-e1dlw42UG-UKvsK
 4. Copy the e-mail address from step 8 (it's called Service account ID there) and share the sheet with the mail!
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20104113.jpg "Sheet")
+</details>
 
 
-### Filling the Spreadsheet
+<!-- ### Filling the spreadsheet -->
+
+<details>
+<summary>Filling the spreadsheet </summary>
 
 After setting that up, fill in the global settings in the Sheet. The Blender Path and Render Path is mandatory, the rest is optional.
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20134758.jpg)
 
 Now you only have to paste your attributes of your job to be rendered, and run `renderrob.exe`!
+
+</details>
 
 ## Properties
 
