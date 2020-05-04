@@ -19,6 +19,63 @@
 - 15 minutes of time for setup
 - Blender
 
+## Properties
+
+Property list of the spreadsheet
+
+| Property | Usage |
+|--- |:---|
+| active | Activates or deactivates job |
+| .blend file path | Path of blend file. Absolute path, as well as relative path to file folder in globals is possible |
+| camera | Name of camera to be activated, optional |
+| start frame | First frame to be rendered|
+| end frame | Last frame to be rendered|
+| X res | Horizontal resolution |
+| Y res | Vertical resolution|
+| samples | Number of Cycles or Eevee passes|
+| file format | Output file format. Exr refers to multilayer exr|
+| Cycles (Eevee) | If activated, Cycles is used, otherwise Eevee|
+| CPU | Usage of CPU for rendering |
+| GPU | Usage of GPU for rendering |
+| motion blur | Usage of Motion blur |
+| read only | If activated, already rendered images don't get overwritten |
+| place-holder | Creating placeholders of images being rendered |
+| high-quality | If deactivated, preview settings from globals are used|
+| animation denoise | Usage of post-process animation denoising|
+| denoise | Usage of image-denoising|
+| comments | Put your own comments of the shot here|
+
+## Further explanations
+
+- If you want to abort all renders, you have to close all three command-line windows.
+- The reason motion blur is in Render Rob, is that I often experienced situations where motion blur had artifacts, so I needed few frames without it.
+- Column t is necessary. Please do not delete it.
+- Column a is a help for being able to select cells easier.
+- If read only is enabled, a new folder with a new version number is created and used as render output.
+- Jobs get rendered in the order, they are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
+- Border rendering gets disabled, if high quality is active.
+- Currently the rendering of multiple scenes and view layers is not supported. You will get a warning and it will only render the first scene and the first view layer. If you need this functionality please open an issue and I will look what I can do.
+- You can put your own blender commands in the file called `rr_user_commands.py`. An example for this is be the activation of an add-on.
+- If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
+- Standard settings for a render job is, that all checkboxes are activated apart from the last one. In this way it's easy to see what you're doing.
+- If you want to render a still image, fill start and endframe with same value.
+
+## Warnings in the sheet
+
+If a property in the sheet gets marked yellow, this means, that a possible error is found. These are just warnings, so you still are able to start the job. In some cases it will work, in some it won't.
+
+Following things are being looked at:
+
+- Double occurrences of jobs
+- No render device selected
+- Both devices active, but no read only
+- Both devices active, but no placeholders
+- High quality animation, but no animation denoising
+- Animation denoising, but exr is not selected
+- Single frame rendering (start and end frame have the same value), but animation denoising is activated
+- Single frame in high quality is being rendered, but Denoising is deactivated
+- Single frame being rendered, but both CPU and GPU are selected
+
 ## Setup
 
 Click on the chapter to open it:
