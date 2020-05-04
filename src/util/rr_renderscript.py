@@ -1,14 +1,12 @@
+import rr_user_commands
 import bpy  # pylint: disable=import-error
 import time
 import sys
 
 sys.path.append(str(__file__)[0:-18].replace("\\", "/"))
-import rr_user_commands
 
-bpsc = bpy.context.scene
-bprn = bpsc.render
-current_scene_data = bpy.data.scenes[0]
-current_scene_render = bpy.data.scenes[0].render
+# bpsc = bpy.context.scene
+# bprn = bpsc.render
 
 
 def tobool(string):
@@ -18,9 +16,9 @@ def tobool(string):
         return True
     else:
         raise TypeError
-    
 
-def inexclude_collection(collection_names, exclude, parent=""):
+
+def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
     # check if first function being called first time
 
     if parent == "":
@@ -29,7 +27,7 @@ def inexclude_collection(collection_names, exclude, parent=""):
             if name == "":
                 collection_names.pop(counter)
             counter += 1
-        parent_collection = bpy.data.scenes[0].view_layers[0].layer_collection
+        parent_collection = view_layer_data.layer_collection
         # if function being called first time, reset number of changed
     else:
         parent_collection = parent
@@ -43,7 +41,7 @@ def inexclude_collection(collection_names, exclude, parent=""):
         # check if has children
         if len(collection.children) > 0:
             inexclude_collection(
-                collection_names, exclude, parent=collection)
+                collection_names, exclude, view_layer_data, parent=collection)
         else:
             continue
     if parent == "" and len(collection_names) > 0:
@@ -52,46 +50,55 @@ def inexclude_collection(collection_names, exclude, parent=""):
         time.sleep(10)
 
 
-
 def set_settings(camera,
- device,
- mb,
- xres,
- yres,
- percres,
- an_denoise,
- denoise,
- overwrite,
- placeholder,
- samples,
- frame_step,
- cycles,
- border,
- activate_collections,
- deactivate_collections):
+                 device,
+                 mb,
+                 xres,
+                 yres,
+                 percres,
+                 an_denoise,
+                 denoise,
+                 overwrite,
+                 placeholder,
+                 samples,
+                 frame_step,
+                 cycles,
+                 border,
+                 activate_collections,
+                 deactivate_collections,
+                 scene,
+                 view_layer):
     print("____________________ Starting settings ____________________")
-    
+
+    if scene == "":
+        current_scene_data = bpy.data.scenes[0]
+    else:
+        try:
+            current_scene_data = bpy.data.scenes[scene]
+        except:
+            print("Wrong scene name. Please check again!")
+            time.sleep(10)
+
+    if view_layer == "":
+        view_layer_data = current_scene_data.view_layers[0]
+    else:
+        try:
+            view_layer_data = current_scene_data.view_layers[view_layer]
+        except:
+            print("Wrong view layer name. Please check again!")
+            time.sleep(10)
+
+    current_scene_render = current_scene_data.render
+
     try:
         if camera != '':
             current_scene_data.camera = bpy.data.objects[camera]
     except KeyError as keyerroridentifier:
         print(keyerroridentifier)
         time.sleep(10)
-        
-    if len(bpy.data.scenes) > 1:
-        print("You are using more than one Scene. This is not supported at the moment. Falling back to using first Scene.")
-        time.sleep(10)
-        
-    if len(bpy.data.scenes[0].view_layers) > 1:
-        print("You are using more than one View Layer. This is not supported at the moment. Falling back to using first View Layer.")
-        time.sleep(10)
-        
-    inexclude_collection(deactivate_collections, True)
-    inexclude_collection(activate_collections, False)
 
-
-    # enable animation nodes
-    # bpy.ops.preferences.addon_enable(module='animation_nodes')
+    inexclude_collection(deactivate_collections, True, view_layer_data)
+    inexclude_collection(activate_collections, False, view_layer_data)
 
     # disable render border
     current_scene_render.use_border = border
@@ -119,7 +126,7 @@ def set_settings(camera,
             cycles_pref.compute_device_type = 'CUDA'
 
             current_scene_data.cycles.device = 'GPU'
-            print(bpsc.cycles.device)
+            # print(bpsc.cycles.device)
             # bpy.ops.render.render(True)
 
             for device in cycles_pref.devices:
@@ -135,15 +142,15 @@ def set_settings(camera,
 
         # motion blur
         current_scene_render.use_motion_blur = mb
-        
+
         # denoising data
-        current_scene_data.view_layers[0].cycles.denoising_store_passes = an_denoise
-        current_scene_data.view_layers[0].cycles.use_denoising = denoise
+        view_layer_data.cycles.denoising_store_passes = an_denoise
+        view_layer_data.cycles.use_denoising = denoise
         # disable compositing if animation_denoising
         current_scene_render.use_compositing = not an_denoise
         current_scene_data.use_nodes = not an_denoise
         current_scene_data.cycles.use_animated_seed = an_denoise
-    
+
     print("DEVICE: ", device)
     # output settings
     current_scene_render.resolution_x = xres
@@ -158,6 +165,10 @@ def set_settings(camera,
     current_scene_data.frame_step = frame_step
 
     print("____________________ Finished settings ____________________")
+    
+if __name__ == "__main__":
+    set_settings('Camera_top', 'gpu', True, 1920, 1080, 25, True, False, False, True, 4, 1, True, True, [
+                                 'objects 1', 'objects 2'], ['objects'], 'Scene.001', 'View Layer.001')
 
 
 # set_settings('Camera_top', 'gpu', True, 1920, 1080, 10,

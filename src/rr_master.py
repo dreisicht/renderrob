@@ -180,9 +180,12 @@ class jobs(object):
         self.get_shotname()
         self.activate_collections = self.jobs_table[job_nr][20].replace(", ", ",").split(",")
         self.deactivate_collections = self.jobs_table[job_nr][21].replace(", ", ",").split(",")
+        
+        self.scene = self.jobs_table[job_nr][22]
+        self.view_layer = self.jobs_table[job_nr][23]
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', '{}')".format(
             self.currentpath,
             self.active_camera,
             device,
@@ -199,7 +202,9 @@ class jobs(object):
             self.cycles,
             self.border,
             self.activate_collections,
-            self.deactivate_collections)
+            self.deactivate_collections,
+            self.scene,
+            self.view_layer)
         
         # print(inlinepython)
 

@@ -44,6 +44,10 @@ Property list of the spreadsheet
 | animation denoise | Usage of post-process animation denoising|
 | denoise | Usage of image-denoising|
 | comments | Put your own comments of the shot here|
+| activate collections | Names of collections to activate for rendering. Separate by comma+space. Optional. |
+| deactivate collections | Names of collections to deactivate for rendering. Separate by comma+space. Optional. |
+| scene | Add name of scene to render. Only one is allowed here. Optional.|
+| view layer | Add name of view layer to render. Only one is allowed here. Optional.|
 
 ## Further explanations
 
