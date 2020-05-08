@@ -9,11 +9,7 @@ from datetime import datetime
 from colorama import Fore, Back, Style, init
 from rr_gspread import query_sheet
 from subprocess import Popen, CREATE_NEW_CONSOLE
-
-
-def print_ascii_art():
-    f = open("design/ascii-art.txt")
-    print(f.read())
+import rr_image
 
 
 class jobs(object):
@@ -25,9 +21,16 @@ class jobs(object):
         if len(excel_file) > 0:
             self.jobs_table, global_set = self.rr_read_excel(
                 excel_file[0].replace("\\", "/"))
+            self.print_info("I found an Excel file. I'm gonna use that one!")
             # print(self.jobs_table, global_set)
         else:
-            self.jobs_table, global_set = query_sheet()
+            if not glob.glob(self.currentpath + "/key/*.xlsx"):
+                self.print_error("I didn't find either an .xlsx file or a .json key. Please provide one of the two!")
+            try:
+                self.jobs_table, global_set = query_sheet()
+                self.print_info("I downloaded the data from Google Sheets.")
+            except:
+                self.print_error("Couldn't get the data from Google Sheets. Maybe check your json key!")
             # print(self.jobs_table, global_set)
 
         self.blenderpath = global_set[0][1].replace("\\", "/")
@@ -47,23 +50,23 @@ class jobs(object):
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
             self.print_error("Please fill the path to blender under globals!")
-            raise SystemExit(0)
+            quit()
         elif not os.path.isfile(self.blenderpath[1:-1]):
             self.print_error("Blender folder not existing. Perhaps spelling mistake?")
-            raise SystemExit(0)
+            quit()
 
         # check if render path is filled out correctly
         if self.renderpath == "C:/Path/To/My/Renders/":
             self.print_error(
                 "Please fill the path to you render folder under globals!")
-            raise SystemExit(0)
+            quit()
         elif not os.path.exists(self.renderpath):
             self.print_error("Render Output folder not existing. Perhaps spelling mistake?")
-            raise SystemExit(0)
+            quit()
         
         if not os.path.exists(self.blendfolder):
             self.print_warning(".blend file folder not existing. Perhaps spelling mistake?")
-            # raise SystemExit(0)
+            # quit()
 
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
@@ -94,6 +97,7 @@ class jobs(object):
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         input(Style.RESET_ALL + Back.RED + Fore.BLACK +
               time_current + "[ERROR] " + ipt_str + " Press any key to exit." + Style.RESET_ALL)
+        quit()
 
     @staticmethod
     def print_warning(ipt_str):
@@ -375,7 +379,6 @@ class jobs(object):
 
 # initialize colorama
 init(convert=True)
-print_ascii_art()
 jobs_obj = jobs()
 jobs_obj.print_info("Hello from Render Rob! I'm glad to help you!")
 jobs_obj.start_generate()

@@ -187,10 +187,11 @@ def set_settings(camera,
                 for device in cycles_pref.devices:
                     if "GeForce" in str(device.name):
                         device.use = True
+                        print_info("Using device" + str(device.name))
                     if "GHz" in str(device.name):
                         device.use = False
 
-                    print(device.name, device.use)
+                    # print_info(device.name, device.use)
 
                 current_scene_render.tile_x = 256
                 current_scene_render.tile_y = 256
@@ -221,7 +222,7 @@ def set_settings(camera,
         # overwrite, placeholder
         current_scene_render.use_overwrite = overwrite
         current_scene_render.use_placeholder = placeholder
-        print(current_scene_render.use_placeholder)
+        # print(current_scene_render.use_placeholder)
 
         # n-th frame
         current_scene_data.frame_step = frame_step
