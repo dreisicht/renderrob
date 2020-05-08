@@ -1,3 +1,9 @@
 {
-	"python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe"
+	"python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Programs\\Python\\Python38-32\\python.exe",
+	"spellright.language": [
+		"de"
+	],
+	"spellright.documentTypes": [
+		"latex"
+	]
 }

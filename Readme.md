@@ -4,12 +4,19 @@
 
 **Render Rob is a Google Spreadsheet based Render manager for Blender. It gives you the possibility to easily manage your render jobs and change the settings from the sheet itself for better overview. No need for command line fiddling anymore!**
 
+## Why should I use it?
+
+## Who ist it for?
+
 ## Features
 
 - Overview of jobs and settings in a table
 - Only one click needed to start rendering your jobs
 - Usable for remote rendering too, since your UI is the sheet
 - Warnings for implausible render settings directly in the sheet
+- Automatic organizing of output folder
+- Automatic start of CPU and GPU jobs, so that all devices are allways at full load
+<!-- screenshot!! TODO -->
 
 ![Screenshot](img/readme_pics/screenshot.jpg)
 
@@ -57,13 +64,16 @@ Property list of the spreadsheet
 - Column a is a help for being able to select cells easier.
 - If read only is enabled, a new folder with a new version number is created and used as render output.
 - Jobs get rendered in the order, they are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
-- Border rendering gets disabled, if high quality is active.
+- Border rendering gets disabled, if high quality is active. Otherwise it remains enabled.
 - Currently the rendering of multiple scenes and view layers is not supported. You will get a warning and it will only render the first scene and the first view layer. If you need this functionality please open an issue and I will look what I can do.
 - You can put your own blender commands in the file called `rr_user_commands.py`. An example for this is be the activation of an add-on.
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
 - Standard settings for a render job is, that all checkboxes are activated apart from the last one. In this way it's easy to see what you're doing.
 - If you want to render a still image, fill start and endframe with same value.
 - collections get first activated and then deactivated
+- CPU renders on n-1 cores to not bottleneck GPU render
+- You can only render one scene in one job. If you want to render a second scene just create another job
+- Viewlayers TODO TODO TODO
 
 ## Warnings in the sheet
 

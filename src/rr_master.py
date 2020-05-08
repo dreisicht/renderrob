@@ -1,37 +1,70 @@
-# import subprocess
-import threading
 import os
-from rr_gspread import query_sheet
-import subprocess
-from subprocess import Popen, CREATE_NEW_CONSOLE
-from time import sleep
 import sys
+import glob
+import xlrd
+import threading
+import subprocess
+from time import sleep
+from datetime import datetime
+from colorama import Fore, Back, Style, init
+from rr_gspread import query_sheet
+from subprocess import Popen, CREATE_NEW_CONSOLE
+
+
+def print_ascii_art():
+    f = open("design/ascii-art.txt")
+    print(f.read())
 
 
 class jobs(object):
     def __init__(self):
-        self.jobs_table, global_set = query_sheet()
-        
+        self.currentpath = os.path.dirname(
+            sys.argv[0]).replace("\\", "/") + "/"
+        # print(glob.glob(self.currentpath + "*.xlsx"))
+        excel_file = glob.glob(self.currentpath + "*.xlsx")
+        if len(excel_file) > 0:
+            self.jobs_table, global_set = self.rr_read_excel(
+                excel_file[0].replace("\\", "/"))
+            # print(self.jobs_table, global_set)
+        else:
+            self.jobs_table, global_set = query_sheet()
+            # print(self.jobs_table, global_set)
+
         self.blenderpath = global_set[0][1].replace("\\", "/")
         self.renderpath = self.path_process(global_set[1][1])
         self.blendfolder = self.path_process(global_set[2][1])
-        
+
+        # defining colors here
+        self.red = "980030"
+        self.green = "499a6c"
+        self.yellow = "ffd966"
+        self.grey = "999999"
+        self.light_blue = "78909c"
+        self.dark_blue = "45818e"
+        self.lighter_stone = "242a2d"
+        self.dark_stone = "22282b"
+
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
-            print("___________________________________________________")
-            print("ERROR: Please fill the path to blender under globals!")
-            print("___________________________________________________")
-            sleep(10)
+            self.print_error("Please fill the path to blender under globals!")
             raise SystemExit(0)
-        
+        elif not os.path.isfile(self.blenderpath[1:-1]):
+            self.print_error("Blender folder not existing. Perhaps spelling mistake?")
+            raise SystemExit(0)
+
         # check if render path is filled out correctly
-        if self.renderpath == "C:/Path/To/My/Renders":
-            print("___________________________________________________")
-            print("ERROR: Please fill the path to you render folder under globals!")
-            print("___________________________________________________")
-            sleep(10)
+        if self.renderpath == "C:/Path/To/My/Renders/":
+            self.print_error(
+                "Please fill the path to you render folder under globals!")
+            raise SystemExit(0)
+        elif not os.path.exists(self.renderpath):
+            self.print_error("Render Output folder not existing. Perhaps spelling mistake?")
             raise SystemExit(0)
         
+        if not os.path.exists(self.blendfolder):
+            self.print_warning(".blend file folder not existing. Perhaps spelling mistake?")
+            # raise SystemExit(0)
+
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
 
@@ -42,15 +75,68 @@ class jobs(object):
         self.preview_framestep_active = self.tobool(global_set[5][2])
 
         self.shot_iteration_number = 1
-        
+
         self.thread_cpu = None
         self.thread_gpu = None
         self.thread_gpu_an_dn = None
-        
+
+    def rr_read_excel(self, path_sheet):
+        wb = xlrd.open_workbook(path_sheet)
+        jobs_sheet = wb.sheet_by_index(0)
+        global_sheet = wb.sheet_by_index(1)
+
+        return self.fill_array(jobs_sheet), self.fill_array(global_sheet)
+
+    # print methods
+    @staticmethod
+    def print_error(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        input(Style.RESET_ALL + Back.RED + Fore.BLACK +
+              time_current + "[ERROR] " + ipt_str + " Press any key to exit." + Style.RESET_ALL)
+
+    @staticmethod
+    def print_warning(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        input(Style.RESET_ALL + Back.YELLOW + Fore.BLACK +
+              Fore.BLACK + time_current + "[WARNING] " + ipt_str + " Press any key to continue." + Style.RESET_ALL)
+
+    @staticmethod
+    def print_info_input(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        input(Style.RESET_ALL + Back.CYAN + Fore.BLACK +
+              Fore.BLACK + time_current + "[INFO] " + ipt_str + " Press any key to continue." + Style.RESET_ALL)
+
+    @staticmethod
+    def print_info(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print(time_current, ipt_str)
+
+    @staticmethod
+    def fill_array(query_object):
+        mydata = []
+        for row in range(query_object.nrows):
+            # stop if line is empty
+            if query_object.cell_value(row, 1) == "":
+                break
+
+            # create sub list
+            sub = []
+            for column in range(query_object.ncols):
+                value = query_object.cell_value(row, column)
+                if type(value) is float:
+                    value = int(value)
+                sub.append(value)
+            mydata.append(sub)
+        return mydata
 
     @staticmethod
     def path_process(path_string):
-        path_string = path_string.replace("\\", "/").replace('"', '').replace("'", "")
+        path_string = path_string.replace(
+            "\\", "/").replace('"', '').replace("'", "")
         if len(path_string) < 1:
             return ''
         if path_string[-1] != "/":
@@ -59,13 +145,23 @@ class jobs(object):
             return path_string
 
     @staticmethod
-    def tobool(string):
-        if string.upper() == "FALSE":
-            return False
-        elif string.upper() == "TRUE":
-            return True
+    def tobool(bool_val):
+        if type(bool_val) == str:
+            if bool_val.upper() == "FALSE":
+                return False
+            elif bool_val.upper() == "TRUE":
+                return True
+            else:
+                print("Bool Error")
+                # raise TypeError
+        elif type(bool_val) == int:
+            if bool_val == 0:
+                return False
+            elif bool_val == 1:
+                return True
         else:
-            raise TypeError
+            print("Bool Error")
+            # raise TypeError
 
     def get_shotname(self):
         # preview or hq suffix
@@ -75,14 +171,13 @@ class jobs(object):
             self.quality_state_string = "preview"
 
         # get blender file name without .blend
-        
+
         filename = self.blendpath.split("/")[-1][:-6]
-
-
-        self.shotname = (filename + "-" + 
+        self.shotname = (filename + "-" +
                          self.active_camera + "-" +
                          str(self.startframe) + "-" +
                          str(self.endframe) + "-" +
+                         str(self.scene) + "-" +
                          self.quality_state_string + "-v")
 
         # get iteration number
@@ -97,15 +192,20 @@ class jobs(object):
             if self.overwrite and self.shot_iteration_number > 1:
                 self.shot_iteration_number = self.shot_iteration_number - 1
             else:
-                os.mkdir(self.frame_path + str(self.shot_iteration_number).zfill(2))
-                
+                print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                      "Created directory " + self.frame_path +
+                      str(self.shot_iteration_number).zfill(2))
+                os.mkdir(self.frame_path +
+                         str(self.shot_iteration_number).zfill(2))
+
         # if animation denoise active, create folder
         if self.animation_denoise and self.active:
             denoise_folder = self.frame_path + \
                 str(self.shot_iteration_number).zfill(2) + "_dn"
             if not os.path.exists(denoise_folder):
                 os.mkdir(denoise_folder)
-                
+                print("[{}]".format(datetime.now().strftime(
+                    '%Y-%m-%d %H:%M:%S')), "Created directory " + denoise_folder)
 
         self.full_frame_path = (self.frame_path +
                                 str(self.shot_iteration_number).zfill(2) + "/"
@@ -114,7 +214,7 @@ class jobs(object):
     def read_job(self, job_nr):
         # check if job is active, otherwise jump to next job
         self.active = self.jobs_table[job_nr][1]
-        if self.active is None or self.active == '':
+        if self.active is None or self.active == '' or self.active == 0:
             self.active = False
             self.cpu_act = False
             self.gpu_act = False
@@ -122,7 +222,7 @@ class jobs(object):
             return
         else:
             self.active = self.tobool(self.active)
-            
+
         self.hq = self.tobool(self.jobs_table[job_nr][16])
         # check if highquality enabled, otherwise use lowquality settings
         if self.hq:
@@ -136,7 +236,7 @@ class jobs(object):
                 self.samples = self.preview_samples
             else:
                 self.samples = self.jobs_table[job_nr][8]
-                
+
             if self.preview_framestep_active:
                 self.framestep = self.preview_framestep
             else:
@@ -145,7 +245,6 @@ class jobs(object):
                 self.resolution_scale = self.preview_res
             else:
                 self.resolution_scale = 100
-
 
         self.cycles = self.tobool(self.jobs_table[job_nr][10])
 
@@ -175,14 +274,16 @@ class jobs(object):
             self.blendpath = self.blendfilepath
         else:
             self.blendpath = self.blendfolder + self.blendfilepath
-        self.currentpath = os.path.dirname(sys.argv[0]).replace("\\", "/") + "/"
         # print(self.currentpath)
-        self.get_shotname()
-        self.activate_collections = self.jobs_table[job_nr][20].replace(", ", ",").split(",")
-        self.deactivate_collections = self.jobs_table[job_nr][21].replace(", ", ",").split(",")
-        
         self.scene = self.jobs_table[job_nr][22]
-        self.view_layer = self.jobs_table[job_nr][23]
+        self.activate_collections = self.jobs_table[job_nr][20].replace(
+            ", ", ",").split(",")
+        self.deactivate_collections = self.jobs_table[job_nr][21].replace(
+            ", ", ",").split(",")
+
+        self.view_layer = self.jobs_table[job_nr][23].replace(
+            ", ", ",").split(",")
+        self.get_shotname()
 
     def render_job(self, device):
         inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', '{}')".format(
@@ -205,19 +306,27 @@ class jobs(object):
             self.deactivate_collections,
             self.scene,
             self.view_layer)
-        
+
         # print(inlinepython)
+
+        if self.scene != "":
+            scene_sub_command_string = " -S " + self.scene
+        else:
+            scene_sub_command_string = ""
 
         command_string = (self.blenderpath +
                           ' -b ' + self.blendpath +
+                          scene_sub_command_string +
                           ' -o ' + self.full_frame_path +
                           " --python-expr " + '"' + inlinepython + '"' +
-                          " -s " + self.startframe + " -e " + self.endframe +
+                          " -s " + str(self.startframe) + " -e " + str(self.endframe) +
                           " -F " + self.file_format_upper +
                           " -a ")
-        print(command_string)
+        # print(command_string)
         # return "None"
-        print("Rendering {} on {}".format(self.shotname + str(self.shot_iteration_number), device.upper()))
+        print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+              "Rendering {} on {}".format(self.shotname +
+                                          str(self.shot_iteration_number), device.upper()))
         return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
         # subprocess.run(command_string)
 
@@ -231,7 +340,8 @@ class jobs(object):
         command_string_denoise = (self.blenderpath + ' -b ' +
                                   ' --python-expr ' + '"' + inlinepython_denoise + '"')
         # print(command_string_denoise)
-        print("Denoising", self.shotname + str(self.shot_iteration_number))
+        print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+              "Denoising", self.shotname + str(self.shot_iteration_number))
         # return "None"
         return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)
 
@@ -246,7 +356,7 @@ class jobs(object):
                 self.thread_gpu_an_dn._wait(1048574)
 
             # sleep, to avoid simultanous start, so both render first frame
-            sleep(0.01)
+            sleep(0.1)
             if self.active and self.gpu_act:
                 self.thread_gpu = self.render_job("gpu")
 
@@ -263,8 +373,13 @@ class jobs(object):
             self.thread_gpu_an_dn._wait(1048574)
 
 
-
+# initialize colorama
+init(convert=True)
+print_ascii_art()
 jobs_obj = jobs()
+jobs_obj.print_info("Hello from Render Rob! I'm glad to help you!")
 jobs_obj.start_generate()
 # print("Window closing in 10 minutes.")
-
+byebyestr = "[{}] ".format(datetime.now().strftime(
+    '%Y-%m-%d %H:%M:%S')) + "I'm done here. If you give me any key, I'll be gone!"
+input(byebyestr)

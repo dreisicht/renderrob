@@ -34,3 +34,7 @@ def write_data_in_sheet(renderfolder, status, job_nr):
     '''
     login()
     pass
+
+
+if __name__ == "__main__":
+    print(query_sheet())
