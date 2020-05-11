@@ -74,6 +74,7 @@ Property list of the spreadsheet
 - CPU renders on n-1 cores to not bottleneck GPU render
 - You can only render one scene in one job. If you want to render a second scene just create another job
 - Viewlayers TODO TODO TODO
+- Separate View Layers and addons with a comma
 
 ## Warnings in the sheet
 

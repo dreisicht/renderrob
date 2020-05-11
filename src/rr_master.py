@@ -6,7 +6,9 @@ import threading
 import subprocess
 from time import sleep
 from datetime import datetime
-from colorama import Fore, Back, Style, init
+# from colorama import Fore, Back, Style, init
+from sty import fg, bg, ef, rs, Style, RgbBg
+import sty
 from rr_gspread import query_sheet
 from subprocess import Popen, CREATE_NEW_CONSOLE
 import rr_image
@@ -14,6 +16,7 @@ import rr_image
 
 class jobs(object):
     def __init__(self):
+        self.print_info("Hello from Render Rob! I'm glad to help you!")
         self.currentpath = os.path.dirname(
             sys.argv[0]).replace("\\", "/") + "/"
         # print(glob.glob(self.currentpath + "*.xlsx"))
@@ -24,11 +27,12 @@ class jobs(object):
             self.print_info("I found an Excel file. I'm gonna use that one!")
             # print(self.jobs_table, global_set)
         else:
-            if not glob.glob(self.currentpath + "/key/*.xlsx"):
+            if not glob.glob(self.currentpath + "/key/*.json"):
                 self.print_error("I didn't find either an .xlsx file or a .json key. Please provide one of the two!")
             try:
+                self.print_info("I'm gonna go and get the data from Google Sheets.")
                 self.jobs_table, global_set = query_sheet()
-                self.print_info("I downloaded the data from Google Sheets.")
+                self.print_info("I successfully downloaded the data from Google Sheets.")
             except:
                 self.print_error("Couldn't get the data from Google Sheets. Maybe check your json key!")
             # print(self.jobs_table, global_set)
@@ -36,23 +40,35 @@ class jobs(object):
         self.blenderpath = global_set[0][1].replace("\\", "/")
         self.renderpath = self.path_process(global_set[1][1])
         self.blendfolder = self.path_process(global_set[2][1])
+        self.add_on_list = global_set[6][1].replace(", ", ",").split(",")
+        # remove empty elements
+        self.add_on_list = [x for x in self.add_on_list if x]
 
         # defining colors here
-        self.red = "980030"
-        self.green = "499a6c"
-        self.yellow = "ffd966"
-        self.grey = "999999"
-        self.light_blue = "78909c"
-        self.dark_blue = "45818e"
-        self.lighter_stone = "242a2d"
-        self.dark_stone = "22282b"
+        self.red = self.hex_to_rgb("980030")
+        self.green = self.hex_to_rgb("499a6c")
+        self.yellow = self.hex_to_rgb("ffd966")
+        self.grey = self.hex_to_rgb("999999")
+        self.light_blue = self.hex_to_rgb("78909c")
+        self.dark_blue = self.hex_to_rgb("45818e")
+        self.lighter_stone = self.hex_to_rgb("242a2d")
+        self.dark_stone = self.hex_to_rgb("22282b")
+
+        bg.red = Style(RgbBg(self.red[0], self.red[1], self.red[2]))
+        bg.green = Style(RgbBg(self.green[0], self.green[1], self.green[2]))
+        bg.yellow = Style(RgbBg(self.yellow[0], self.yellow[1], self.yellow[2]))
+        bg.grey = Style(RgbBg(self.grey[0], self.grey[1], self.grey[2]))
+        bg.light_blue = Style(RgbBg(self.light_blue[0], self.light_blue[1], self.light_blue[2]))
+        bg.dark_blue = Style(RgbBg(self.dark_blue[0], self.dark_blue[1], self.dark_blue[2]))
+        bg.lighter_stone = Style(RgbBg(self.lighter_stone[0], self.lighter_stone[1], self.lighter_stone[2]))
+        bg.dark_stone = Style(RgbBg(self.dark_stone[0], self.dark_stone[1], self.dark_stone[2]))
 
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
             self.print_error("Please fill the path to blender under globals!")
             quit()
         elif not os.path.isfile(self.blenderpath[1:-1]):
-            self.print_error("Blender folder not existing. Perhaps spelling mistake?")
+            self.print_error("I couldn't find the Blender folder. Perhaps a spelling mistake?")
             quit()
 
         # check if render path is filled out correctly
@@ -61,11 +77,11 @@ class jobs(object):
                 "Please fill the path to you render folder under globals!")
             quit()
         elif not os.path.exists(self.renderpath):
-            self.print_error("Render Output folder not existing. Perhaps spelling mistake?")
+            self.print_error("I couldn't find the render output folder. Perhaps a spelling mistake?")
             quit()
         
         if not os.path.exists(self.blendfolder):
-            self.print_warning(".blend file folder not existing. Perhaps spelling mistake?")
+            self.print_warning("I couldn't find the .blend file folder. Perhaps a spelling mistake?")
             # quit()
 
         self.preview_res = global_set[3][1]
@@ -95,23 +111,24 @@ class jobs(object):
     def print_error(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(Style.RESET_ALL + Back.RED + Fore.BLACK +
-              time_current + "[ERROR] " + ipt_str + " Press any key to exit." + Style.RESET_ALL)
+        input(bg.red + fg.white + time_current + "[ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
         quit()
+        
+    @staticmethod
+    def hex_to_rgb(h):
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
     @staticmethod
     def print_warning(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(Style.RESET_ALL + Back.YELLOW + Fore.BLACK +
-              Fore.BLACK + time_current + "[WARNING] " + ipt_str + " Press any key to continue." + Style.RESET_ALL)
+        input(bg.yellow + fg.black + time_current + "[WARNING] " + ipt_str + " Press Enter to continue." + rs.all)
 
     @staticmethod
     def print_info_input(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(Style.RESET_ALL + Back.CYAN + Fore.BLACK +
-              Fore.BLACK + time_current + "[INFO] " + ipt_str + " Press any key to continue." + Style.RESET_ALL)
+        input(bg.dark_blue + fg.white + time_current + "[INFO] " + ipt_str + " Press Enter to continue." + rs.all)
 
     @staticmethod
     def print_info(ipt_str):
@@ -183,37 +200,57 @@ class jobs(object):
                          str(self.endframe) + "-" +
                          str(self.scene) + "-" +
                          self.quality_state_string + "-v")
-
+        
         # get iteration number
-        self.frame_path = self.renderpath + self.shotname
-        self.shot_iteration_number = 1
-        while os.path.exists(self.frame_path + str(self.shot_iteration_number).zfill(2)):
-            self.shot_iteration_number = self.shot_iteration_number + 1
+        if self.endframe == "":
+            self.frame_path = self.renderpath + "stills/"
+            self.shot_iteration_number = 1
+            while os.path.exists(self.frame_path + self.shotname + str(self.shot_iteration_number).zfill(2) + "-" + str(self.startframe).zfill(4) + "." + self.file_format):  # TODO
+                self.print_info(self.shot_iteration_number)
+                self.shot_iteration_number = self.shot_iteration_number + 1
+                
+        else:
+            self.frame_path = self.renderpath + self.shotname
+            self.shot_iteration_number = 1
+            while os.path.exists(self.frame_path + str(self.shot_iteration_number).zfill(2)):
+                self.shot_iteration_number = self.shot_iteration_number + 1
+
         # print(self.frame_path + str(self.shot_iteration_number).zfill(2))
 
+        # if still frame rendering, create stills folder
+        if self.endframe == "":
+            if not os.path.exists(self.frame_path):
+                os.mkdir(self.frame_path)
+                self.print_info("I created directory " + self.frame_path)
+
+            self.full_frame_path = (self.frame_path + self.shotname + str(self.shot_iteration_number).zfill(2) + "-" + "####." + self.file_format) # TODO
+            self.print_info(self.full_frame_path)
+
         # if overwrite active, get to the folder with the highest iteration number
-        if self.active:
-            if self.overwrite and self.shot_iteration_number > 1:
-                self.shot_iteration_number = self.shot_iteration_number - 1
-            else:
-                print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-                      "Created directory " + self.frame_path +
-                      str(self.shot_iteration_number).zfill(2))
-                os.mkdir(self.frame_path +
-                         str(self.shot_iteration_number).zfill(2))
+        else:
+            if self.active:
+                if self.overwrite and self.shot_iteration_number > 1:
+                    self.shot_iteration_number = self.shot_iteration_number - 1
+                else:
+                    print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                          "I created directory " + self.frame_path +
+                          str(self.shot_iteration_number).zfill(2))
+                    os.mkdir(self.frame_path +
+                             str(self.shot_iteration_number).zfill(2))
 
-        # if animation denoise active, create folder
-        if self.animation_denoise and self.active:
-            denoise_folder = self.frame_path + \
-                str(self.shot_iteration_number).zfill(2) + "_dn"
-            if not os.path.exists(denoise_folder):
-                os.mkdir(denoise_folder)
-                print("[{}]".format(datetime.now().strftime(
-                    '%Y-%m-%d %H:%M:%S')), "Created directory " + denoise_folder)
+            # if animation denoise active, create folder
+            if self.animation_denoise and self.active:
+                denoise_folder = self.frame_path + \
+                    str(self.shot_iteration_number).zfill(2) + "_dn"
+                if not os.path.exists(denoise_folder):
+                    os.mkdir(denoise_folder)
+                    print("[{}]".format(datetime.now().strftime(
+                        '%Y-%m-%d %H:%M:%S')), "I created directory " + denoise_folder)
 
-        self.full_frame_path = (self.frame_path +
-                                str(self.shot_iteration_number).zfill(2) + "/"
-                                + self.shotname + "-" + "####." + self.file_format)
+            # get path of the frames
+            self.full_frame_path = (self.frame_path +
+                                    str(self.shot_iteration_number).zfill(2) + "/"
+                                    + self.shotname + "-" + "####." + self.file_format)
 
     def read_job(self, job_nr):
         # check if job is active, otherwise jump to next job
@@ -279,18 +316,23 @@ class jobs(object):
         else:
             self.blendpath = self.blendfolder + self.blendfilepath
         # print(self.currentpath)
-        self.scene = self.jobs_table[job_nr][22]
+        self.scene = self.jobs_table[job_nr][19]
         self.activate_collections = self.jobs_table[job_nr][20].replace(
             ", ", ",").split(",")
+        # remove empty elements
+        self.activate_collections = [x for x in self.activate_collections if x]
+
         self.deactivate_collections = self.jobs_table[job_nr][21].replace(
             ", ", ",").split(",")
-
-        self.view_layer = self.jobs_table[job_nr][23].replace(
+        self.deactivate_collections = [x for x in self.deactivate_collections if x]
+        self.view_layer = self.jobs_table[job_nr][20].replace(
             ", ", ",").split(",")
+        self.view_layer = [
+            x for x in self.view_layer if x]
         self.get_shotname()
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', '{}')".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', {}, {})".format(
             self.currentpath,
             self.active_camera,
             device,
@@ -306,10 +348,9 @@ class jobs(object):
             self.framestep,
             self.cycles,
             self.border,
-            self.activate_collections,
-            self.deactivate_collections,
             self.scene,
-            self.view_layer)
+            self.view_layer,
+            self.add_on_list)
 
         # print(inlinepython)
 
@@ -317,15 +358,21 @@ class jobs(object):
             scene_sub_command_string = " -S " + self.scene
         else:
             scene_sub_command_string = ""
+        
+        # if end frame empty, render single frame
+        if self.endframe == "":
+            render_frame_command = " -f " + str(self.startframe) 
+        else:
+            render_frame_command = " -s " + \
+                str(self.startframe) + " -e " + str(self.endframe) + " -a "
 
         command_string = (self.blenderpath +
                           ' -b ' + self.blendpath +
                           scene_sub_command_string +
                           ' -o ' + self.full_frame_path +
                           " --python-expr " + '"' + inlinepython + '"' +
-                          " -s " + str(self.startframe) + " -e " + str(self.endframe) +
                           " -F " + self.file_format_upper +
-                          " -a ")
+                          render_frame_command)
         # print(command_string)
         # return "None"
         print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
@@ -378,11 +425,12 @@ class jobs(object):
 
 
 # initialize colorama
-init(convert=True)
+# init(convert=True)
 jobs_obj = jobs()
-jobs_obj.print_info("Hello from Render Rob! I'm glad to help you!")
 jobs_obj.start_generate()
 # print("Window closing in 10 minutes.")
 byebyestr = "[{}] ".format(datetime.now().strftime(
-    '%Y-%m-%d %H:%M:%S')) + "I'm done here. If you give me any key, I'll be gone!"
+    '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
+print(fg.white, bg.dark_blue)
 input(byebyestr)
+print(rs.all)

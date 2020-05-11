@@ -12,3 +12,5 @@
 /design
 *.afdesign
 *.xlsx
+*.whl
+*.exr

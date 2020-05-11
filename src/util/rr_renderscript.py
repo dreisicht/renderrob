@@ -1,14 +1,46 @@
+
 import bpy  # pylint: disable=import-error
+import pip
 import time
 import sys
 from ast import literal_eval
+
+from multiprocessing import cpu_count
+
+import rr_c_image
+
+
+from sty import fg, bg, ef, rs, Style, RgbBg
 from colorama import Fore, Back, Style, init
+
 
 sys.path.append(str(__file__)[0:-18].replace("\\", "/"))
 # import rr_user_commands
 init(convert=True)
 # bpsc = bpy.context.scene
 # bprn = bpsc.render
+
+def hex_to_rgb(h):
+    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+
+# red = hex_to_rgb("980030")
+# green = hex_to_rgb("499a6c")
+# yellow = hex_to_rgb("ffd966")
+# grey = hex_to_rgb("999999")
+# light_blue = hex_to_rgb("78909c")
+# dark_blue = hex_to_rgb("45818e")
+# lighter_stone = hex_to_rgb("242a2d")
+# dark_stone = hex_to_rgb("22282b")
+
+# bg.red = Style(RgbBg(red[0], red[1], red[2]))
+# bg.green = Style(RgbBg(green[0], green[1], green[2]))
+# bg.yellow = Style(RgbBg(yellow[0], yellow[1], yellow[2]))
+# bg.grey = Style(RgbBg(grey[0], grey[1], grey[2]))
+# bg.light_blue = Style(RgbBg(light_blue[0], light_blue[1], light_blue[2]))
+# bg.dark_blue = Style(RgbBg(dark_blue[0], dark_blue[1], dark_blue[2]))
+# bg.lighter_stone = Style(RgbBg(lighter_stone[0], lighter_stone[1], lighter_stone[2]))
+# bg.dark_stone = Style(RgbBg(dark_stone[0], dark_stone[1], dark_stone[2]))
 
 
 def tobool(bool_val):
@@ -96,10 +128,9 @@ def set_settings(camera,
                  frame_step,
                  cycles,
                  border,
-                 activate_collections,
-                 deactivate_collections,
                  scene,
-                 view_layer_names):
+                 view_layer_names,
+                 add_on_list):
     print_info("Render Rob here. I'm starting to make my changes in your Blender file!")
 
     if scene == "" and len(bpy.data.scenes) > 1:
@@ -109,16 +140,20 @@ def set_settings(camera,
     current_scene_data = bpy.context.scene
 
     # if no view layer given
-    view_layer_names = literal_eval(view_layer_names)
-    if len(view_layer_names) == 0:
+    # view_layer_names = literal_eval(view_layer_names)
+    # print("len(view_layer_names): {} ; view_layer_names[0] {}".format(
+        # len(view_layer_names), view_layer_names[0]))
+    if view_layer_names == []:
+        print("A1")
         # if only one view_layer in scene
         if len(current_scene_data.view_layers) == 1:
             view_layer_data = current_scene_data.view_layers[0]
         else: 
-            print("I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
+            print_info("I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
             view_layer_data = current_scene_data.view_layers
     # if only one view_layer given
-    elif len(view_layer_names) == 1 and view_layer_names[0] != "":
+    elif len(view_layer_names) == 1 and view_layer_names != []:
+        print("A2")
         # if only one view_layer in scene
         if len(current_scene_data.view_layers) == 1:
             view_layer_data = current_scene_data.view_layers[0]
@@ -127,15 +162,29 @@ def set_settings(camera,
             try:
                 view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
             except KeyError:
-                print_error("View Layer not found. Please check the name in the sheet!")
+                print_error("View Layer not found. Please check the name in the sheet!") # TODO: test
     # if more than one view_layer given:
-    else:
+    elif len(view_layer_names) > 1:
+        print("A3")
         if len(current_scene_data.view_layers) < len(view_layer_names):
             print_error("You gave me more View Layers given than existing")
         else:
             view_layer_data = []
+            
             for vl in view_layer_names:
                 view_layer_data.append(current_scene_data.view_layers[vl])
+            print("B3")
+    else:
+        print_error("Unexpected ViewLayer Error.")
+                
+    # activate add-ons:
+    for add_on in add_on_list:
+        print_info(str(add_on))
+        try:
+            bpy.ops.preferences.addon_enable(module=add_on)
+            print_info("I activated the addon {}.".format(add_on))
+        except:
+            print_error("I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
 
     current_scene_render = current_scene_data.render
 
@@ -144,16 +193,17 @@ def set_settings(camera,
             current_scene_data.camera = bpy.data.objects[camera]
     except KeyError:
         print_warning("I didn't find the camera called {}.".format(camera))
-        time.sleep(10)
 
     try:
-        if type(view_layer_data) is bpy.types.bpy_prop_collection:
-            for view_layer in view_layer_data:
-                inexclude_collection(deactivate_collections, True, view_layer)
-                inexclude_collection(activate_collections, False, view_layer)
-        elif type(view_layer_data) is bpy.types.ViewLayer:
-            inexclude_collection(deactivate_collections, True, view_layer_data)
-            inexclude_collection(activate_collections, False, view_layer_data)
+        # if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
+        #     for view_layer in view_layer_data:
+        #         inexclude_collection(deactivate_collections, True, view_layer)
+        #         inexclude_collection(activate_collections, False, view_layer)
+        # elif type(view_layer_data) is bpy.types.ViewLayer or type(view_layer_data) is list:
+        #     inexclude_collection(deactivate_collections, True, view_layer_data)
+        #     inexclude_collection(activate_collections, False, view_layer_data)
+        # else:
+        #     print_error("Inexclude handling went wrong.")
 
         # disable render border
         current_scene_render.use_border = border
@@ -169,10 +219,10 @@ def set_settings(camera,
             # cpu
             if device == "cpu":
                 current_scene_render.threads_mode = 'FIXED'
-                current_scene_render.threads = 22
+                current_scene_render.threads = cpu_count() - 2
                 current_scene_data.cycles.device = 'CPU'
-                current_scene_render.tile_x = 32
-                current_scene_render.tile_y = 32
+                current_scene_render.tile_x = 64
+                current_scene_render.tile_y = 64
 
             # gpu
             if device == "gpu":
@@ -200,13 +250,18 @@ def set_settings(camera,
             current_scene_render.use_motion_blur = mb
 
             # denoising data
-            if type(view_layer_data) is bpy.types.bpy_prop_collection:
+            print(type(view_layer_data), view_layer_data)
+            if type(view_layer_data) is bpy.types.bpy_prop_collection or list:
                 for view_layer in view_layer_data:
+                    print(view_layer.name, denoise,
+                          view_layer.cycles.use_denoising)
                     view_layer.cycles.denoising_store_passes = an_denoise
                     view_layer.cycles.use_denoising = denoise
             elif type(view_layer_data) is bpy.types.ViewLayer:
                 view_layer.cycles.denoising_store_passes = an_denoise
                 view_layer.cycles.use_denoising = denoise
+            else:
+                print_error("Denoising Handling went wrong.")
 
             # disable compositing if animation_denoising
             current_scene_render.use_compositing = not an_denoise
@@ -226,7 +281,22 @@ def set_settings(camera,
 
         # n-th frame
         current_scene_data.frame_step = frame_step
+        print(bpy.context.view_layer.cycles.use_denoising)
 
         print_info("Done making the changes in your Blender file.")
+        time.sleep(2)
     except KeyError:
         print_error("Sorry, unknown error.")
+        
+
+
+
+
+
+
+
+
+
+# set_settings('Camera_top', 'cpu', True, 1920, 1080, 25, True, False, False, True, 4, 1, True, True, ['objects 1', 'objects 2'], ['objects'], 'Scene', ['View Layer'], ['animation_nodes', 'asdf'])
+
+# set_settings('Camera_top', 'gpu', True, 1920, 1080, 25, True, False, False, True, 4, 1, True, True, [''], [''], '', [''], ['animation_nodes', 'asdf'])
