@@ -192,23 +192,25 @@ class jobs(object):
             self.quality_state_string = "preview"
 
         # get blender file name without .blend
+        
+        self.view_layer_dir = ",".join(self.view_layer).replace("View Layer", "Vl")
 
         filename = self.blendpath.split("/")[-1][:-6]
         self.shotname = (filename + "-" +
-                         self.active_camera + "-" +
+                         self.active_camera.replace("Camera", "Cam") + "-" +
                          str(self.startframe) + "-" +
                          str(self.endframe) + "-" +
-                         str(self.scene) + "-" +
+                         str(self.scene.replace("Scene", "Sc")) + "-" +
+                         str(self.view_layer_dir) + "-" +
                          self.quality_state_string + "-v")
-        
+
         # get iteration number
         if self.endframe == "":
             self.frame_path = self.renderpath + "stills/"
             self.shot_iteration_number = 1
             while os.path.exists(self.frame_path + self.shotname + str(self.shot_iteration_number).zfill(2) + "-" + str(self.startframe).zfill(4) + "." + self.file_format):  # TODO
-                self.print_info(self.shot_iteration_number)
                 self.shot_iteration_number = self.shot_iteration_number + 1
-                
+
         else:
             self.frame_path = self.renderpath + self.shotname
             self.shot_iteration_number = 1
@@ -218,7 +220,9 @@ class jobs(object):
         # print(self.frame_path + str(self.shot_iteration_number).zfill(2))
 
         # if still frame rendering, create stills folder
-        if self.endframe == "":
+        if self.endframe == "" and self.active:
+            if self.overwrite and self.shot_iteration_number > 1:
+                self.shot_iteration_number = self.shot_iteration_number - 1
             if not os.path.exists(self.frame_path):
                 os.mkdir(self.frame_path)
                 self.print_info("I created directory " + self.frame_path)

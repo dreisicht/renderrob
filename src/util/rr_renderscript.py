@@ -63,6 +63,7 @@ def tobool(bool_val):
 
 
 def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
+    #### FUNCTION CURRENTLY NOT BEING USED
     # check if first function being called first time
 
     if parent == "":
@@ -94,14 +95,15 @@ def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
             " and ".join(collection_names)))
 
 def print_error(ipt_str):
-    print(Back.RED, Fore.BLACK)
+    print(Back.RED, Fore.WHITE)
     input("[ERROR] " + ipt_str + " Press any key to exit.")
     print(Style.RESET_ALL)
     quit()
 
 def print_warning(ipt_str):
     print(Back.YELLOW, Fore.BLACK)
-    input("[WARNING] " + ipt_str + " Press any key to continue.")
+    print("[WARNING] " + ipt_str + " Continuing in 3 seconds.")
+    time.sleep(3)
     print(Style.RESET_ALL)
 
 def print_info_input(ipt_str):
@@ -111,7 +113,7 @@ def print_info_input(ipt_str):
     
     
 def print_info(ipt_str):
-    print(Back.CYAN + "[INFO] " + ipt_str + Style.RESET_ALL)
+    print(Back.CYAN, Fore.BLACK + "[INFO] " + ipt_str + Style.RESET_ALL)
 
 
 def set_settings(camera,
@@ -131,70 +133,77 @@ def set_settings(camera,
                  scene,
                  view_layer_names,
                  add_on_list):
-    print_info("Render Rob here. I'm starting to make my changes in your Blender file!")
-
-    if scene == "" and len(bpy.data.scenes) > 1:
-        print_warning(
-            "There are more than one scenes, but you didn't tell me which scene to render! So I render the last used scene.")
-        # time.sleep(10)
-    current_scene_data = bpy.context.scene
-
-    # if no view layer given
-    # view_layer_names = literal_eval(view_layer_names)
-    # print("len(view_layer_names): {} ; view_layer_names[0] {}".format(
-        # len(view_layer_names), view_layer_names[0]))
-    if view_layer_names == []:
-        print("A1")
-        # if only one view_layer in scene
-        if len(current_scene_data.view_layers) == 1:
-            view_layer_data = current_scene_data.view_layers[0]
-        else: 
-            print_info("I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
-            view_layer_data = current_scene_data.view_layers
-    # if only one view_layer given
-    elif len(view_layer_names) == 1 and view_layer_names != []:
-        print("A2")
-        # if only one view_layer in scene
-        if len(current_scene_data.view_layers) == 1:
-            view_layer_data = current_scene_data.view_layers[0]
-        # if more than one view layer in scene
-        else:
-            try:
-                view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
-            except KeyError:
-                print_error("View Layer not found. Please check the name in the sheet!") # TODO: test
-    # if more than one view_layer given:
-    elif len(view_layer_names) > 1:
-        print("A3")
-        if len(current_scene_data.view_layers) < len(view_layer_names):
-            print_error("You gave me more View Layers given than existing")
-        else:
-            view_layer_data = []
+    
+    try:
+        print_info("Render Rob here. I'm starting to make my changes in your Blender file!")
+    
+        if scene == "" and len(bpy.data.scenes) > 1:
+            print_warning(
+                "There are more than one scenes, but you didn't tell me which scene to render! So I render the last used scene.")
+            # time.sleep(10)
+        current_scene_data = bpy.context.scene
+    
+        # if no view layer given
+        # view_layer_names = literal_eval(view_layer_names)
+        # print("len(view_layer_names): {} ; view_layer_names[0] {}".format(
+            # len(view_layer_names), view_layer_names[0]))
             
-            for vl in view_layer_names:
-                view_layer_data.append(current_scene_data.view_layers[vl])
-            print("B3")
-    else:
-        print_error("Unexpected ViewLayer Error.")
+        # first we deactivate all View Layers:
+        for view_layer in current_scene_data.view_layers:
+            view_layer.use = False
+        
+        if view_layer_names == []:
+            # print("A1")
+            # if only one view_layer in scene
+            if len(current_scene_data.view_layers) == 1:
+                view_layer_data = current_scene_data.view_layers[0]
+            else: 
+                print_info("I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
+                view_layer_data = current_scene_data.view_layers
+        # if only one view_layer given
+        elif len(view_layer_names) == 1 and view_layer_names != []:
+            # print("A2")
+            # if only one view_layer in scene
+            if len(current_scene_data.view_layers) == 1:
+                view_layer_data = current_scene_data.view_layers[0]
+            # if more than one view layer in scene
+            else:
+                try:
+                    view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
+                except KeyError:
+                    print_error("View Layer not found. Please check the name in the sheet!") # TODO: test
+        # if more than one view_layer given:
+        elif len(view_layer_names) > 1:
+            # print("A3")
+            if len(current_scene_data.view_layers) < len(view_layer_names):
+                print_error("You gave me more View Layers given than existing!")
+            else:
+                view_layer_data = []
                 
-    # activate add-ons:
-    for add_on in add_on_list:
-        print_info(str(add_on))
+                for vl in view_layer_names:
+                    view_layer_data.append(current_scene_data.view_layers[vl])
+                # print("B3")
+        else:
+            print_error("Unexpected ViewLayer Error.")
+                    
+        # activate add-ons:
+        for add_on in add_on_list:
+            print_info(str(add_on))
+            try:
+                bpy.ops.preferences.addon_enable(module=add_on)
+                print_info("I activated the addon {}.".format(add_on))
+            except:
+                print_error("I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
+    
+        current_scene_render = current_scene_data.render
+    
         try:
-            bpy.ops.preferences.addon_enable(module=add_on)
-            print_info("I activated the addon {}.".format(add_on))
-        except:
-            print_error("I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
+            if camera != '':
+                current_scene_data.camera = bpy.data.objects[camera]
+        except KeyError:
+            print_error("I didn't find the camera called {}.".format(camera))
 
-    current_scene_render = current_scene_data.render
 
-    try:
-        if camera != '':
-            current_scene_data.camera = bpy.data.objects[camera]
-    except KeyError:
-        print_warning("I didn't find the camera called {}.".format(camera))
-
-    try:
         # if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
         #     for view_layer in view_layer_data:
         #         inexclude_collection(deactivate_collections, True, view_layer)
@@ -250,16 +259,18 @@ def set_settings(camera,
             current_scene_render.use_motion_blur = mb
 
             # denoising data
-            print(type(view_layer_data), view_layer_data)
-            if type(view_layer_data) is bpy.types.bpy_prop_collection or list:
+            # print(type(view_layer_data), view_layer_data)
+            if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
                 for view_layer in view_layer_data:
-                    print(view_layer.name, denoise,
-                          view_layer.cycles.use_denoising)
+                    view_layer.use = True
+                    # print(view_layer.name, denoise,
+                    #       view_layer.cycles.use_denoising)
                     view_layer.cycles.denoising_store_passes = an_denoise
                     view_layer.cycles.use_denoising = denoise
             elif type(view_layer_data) is bpy.types.ViewLayer:
-                view_layer.cycles.denoising_store_passes = an_denoise
-                view_layer.cycles.use_denoising = denoise
+                view_layer_data.use = True
+                view_layer_data.cycles.denoising_store_passes = an_denoise
+                view_layer_data.cycles.use_denoising = denoise
             else:
                 print_error("Denoising Handling went wrong.")
 
@@ -281,11 +292,11 @@ def set_settings(camera,
 
         # n-th frame
         current_scene_data.frame_step = frame_step
-        print(bpy.context.view_layer.cycles.use_denoising)
+        # print(bpy.context.view_layer.cycles.use_denoising)
 
         print_info("Done making the changes in your Blender file.")
         time.sleep(2)
-    except KeyError:
+    except:
         print_error("Sorry, unknown error.")
         
 
