@@ -96,8 +96,9 @@ def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
 
 def print_error(ipt_str):
     print(Back.RED, Fore.WHITE)
-    input("[ERROR] " + ipt_str + " Press any key to exit.")
+    print("[ERROR] " + ipt_str + " Exiting in 20 seconds.")
     print(Style.RESET_ALL)
+    time.sleep(30)
     quit()
 
 def print_warning(ipt_str):
