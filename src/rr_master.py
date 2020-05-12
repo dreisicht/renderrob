@@ -4,6 +4,7 @@ import glob
 import xlrd
 import threading
 import subprocess
+import signal
 from time import sleep
 from datetime import datetime
 # from colorama import Fore, Back, Style, init
@@ -495,13 +496,23 @@ def delete_empty_folders(folderpath):
 
 # initialize colorama
 # init(convert=True)
-jobs_obj = jobs()
-jobs_obj.start_generate()
-# jobs_obj.print_info("I'm done checking the jobs!")
-# delete_empty_folders(jobs_obj.renderpath)
-# print("Window closing in 10 minutes.")
-byebyestr = "[{}] ".format(datetime.now().strftime(
-    '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
-print(fg.white, bg.dark_blue)
-input(byebyestr)
-print(rs.all)
+if __name__ == "__main__":
+    try:
+        jobs_obj = jobs()
+        jobs_obj.start_generate()
+        # jobs_obj.print_info("I'm done checking the jobs!")
+        # delete_empty_folders(jobs_obj.renderpath)
+        # print("Window closing in 10 minutes.")
+        byebyestr = "[{}] ".format(datetime.now().strftime(
+            '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
+        print(fg.white, bg.dark_blue)
+        input(byebyestr)
+        print(rs.all)
+    except KeyboardInterrupt:
+        jobs_obj.print_info("Okay, I understood!")
+        if jobs_obj.thread_cpu is not None:
+            jobs_obj.thread_cpu.terminate()
+        if jobs_obj.thread_gpu is not None:
+            jobs_obj.thread_gpu.terminate()
+        if jobs_obj.thread_gpu_an_dn is not None:
+            jobs_obj.thread_gpu_an_dn.terminate()
