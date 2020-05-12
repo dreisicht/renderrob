@@ -10,7 +10,7 @@ from multiprocessing import cpu_count
 import rr_c_image
 
 
-from sty import fg, bg, ef, rs, Style, RgbBg
+# from sty import fg, bg, ef, rs, Style, RgbBg
 from colorama import Fore, Back, Style, init
 
 
@@ -142,7 +142,14 @@ def set_settings(camera,
             print_warning(
                 "There are more than one scenes, but you didn't tell me which scene to render! So I render the last used scene.")
             # time.sleep(10)
-        current_scene_data = bpy.context.scene
+            current_scene_data = bpy.context.scene
+        elif scene != "" and len(bpy.data.scenes) == 1:
+            current_scene_data = bpy.data.scenes[0]
+        else:
+            try:
+                current_scene_data = bpy.data.scenes[scene]
+            except KeyError:
+                print_error("Scene {} not found!".format(scene))
     
         # if no view layer given
         # view_layer_names = literal_eval(view_layer_names)
@@ -172,7 +179,7 @@ def set_settings(camera,
                 try:
                     view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
                 except KeyError:
-                    print_error("View Layer not found. Please check the name in the sheet!") # TODO: test
+                    print_error("View Layer {} not found. Please check the name in the sheet!".format(view_layer_names[0])) # TODO: test
         # if more than one view_layer given:
         elif len(view_layer_names) > 1:
             # print("A3")
@@ -298,7 +305,9 @@ def set_settings(camera,
         print_info("Done making the changes in your Blender file.")
         time.sleep(2)
     except:
-        print_error("Sorry, unknown error.")
+        print_info("I'm out!")
+        time.sleep(10)
+        quit()
         
 
 

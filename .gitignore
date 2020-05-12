@@ -11,6 +11,6 @@
 *.afpub
 /design
 *.afdesign
-*.xlsx
+*.xlsx*
 *.whl
 *.exr

@@ -93,7 +93,7 @@ class jobs(object):
         self.preview_framestep = global_set[5][1]
         self.preview_framestep_active = self.tobool(global_set[5][2])
 
-        self.shot_iteration_number = 1
+        self.shot_iter_num = 1
 
         self.thread_cpu = None
         self.thread_gpu = None
@@ -106,6 +106,10 @@ class jobs(object):
 
         return self.fill_array(jobs_sheet), self.fill_array(global_sheet)
 
+    @staticmethod
+    def hex_to_rgb(h):
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
     # print methods
     @staticmethod
     def print_error(ipt_str):
@@ -113,16 +117,18 @@ class jobs(object):
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         input(bg.red + fg.white + time_current + "[ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
         quit()
-        
-    @staticmethod
-    def hex_to_rgb(h):
-        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
     @staticmethod
     def print_warning(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         input(bg.yellow + fg.black + time_current + "[WARNING] " + ipt_str + " Press Enter to continue." + rs.all)
+        
+    @staticmethod
+    def print_warning_noinput(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print(bg.yellow + fg.black + time_current + "[WARNING]" + ipt_str + rs.all)
 
     @staticmethod
     def print_info_input(ipt_str):
@@ -184,6 +190,7 @@ class jobs(object):
             print("Bool Error")
             # raise TypeError
 
+
     def get_shotname(self):
         # preview or hq suffix
         if self.hq:
@@ -203,58 +210,58 @@ class jobs(object):
                          str(self.scene.replace("Scene", "Sc")) + "-" +
                          str(self.view_layer_dir) + "-" +
                          self.quality_state_string + "-v")
+        self.shotname = self.shotname.replace(" ", "_")
 
-        # get iteration number
+    def assemble_frame_path(self):
+        return (self.frame_render_folder + self.shotname + "$$" + 
+                "-" + "####." + self.file_format)
+
+    def get_frame_path(self):
+        '''inputs:
+        self.renderpath
+        self.shotname
+        self.endframe
+        
+        output:
+        *self.full_frame_path*
+        
+        full_frame_path is a string, which points either to a folder (animation rendering),
+        or to a single image (still image rendering)
+        
+        '''
+        self.shot_iter_num = 1
+        
+        # Different folder for still images and animations
+        # If still image rendering
         if self.endframe == "":
-            self.frame_path = self.renderpath + "stills/"
-            self.shot_iteration_number = 1
-            while os.path.exists(self.frame_path + self.shotname + str(self.shot_iteration_number).zfill(2) + "-" + str(self.startframe).zfill(4) + "." + self.file_format):  # TODO
-                self.shot_iteration_number = self.shot_iteration_number + 1
-
+            self.frame_render_folder = self.renderpath + "stills/"
+        # if animation rendering
         else:
-            self.frame_path = self.renderpath + self.shotname
-            self.shot_iteration_number = 1
-            while os.path.exists(self.frame_path + str(self.shot_iteration_number).zfill(2)):
-                self.shot_iteration_number = self.shot_iteration_number + 1
+            self.frame_render_folder = self.renderpath + self.shotname + "$$/"
+            # print(self.frame_render_folder)
 
-        # print(self.frame_path + str(self.shot_iteration_number).zfill(2))
+        self.full_frame_path_no_ver = self.assemble_frame_path()
 
-        # if still frame rendering, create stills folder
-        if self.endframe == "" and self.active:
-            if self.overwrite and self.shot_iteration_number > 1:
-                self.shot_iteration_number = self.shot_iteration_number - 1
-            if not os.path.exists(self.frame_path):
-                os.mkdir(self.frame_path)
-                self.print_info("I created directory " + self.frame_path)
+        # while image with given iteration number ist existing, raise iteration number
+        while os.path.exists(self.full_frame_path_no_ver.replace("$$", str(self.shot_iter_num).zfill(2)).replace("####", str(self.startframe).zfill(4))):
+            self.shot_iter_num = self.shot_iter_num + 1
 
-            self.full_frame_path = (self.frame_path + self.shotname + str(self.shot_iteration_number).zfill(2) + "-" + "####." + self.file_format) # TODO
-            self.print_info(self.full_frame_path)
+        if self.overwrite and self.shot_iter_num > 1:
+            self.shot_iter_num = self.shot_iter_num - 1
 
-        # if overwrite active, get to the folder with the highest iteration number
-        else:
-            if self.active:
-                if self.overwrite and self.shot_iteration_number > 1:
-                    self.shot_iteration_number = self.shot_iteration_number - 1
-                else:
-                    print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-                          "I created directory " + self.frame_path +
-                          str(self.shot_iteration_number).zfill(2))
-                    os.mkdir(self.frame_path +
-                             str(self.shot_iteration_number).zfill(2))
+        # update full_frame_path with iteration number
+        self.full_frame_path = self.full_frame_path_no_ver.replace("$$", str(self.shot_iter_num).zfill(2))
 
-            # if animation denoise active, create folder
-            if self.animation_denoise and self.active:
-                denoise_folder = self.frame_path + \
-                    str(self.shot_iteration_number).zfill(2) + "_dn"
-                if not os.path.exists(denoise_folder):
-                    os.mkdir(denoise_folder)
-                    print("[{}]".format(datetime.now().strftime(
-                        '%Y-%m-%d %H:%M:%S')), "I created directory " + denoise_folder)
+    def create_folder(self, ipt_str):
+        if not os.path.exists(ipt_str):
+                os.mkdir(ipt_str)
+                self.print_info("Created directory " + ipt_str)
 
-            # get path of the frames
-            self.full_frame_path = (self.frame_path +
-                                    str(self.shot_iteration_number).zfill(2) + "/"
-                                    + self.shotname + "-" + "####." + self.file_format)
+    def create_output_folder(self):
+        
+        # if job is active and read-only is enabled, create folders
+        if self.active:
+            self.create_folder(self.frame_render_folder.replace("$$", str(self.shot_iter_num).zfill(2)))
 
     def read_job(self, job_nr):
         # check if job is active, otherwise jump to next job
@@ -334,6 +341,8 @@ class jobs(object):
         self.view_layer = [
             x for x in self.view_layer if x]
         self.get_shotname()
+        self.get_frame_path()
+        self.create_output_folder()
 
     def render_job(self, device):
         inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', {}, {})".format(
@@ -378,27 +387,61 @@ class jobs(object):
                           " -F " + self.file_format_upper +
                           render_frame_command)
         # print(command_string)
-        # return "None"
-        print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-              "Rendering {} on {}".format(self.shotname +
-                                          str(self.shot_iteration_number), device.upper()))
+        
+        self.print_info("Rendering {} on {}".format(self.shotname +
+                                          str(self.shot_iter_num), device.upper()))
         return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
-        # subprocess.run(command_string)
 
     def denoise_job(self, job_nr):
-        inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder('{}/', {}, {})".format(
+        inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder_explicit('{}', {}, {})".format(
             self.currentpath,
-            self.frame_path + str(self.shot_iteration_number).zfill(2),
+            self.frame_render_folder.replace("$$", str(self.shot_iter_num).zfill(2)),
             self.startframe,
             self.endframe
         )
         command_string_denoise = (self.blenderpath + ' -b ' +
                                   ' --python-expr ' + '"' + inlinepython_denoise + '"')
         # print(command_string_denoise)
-        print("[{}]".format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
-              "Denoising", self.shotname + str(self.shot_iteration_number))
+        self.print_info("Denoising " + self.shotname + str(self.shot_iter_num))
         # return "None"
         return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)
+
+    def save_previous_job_data(self):
+        self.active_old = self.active
+        self.startframe_old = self.startframe
+        self.endframe_old = self.endframe
+        self.frame_path_old = self.frame_render_folder
+        self.file_format_old = self.file_format
+        self.full_frame_path_old = self.full_frame_path
+        self.shot_iteration_number_old = self.shot_iter_num
+        self.animation_denoise_old = self.animation_denoise
+
+    def check_file(self, ipt_str):
+        if os.path.exists(ipt_str):
+            if os.path.getsize(ipt_str) > 100:
+                return True
+        return False
+
+    def check_renders(self):
+        if self.active_old:
+            # if still image
+            if self.endframe_old == "":
+                searchrange = range(int(self.startframe_old), int(self.startframe_old) + 1)
+            # if animation
+            else:
+                searchrange = range(int(self.startframe_old), int(self.endframe_old) + 1)
+
+            if self.animation_denoise_old:
+                self.full_frame_path_old = "_dn/".join(self.full_frame_path_old.rsplit("/", 1))
+
+            for frame in searchrange:
+                check_path = self.full_frame_path_old.replace(
+                    "####",
+                    str(frame).zfill(4))
+                if not self.check_file(check_path):
+                    self.print_warning_noinput(" I checked {} and saw that something didn't work. Try rendering it again!".format(
+                        self.full_frame_path_old).replace("####", str(frame).zfill(4)))
+                    return None
 
     def start_generate(self):
         for job in range(1, len(self.jobs_table)):
@@ -410,6 +453,9 @@ class jobs(object):
             if self.thread_gpu_an_dn is not None:
                 self.thread_gpu_an_dn._wait(1048574)
 
+            if hasattr(self, "active_old"):
+                self.check_renders()
+
             # sleep, to avoid simultanous start, so both render first frame
             sleep(0.1)
             if self.active and self.gpu_act:
@@ -417,21 +463,42 @@ class jobs(object):
 
             if self.thread_cpu is not None:
                 self.thread_cpu._wait(1048574)
+
             if self.thread_gpu is not None:
                 self.thread_gpu._wait(1048574)
 
             if self.active and self.animation_denoise:
                 self.thread_gpu_an_dn = self.denoise_job(job)
 
+            self.save_previous_job_data()
+            
         # wait if an denoising is still running
         if self.thread_gpu_an_dn is not None:
             self.thread_gpu_an_dn._wait(1048574)
+            self.check_renders()
+
+def delete_empty_folders(folderpath):
+    for root, dirs in os.walk(folderpath, topdown=False):
+        for name in dirs:
+            try:
+                # check whether the directory is empty
+                if len(os.listdir(os.path.join(root, name))) == 0:
+                    print("Deleting", os.path.join(root, name))
+                    try:
+                        os.rmdir(os.path.join(root, name))
+                    except:
+                        print("FAILED :", os.path.join(root, name))
+                        pass
+            except:
+                pass
 
 
 # initialize colorama
 # init(convert=True)
 jobs_obj = jobs()
 jobs_obj.start_generate()
+# jobs_obj.print_info("I'm done checking the jobs!")
+# delete_empty_folders(jobs_obj.renderpath)
 # print("Window closing in 10 minutes.")
 byebyestr = "[{}] ".format(datetime.now().strftime(
     '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
