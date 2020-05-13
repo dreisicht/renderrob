@@ -444,6 +444,15 @@ class jobs(object):
                         self.full_frame_path_old).replace("####", str(frame).zfill(4)))
                     return None
 
+
+    def delete_empty_folders(self, ipt_dir):
+        rootdir = os.listdir(ipt_dir)
+        # os.chdir(ipt_dir)
+        for directory in rootdir:
+            if not os.listdir(ipt_dir + "/" + directory):
+                os.rmdir(ipt_dir + "/" + directory)
+                self.print_warning_noinput(" Deleted /" + directory)
+
     def start_generate(self):
         for job in range(1, len(self.jobs_table)):
             self.read_job(job)
@@ -478,20 +487,6 @@ class jobs(object):
             self.thread_gpu_an_dn._wait(1048574)
             self.check_renders()
 
-def delete_empty_folders(folderpath):
-    for root, dirs in os.walk(folderpath, topdown=False):
-        for name in dirs:
-            try:
-                # check whether the directory is empty
-                if len(os.listdir(os.path.join(root, name))) == 0:
-                    print("Deleting", os.path.join(root, name))
-                    try:
-                        os.rmdir(os.path.join(root, name))
-                    except:
-                        print("FAILED :", os.path.join(root, name))
-                        pass
-            except:
-                pass
 
 
 # initialize colorama
@@ -501,7 +496,7 @@ if __name__ == "__main__":
         jobs_obj = jobs()
         jobs_obj.start_generate()
         # jobs_obj.print_info("I'm done checking the jobs!")
-        # delete_empty_folders(jobs_obj.renderpath)
+        jobs_obj.delete_empty_folders(jobs_obj.renderpath)
         # print("Window closing in 10 minutes.")
         byebyestr = "[{}] ".format(datetime.now().strftime(
             '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
