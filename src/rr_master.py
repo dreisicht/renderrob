@@ -389,6 +389,14 @@ class jobs(object):
             ", ", ",").split(",")
         self.view_layer = [
             x for x in self.view_layer if x]
+        
+        # If Eevee activated, disable according properties:
+        if not self.cycles:
+            self.animation_denoise = False
+            self.gpu_act = False
+            self.cpu_act = True
+            self.denoise = False
+
         self.get_shotname()
         self.get_frame_path()
         self.create_output_folder()
@@ -436,7 +444,7 @@ class jobs(object):
                           " --python-expr " + '"' + inlinepython + '"' +
                           " -F " + self.file_format_upper +
                           render_frame_command)
-        # print(command_string)
+        print(command_string)
         
         self.print_info("Rendering {} on {}".format(self.shotname +
                                           str(self.shot_iter_num), device.upper()))

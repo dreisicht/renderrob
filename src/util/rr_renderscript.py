@@ -231,7 +231,15 @@ def set_settings(scriptpath,
                 # print("B3")
         else:
             print_error("Unexpected ViewLayer Error.")
-                    
+            
+        if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
+            for view_layer in view_layer_data:
+                view_layer.use = True
+        elif type(view_layer_data) is bpy.types.ViewLayer:
+            view_layer_data.use = True
+        else:
+            print_error("Unexpected ViewLayer Error.")
+                
         # activate add-ons:
         for add_on in add_on_list:
             print_info(str(add_on))
@@ -305,16 +313,12 @@ def set_settings(scriptpath,
             current_scene_render.use_motion_blur = mb
 
             # denoising data
-            # print(type(view_layer_data), view_layer_data)
             if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
                 for view_layer in view_layer_data:
-                    view_layer.use = True
-                    # print(view_layer.name, denoise,
-                    #       view_layer.cycles.use_denoising)
+
                     view_layer.cycles.denoising_store_passes = an_denoise
                     view_layer.cycles.use_denoising = denoise
             elif type(view_layer_data) is bpy.types.ViewLayer:
-                view_layer_data.use = True
                 view_layer_data.cycles.denoising_store_passes = an_denoise
                 view_layer_data.cycles.use_denoising = denoise
             else:
