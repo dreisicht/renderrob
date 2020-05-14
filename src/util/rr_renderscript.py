@@ -3,6 +3,7 @@ import bpy  # pylint: disable=import-error
 import pip
 import time
 import sys
+import os
 from ast import literal_eval
 
 from multiprocessing import cpu_count
@@ -19,6 +20,8 @@ sys.path.append(str(__file__)[0:-18].replace("\\", "/"))
 init(convert=True)
 # bpsc = bpy.context.scene
 # bprn = bpsc.render
+
+scriptpath_glob = ""
 
 def hex_to_rgb(h):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
@@ -94,30 +97,62 @@ def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
         print_warning("I couldn't find collection {}!".format(
             " and ".join(collection_names)))
 
+
 def print_error(ipt_str):
-    print(Back.RED, Fore.WHITE)
-    print("[ERROR] " + ipt_str + " Exiting in 20 seconds.")
-    print(Style.RESET_ALL)
-    time.sleep(30)
+    ipt_str = str(ipt_str)
+    print(Back.RED, Fore.WHITE, end="")
+    print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
+    print(Style.RESET_ALL, end="")
+    write_cache("[ERROR]" + ipt_str)
+    time.sleep(3)
     quit()
 
+
 def print_warning(ipt_str):
-    print(Back.YELLOW, Fore.BLACK)
-    print("[WARNING] " + ipt_str + " Continuing in 3 seconds.")
-    time.sleep(3)
-    print(Style.RESET_ALL)
+    ipt_str = str(ipt_str)
+    print(Back.YELLOW, Fore.BLACK, end="")
+    print("[WARNING] " + ipt_str)
+    print(Style.RESET_ALL, end="")
+    write_cache("[WARNING]" + ipt_str)
+    time.sleep(1)
+
 
 def print_info_input(ipt_str):
-    print(Back.CYAN, Fore.BLACK)
+    ipt_str = str(ipt_str)
+    print(Back.CYAN, Fore.BLACK, end="")
     input("[INFO] " + ipt_str)
-    print(Style.RESET_ALL)
-    
-    
+    print(Style.RESET_ALL, end="")
+    # write_cache("[INFO]" + ipt_str)
+
+
 def print_info(ipt_str):
+    ipt_str = str(ipt_str)
     print(Back.CYAN, Fore.BLACK + "[INFO] " + ipt_str + Style.RESET_ALL)
+    # write_cache("[INFO]" + ipt_str)
 
 
-def set_settings(camera,
+def write_cache(ipt_str):
+    global scriptpath_glob
+    cachefilepath = scriptpath_glob + "util/ERRORCACHE"
+    # print(cachefilepath)
+    try:
+        f = open(cachefilepath, "a")
+    except PermissionError:
+        # print("First try failed.")
+        time.sleep(0.1)
+        f = open(cachefilepath, "a")
+    finally:
+        # print("caching failed!")
+        time.sleep(0.1)
+    f.write(ipt_str + "\n")
+    f.close()
+    # print("Closed.")
+
+
+
+
+def set_settings(scriptpath,
+                 camera,
                  device,
                  mb,
                  xres,
@@ -135,12 +170,15 @@ def set_settings(camera,
                  view_layer_names,
                  add_on_list):
     
+    global scriptpath_glob
+    scriptpath_glob = scriptpath
+    
     try:
         print_info("Render Rob here. I'm starting to make my changes in your Blender file!")
     
         if scene == "" and len(bpy.data.scenes) > 1:
             print_warning(
-                "There are more than one scenes, but you didn't tell me which scene to render! So I render the last used scene.")
+                "There are more than one scenes, but you didn't tell me which scene to render! So I am rendering the last used scene.")
             # time.sleep(10)
             current_scene_data = bpy.context.scene
         elif scene != "" and len(bpy.data.scenes) == 1:
@@ -184,7 +222,7 @@ def set_settings(camera,
         elif len(view_layer_names) > 1:
             # print("A3")
             if len(current_scene_data.view_layers) < len(view_layer_names):
-                print_error("You gave me more View Layers given than existing!")
+                print_error("You gave me more View Layers given than existing! ({})".format(", ".join(view_layer_names)))
             else:
                 view_layer_data = []
                 
@@ -304,9 +342,11 @@ def set_settings(camera,
 
         print_info("Done making the changes in your Blender file.")
         time.sleep(2)
-    except:
+    except Exception as e:
+        print_info(e)
+        write_cache("[ERROR]" + e)
         print_info("I'm out!")
-        time.sleep(10)
+        time.sleep(2)
         quit()
         
 

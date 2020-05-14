@@ -18,8 +18,11 @@ import rr_image
 class jobs(object):
     def __init__(self):
         self.print_info("Hello from Render Rob! I'm glad to help you!")
+
         self.currentpath = os.path.dirname(
             sys.argv[0]).replace("\\", "/") + "/"
+        
+        self.flush_cache_file()
         # print(glob.glob(self.currentpath + "*.xlsx"))
         excel_file = glob.glob(self.currentpath + "*.xlsx")
         if len(excel_file) > 0:
@@ -63,6 +66,9 @@ class jobs(object):
         bg.dark_blue = Style(RgbBg(self.dark_blue[0], self.dark_blue[1], self.dark_blue[2]))
         bg.lighter_stone = Style(RgbBg(self.lighter_stone[0], self.lighter_stone[1], self.lighter_stone[2]))
         bg.dark_stone = Style(RgbBg(self.dark_stone[0], self.dark_stone[1], self.dark_stone[2]))
+        
+        self.error_cache_len = 0
+
 
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
@@ -99,6 +105,40 @@ class jobs(object):
         self.thread_cpu = None
         self.thread_gpu = None
         self.thread_gpu_an_dn = None
+        
+
+    def flush_cache_file(self):
+        f = open(self.currentpath + "util/ERRORCACHE", "w")
+        f.write("")
+        f.close()
+        
+    def read_errors(self):
+        # open and read the file after the appending:
+        try:
+            f = open(self.currentpath + "util/ERRORCACHE", "r")
+        except PermissionError:
+            sleep(0.1)
+            f = open(self.currentpath + "util/ERRORCACHE", "r")
+        finally:
+            sleep(0.1)
+            
+        # print(tmp_str[self.error_cache_len:])
+        tmp_str = f.read()
+        
+        f.close()
+        print_list = []
+
+        error_list = tmp_str[self.error_cache_len:].split("\n")
+        self.error_cache_len = len(tmp_str)
+
+        for line in error_list:
+            if line not in print_list:
+                if "[ERROR]" in line:
+                    self.print_error_noinput(line.replace("[ERROR]", ""))
+                elif "[WARNING]" in line:
+                    self.print_warning_noinput(line.replace("[WARNING]", ""))
+            print_list.append(line)
+
 
     def rr_read_excel(self, path_sheet):
         wb = xlrd.open_workbook(path_sheet)
@@ -116,8 +156,16 @@ class jobs(object):
     def print_error(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(bg.red + fg.white + time_current + "[ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
+        input(bg.red + fg.white + time_current + " [ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
         quit()
+
+    @staticmethod
+    def print_error_noinput(ipt_str):
+        time_current = "[{}]".format(
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print(bg.red + fg.white + time_current +
+              " [ERROR] " + ipt_str + rs.all)
+
 
     @staticmethod
     def print_warning(ipt_str):
@@ -129,7 +177,7 @@ class jobs(object):
     def print_warning_noinput(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        print(bg.yellow + fg.black + time_current + "[WARNING]" + ipt_str + rs.all)
+        print(bg.yellow + fg.black + time_current + " [WARNING]" + ipt_str + rs.all)
 
     @staticmethod
     def print_info_input(ipt_str):
@@ -346,7 +394,8 @@ class jobs(object):
         self.create_output_folder()
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', {}, {})".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', {}, {})".format(
+            self.currentpath,
             self.currentpath,
             self.active_camera,
             device,
@@ -394,7 +443,8 @@ class jobs(object):
         return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
 
     def denoise_job(self, job_nr):
-        inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder_explicit('{}', {}, {})".format(
+        inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder_explicit('{}', '{}', {}, {})".format(
+            self.currentpath,
             self.currentpath,
             self.frame_render_folder.replace("$$", str(self.shot_iter_num).zfill(2)),
             self.startframe,
@@ -425,6 +475,7 @@ class jobs(object):
 
     def check_renders(self):
         if self.active_old:
+            self.read_errors()
             # if still image
             if self.endframe_old == "":
                 searchrange = range(int(self.startframe_old), int(self.startframe_old) + 1)
@@ -451,7 +502,7 @@ class jobs(object):
         for directory in rootdir:
             if not os.listdir(ipt_dir + "/" + directory):
                 os.rmdir(ipt_dir + "/" + directory)
-                self.print_warning_noinput(" Deleted /" + directory)
+                self.print_info("Deleted /" + directory + "/")
 
     def start_generate(self):
         for job in range(1, len(self.jobs_table)):
@@ -465,6 +516,7 @@ class jobs(object):
 
             if hasattr(self, "active_old"):
                 self.check_renders()
+                
 
             # sleep, to avoid simultanous start, so both render first frame
             sleep(0.1)
@@ -485,8 +537,8 @@ class jobs(object):
         # wait if an denoising is still running
         if self.thread_gpu_an_dn is not None:
             self.thread_gpu_an_dn._wait(1048574)
-            self.check_renders()
-
+        
+        self.check_renders()
 
 
 # initialize colorama
@@ -500,9 +552,9 @@ if __name__ == "__main__":
         # print("Window closing in 10 minutes.")
         byebyestr = "[{}] ".format(datetime.now().strftime(
             '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
-        print(fg.white, bg.dark_blue)
+        print(fg.white, bg.dark_blue, end="")
         input(byebyestr)
-        print(rs.all)
+        print(rs.all, end="")
     except KeyboardInterrupt:
         jobs_obj.print_info("Okay, I understood!")
         if jobs_obj.thread_cpu is not None:

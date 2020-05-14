@@ -8,6 +8,10 @@
 
 ## Who ist it for?
 
+## Usage
+
+press ctrl + c in the main window to stop the batch rendering. Closing the blender windows itself only cancels current job!
+
 ## Features
 
 - Overview of jobs and settings in a table
