@@ -16,6 +16,7 @@
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
 - Separate View Layers and addons with a comma (space is optional)
 - If you want to render a still image, fill start and endframe with same value.
+- If you want to use multiple Sheets you can configure your sheet name in the file `util/sheetname.ini`
 
 ##### Render output
 
@@ -55,6 +56,8 @@ Following things are being looked at:
 - Single frame being rendered, but both CPU and GPU are selected
 
 ## Setup
+
+**ATTENTION! If you don't want to setup the Google spread api, you can download the sheet as an xlsx and put it next to the .exe** 
 
 Click on the chapter to open it:
 
