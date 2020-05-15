@@ -1,6 +1,7 @@
 import gspread
 import os
 import glob
+import configparser
 from oauth2client.service_account import ServiceAccountCredentials
 
 
@@ -14,8 +15,13 @@ def query_sheet():
     creds = ServiceAccountCredentials.from_json_keyfile_name(
         jsonfiles[0], scope)
     client = gspread.authorize(creds)
-
-    sheet = client.open('Render Rob')
+    current_path = os.path.dirname(
+        os.path.realpath(__file__)).replace("\\", "/")+"/"
+    f_ini = open(current_path + "util/sheetname.ini", "r")
+    sheetname = f_ini.read()
+    f_ini.close()
+    print(sheetname)
+    sheet = client.open(sheetname)
     ws1 = sheet.get_worksheet(0).get_all_values()
     ws2 = sheet.get_worksheet(1).get_all_values()
 
