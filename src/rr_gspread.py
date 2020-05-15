@@ -17,9 +17,12 @@ def query_sheet():
     client = gspread.authorize(creds)
     current_path = os.path.dirname(
         os.path.realpath(__file__)).replace("\\", "/")+"/"
-    f_ini = open(current_path + "util/sheetname.ini", "r")
-    sheetname = f_ini.read()
-    f_ini.close()
+    try:
+        f_ini = open(current_path + "util/sheetname.ini", "r")
+        sheetname = f_ini.read()
+        f_ini.close()
+    except FileNotFoundError:
+        sheetname = 'Render Rob'
     print(sheetname)
     sheet = client.open(sheetname)
     ws1 = sheet.get_worksheet(0).get_all_values()
