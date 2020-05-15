@@ -181,7 +181,7 @@ def set_settings(scriptpath,
                 "There are more than one scenes, but you didn't tell me which scene to render! So I am rendering the last used scene.")
             # time.sleep(10)
             current_scene_data = bpy.context.scene
-        elif scene != "" and len(bpy.data.scenes) == 1:
+        elif len(bpy.data.scenes) == 1:
             current_scene_data = bpy.data.scenes[0]
         else:
             try:

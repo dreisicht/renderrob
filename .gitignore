@@ -15,3 +15,4 @@
 *.whl
 *.exr
 /src/util/ERRORCACHE*
+*.pdf

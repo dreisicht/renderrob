@@ -19,9 +19,7 @@ class jobs(object):
     def __init__(self):
         self.print_info("Hello from Render Rob! I'm glad to help you!")
 
-        self.currentpath = os.path.dirname(
-            sys.argv[0]).replace("\\", "/") + "/"
-        
+        self.currentpath = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")+"/"
         self.flush_cache_file()
         # print(glob.glob(self.currentpath + "*.xlsx"))
         excel_file = glob.glob(self.currentpath + "*.xlsx")
