@@ -6,11 +6,16 @@
 
 ## Why should I use it?
 
+Save time settings up your renders
+You can render a quick preview, before spending hours on your final render
+
+
+
 ## Who ist it for?
 
 ## Usage
 
-press ctrl + c in the main window to stop the batch rendering. Closing the blender windows itself only cancels current job!
+Press ctrl + c in the main window to stop the batch rendering. Closing the blender windows itself only cancels current job!
 
 ## Features
 
@@ -18,7 +23,7 @@ press ctrl + c in the main window to stop the batch rendering. Closing the blend
 - Only one click needed to start rendering your jobs
 - Usable for remote rendering too, since your UI is the sheet
 - Warnings for implausible render settings directly in the sheet
-- Automatic organizing of output folder
+- Automatic organizing of render output folder
 - Automatic start of CPU and GPU jobs, so that all devices are allways at full load
 <!-- screenshot!! TODO -->
 
@@ -54,16 +59,14 @@ Property list of the spreadsheet
 | high-quality | If deactivated, preview settings from globals are used|
 | animation denoise | Usage of post-process animation denoising|
 | denoise | Usage of image-denoising|
-| comments | Put your own comments of the shot here|
-| activate collections | Names of collections to activate for rendering. Separate by comma+space. Optional. |
-| deactivate collections | Names of collections to deactivate for rendering. Separate by comma+space. Optional. |
 | scene | Add name of scene to render. Only one is allowed here. Optional.|
 | view layer | Add name of view layer to render. Only one is allowed here. Optional.|
+| comments | Put your own comments of the shot here|
 
 ## Further explanations
 
 - If you want to abort all renders, you have to close all three command-line windows.
-- The reason motion blur is in Render Rob, is that I often experienced situations where motion blur had artifacts, so I needed few frames without it.
+- The reason motion blur is in Render Rob, is that if you get motion blur artifacts, you can easily re-render those frames without motion blur
 - Column t is necessary. Please do not delete it.
 - Column a is a help for being able to select cells easier.
 - If read only is enabled, a new folder with a new version number is created and used as render output.
@@ -74,11 +77,13 @@ Property list of the spreadsheet
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
 - Standard settings for a render job is, that all checkboxes are activated apart from the last one. In this way it's easy to see what you're doing.
 - If you want to render a still image, fill start and endframe with same value.
-- collections get first activated and then deactivated
 - CPU renders on n-1 cores to not bottleneck GPU render
 - You can only render one scene in one job. If you want to render a second scene just create another job
-- Viewlayers TODO TODO TODO
+- If no View Layer is given, Render Rob renders every View Layer.
+- If no Scene is given, Render Rob renders every Scene.
+- If Animation Denoising is activated, compositing is deactivated.
 - Separate View Layers and addons with a comma
+- If Render Rob cannot find the sheet, maybe it's not shared with the api mail adress.
 
 ## Warnings in the sheet
 

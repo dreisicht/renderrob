@@ -14,4 +14,4 @@
 *.xlsx*
 *.whl
 *.exr
-/src/util/ERRORCACHE
+/src/util/ERRORCACHE*
