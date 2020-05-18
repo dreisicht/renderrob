@@ -11,9 +11,9 @@ Save time managing your render jobs!
 
 ![ ](img/readme_pics/usage.gif)
 
-## Who ist it for?
+## Who is it for?
 
-Hobbyists, Freelancers and small teams.
+Individuals and small teams.
 
 ## Features
 
@@ -23,7 +23,7 @@ Hobbyists, Freelancers and small teams.
 - Usable for remote rendering too, since your UI is the sheet
 - Warnings for implausible render settings directly in the sheet
 - Automatic organizing of render output folder
-- Automatic start of CPU and GPU jobs, so that all devices are allways at full load
+- Automatic start of CPU and GPU jobs, so that all devices are always at full load
 - Built for both Windows and Linux
 <!-- screenshot!! TODO -->
 
@@ -31,7 +31,7 @@ Hobbyists, Freelancers and small teams.
 
 ## Requirements
 
-- Google account or spreadsheet software like Excel
+- Google account or spreadsheet software like Excel or OpenOffice Calc
 - 15 minutes of time for setup
 - Blender
 

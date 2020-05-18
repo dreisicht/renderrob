@@ -15,8 +15,8 @@
 - Column t is necessary. Please do not delete it.
 - For better overview, usually all settings in the sheet are checked (apart from the last one, denoising).
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
-- Separate View Layers and addons with a comma (space is optional)
-- If you want to render a still image, fill start and endframe with same value.
+- Separate View Layers and add-ons with a comma (space is optional)
+- If you want to render a still image, fill start and end frame with same value.
 - If you want to use multiple Sheets you can configure your sheet name in the file `util/sheetname.ini`
 
 ##### Render output
@@ -38,7 +38,7 @@
 
 ##### Errors
 
-- If Render Rob cannot find the sheet, maybe it's not shared with the api mail adress.
+- If Render Rob cannot find the sheet, maybe it's not shared with the API mail address.
 - If you experience other errors, don't hesitate do drop me a message!
 
 ## Warnings in the sheet
@@ -59,12 +59,12 @@ Following things are being looked at:
 
 ## Setup
 
-**ATTENTION! If you don't want to setup the Google spread api, you can download the sheet as an xlsx and put it next to the .exe** 
+**ATTENTION! If you don't want to setup the Google spread API, you can download the sheet as an xlsx and put it next to the .exe** 
 
 Click on the chapter to open it:
 
 <details>
-<summary>Setting up Google api</summary>
+<summary>Setting up Google API</summary>
 
 <!-- ### Setting up Google api -->
 
@@ -122,7 +122,7 @@ https://docs.google.com/spreadsheets/d/1sRj9vS0KO8cSCMgpaX0wPaVbBxr_lR-1asJOY-VA
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
 
 
-3. Name it `Render Rob`. Correct naming is important!
+3. Name it `Render Rob`. If you name it different, you will have to add the name to the `sheetname.ini` located in the `user` folder.
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Sheet")
 
