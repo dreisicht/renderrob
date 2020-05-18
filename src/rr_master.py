@@ -11,8 +11,11 @@ from datetime import datetime
 from sty import fg, bg, ef, rs, Style, RgbBg
 import sty
 from rr_gspread import query_sheet
-from subprocess import Popen, CREATE_NEW_CONSOLE
+from subprocess import Popen
 import rr_image
+
+if "win" in sys.platform:
+    from subprocess import CREATE_NEW_CONSOLE
 
 
 class jobs(object):
@@ -39,7 +42,7 @@ class jobs(object):
                 self.print_error("Couldn't get the data from Google Sheets. Maybe check your json key!")
             # print(self.jobs_table, global_set)
 
-        self.blenderpath = global_set[0][1].replace("\\", "/")
+        self.blenderpath = self.path_process(global_set[0][1])[:-1]
         self.renderpath = self.path_process(global_set[1][1])
         self.blendfolder = self.path_process(global_set[2][1])
         self.add_on_list = global_set[6][1].replace(", ", ",").split(",")
@@ -71,23 +74,25 @@ class jobs(object):
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
             self.print_error("Please fill the path to blender under globals!")
-            quit()
-        elif not os.path.isfile(self.blenderpath[1:-1]):
+            sys.exit()
+        elif self.blenderpath == "blender":
+            pass
+        elif not os.path.isfile(self.blenderpath):
             self.print_error("I couldn't find the Blender folder. Perhaps a spelling mistake?")
-            quit()
+            sys.exit()
 
         # check if render path is filled out correctly
         if self.renderpath == "C:/Path/To/My/Renders/":
             self.print_error(
                 "Please fill the path to you render folder under globals!")
-            quit()
+            sys.exit()
         elif not os.path.exists(self.renderpath):
             self.print_error("I couldn't find the render output folder. Perhaps a spelling mistake?")
-            quit()
+            sys.exit()
         
         if not os.path.exists(self.blendfolder):
             self.print_warning("I couldn't find the .blend file folder. Perhaps a spelling mistake?")
-            # quit()
+            # sys.exit()
 
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
@@ -155,7 +160,7 @@ class jobs(object):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         input(bg.red + fg.white + time_current + " [ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
-        quit()
+        sys.exit()
 
     @staticmethod
     def print_error_noinput(ipt_str):
@@ -446,7 +451,10 @@ class jobs(object):
         
         self.print_info("Rendering {} on {}".format(self.shotname +
                                           str(self.shot_iter_num), device.upper()))
-        return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
+        if "win" in sys.platform:
+            return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
+        elif "linux" in sys.platform:
+            return subprocess.Popen(command_string, shell=True)
 
     def denoise_job(self, job_nr):
         inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder_explicit('{}', '{}', {}, {})".format(
@@ -461,7 +469,10 @@ class jobs(object):
         # print(command_string_denoise)
         self.print_info("Denoising " + self.shotname + str(self.shot_iter_num))
         # return "None"
-        return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)
+        if "win" in sys.platform:
+            return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)
+        elif "linux" in sys.platform:
+            return subprocess.Popen(command_string_denoise, shell=True)
 
     def save_previous_job_data(self):
         self.active_old = self.active
@@ -518,7 +529,7 @@ class jobs(object):
                 self.thread_cpu = self.render_job("cpu")
 
             if self.thread_gpu_an_dn is not None:
-                self.thread_gpu_an_dn._wait(1048574)
+                self.thread_gpu_an_dn.wait(1048574)
 
             if hasattr(self, "active_old"):
                 self.check_renders()
@@ -530,10 +541,10 @@ class jobs(object):
                 self.thread_gpu = self.render_job("gpu")
 
             if self.thread_cpu is not None:
-                self.thread_cpu._wait(1048574)
+                self.thread_cpu.wait(1048574)
 
             if self.thread_gpu is not None:
-                self.thread_gpu._wait(1048574)
+                self.thread_gpu.wait(1048574)
 
             if self.active and self.animation_denoise:
                 self.thread_gpu_an_dn = self.denoise_job(job)
@@ -542,7 +553,7 @@ class jobs(object):
             
         # wait if an denoising is still running
         if self.thread_gpu_an_dn is not None:
-            self.thread_gpu_an_dn._wait(1048574)
+            self.thread_gpu_an_dn.wait(1048574)
         
         self.check_renders()
 

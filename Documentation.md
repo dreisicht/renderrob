@@ -27,6 +27,7 @@
 ##### Rendering
 
 - Border rendering gets disabled, if high quality is active. Otherwise it remains enabled.
+- Random seed is enabled, if Animation Denoising is enabled.
 - Jobs get rendered in the order, they are shown in the list. You can reorder them by drag-and-drop. Therefore select the line and drag it on the left side up or down.
 - CPU renders on n-1 cores to not bottleneck GPU render
 - You can only render one scene in one job. If you want to render a second scene just create another job
@@ -49,9 +50,9 @@ Following things are being looked at:
 - No render device selected
 - Both devices active, but no read only
 - Both devices active, but no placeholders
-- High quality animation, but no animation denoising
-- Animation denoising, but exr is not selected
-- Single frame rendering (start and end frame have the same value), but animation denoising is activated
+- High quality animation, but no Animation Denoising
+- Animation Denoising, but exr is not selected
+- Single frame rendering (start and end frame have the same value), but Animation Denoising is activated
 - Single frame in high quality is being rendered, but Denoising is deactivated
 - Single frame being rendered, but both CPU and GPU are selected
 

@@ -23,7 +23,6 @@ def query_sheet():
         f_ini.close()
     except FileNotFoundError:
         sheetname = 'Render Rob'
-    print(sheetname)
     sheet = client.open(sheetname)
     ws1 = sheet.get_worksheet(0).get_all_values()
     ws2 = sheet.get_worksheet(1).get_all_values()

@@ -1,6 +1,6 @@
 
 import bpy  # pylint: disable=import-error
-import pip
+# import pip
 import time
 import sys
 import os
@@ -105,7 +105,7 @@ def print_error(ipt_str):
     print(Style.RESET_ALL, end="")
     write_cache("[ERROR]" + ipt_str)
     time.sleep(3)
-    quit()
+    sys.exit()
 
 
 def print_warning(ipt_str):
@@ -351,7 +351,7 @@ def set_settings(scriptpath,
         write_cache("[ERROR]" + e)
         print_info("I'm out!")
         time.sleep(2)
-        quit()
+        sys.exit()
         
 
 
