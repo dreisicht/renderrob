@@ -15,8 +15,11 @@ import rr_c_image
 from colorama import Fore, Back, Style, init
 
 
-sys.path.append(str(__file__)[0:-18].replace("\\", "/"))
-# import rr_user_commands
+user_settings_folder = str(__file__).replace("\\", "/").replace("/util/rr_renderscript.py", "/user")
+print(user_settings_folder)
+sys.path.append(user_settings_folder)
+import rr_user_commands
+
 init(convert=True)
 # bpsc = bpy.context.scene
 # bprn = bpsc.render

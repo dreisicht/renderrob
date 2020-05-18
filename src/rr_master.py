@@ -396,8 +396,8 @@ class jobs(object):
         # If Eevee activated, disable according properties:
         if not self.cycles:
             self.animation_denoise = False
-            self.gpu_act = False
-            self.cpu_act = True
+            self.gpu_act = True
+            self.cpu_act = False
             self.denoise = False
 
         self.get_shotname()

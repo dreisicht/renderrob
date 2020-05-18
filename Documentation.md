@@ -7,6 +7,7 @@
 - If you want to abort all renders, you have to close all three command-line windows.
 - To stop the jobs, first close the Render Rob main window.
 - The reason motion blur is in Render Rob, is that if you get motion blur artifacts, you can easily re-render those frames without motion blur
+- You can run your own Python commands by adding them to the file `rr_user_comands.py` located in the folder `user`.
 
 ##### Sheet
 

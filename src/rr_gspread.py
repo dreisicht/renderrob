@@ -18,7 +18,7 @@ def query_sheet():
     current_path = os.path.dirname(
         os.path.realpath(__file__)).replace("\\", "/")+"/"
     try:
-        f_ini = open(current_path + "util/sheetname.ini", "r")
+        f_ini = open(current_path + "user/sheetname.ini", "r")
         sheetname = f_ini.read()
         f_ini.close()
     except FileNotFoundError:
