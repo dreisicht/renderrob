@@ -92,7 +92,6 @@ class jobs(object):
         
         if not os.path.exists(self.blendfolder):
             self.print_warning("I couldn't find the .blend file folder. Perhaps a spelling mistake?")
-            # sys.exit()
 
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
@@ -124,8 +123,7 @@ class jobs(object):
             f = open(self.currentpath + "util/ERRORCACHE", "r")
         finally:
             sleep(0.1)
-            
-        # print(tmp_str[self.error_cache_len:])
+
         tmp_str = f.read()
         
         f.close()
@@ -232,7 +230,6 @@ class jobs(object):
                 return True
             else:
                 print("Bool Error")
-                # raise TypeError
         elif type(bool_val) == int:
             if bool_val == 0:
                 return False
@@ -240,7 +237,6 @@ class jobs(object):
                 return True
         else:
             print("Bool Error")
-            # raise TypeError
 
 
     def get_shotname(self):
@@ -290,7 +286,6 @@ class jobs(object):
         # if animation rendering
         else:
             self.frame_render_folder = self.renderpath + self.shotname + "$$/"
-            # print(self.frame_render_folder)
 
         self.full_frame_path_no_ver = self.assemble_frame_path()
 
@@ -378,7 +373,6 @@ class jobs(object):
             self.blendpath = self.blendfilepath
         else:
             self.blendpath = self.blendfolder + self.blendfilepath
-        # print(self.currentpath)
         self.scene = self.jobs_table[job_nr][19]
         self.activate_collections = self.jobs_table[job_nr][20].replace(
             ", ", ",").split(",")
@@ -466,9 +460,7 @@ class jobs(object):
         )
         command_string_denoise = (self.blenderpath + ' -b ' +
                                   ' --python-expr ' + '"' + inlinepython_denoise + '"')
-        # print(command_string_denoise)
         self.print_info("Denoising " + self.shotname + str(self.shot_iter_num))
-        # return "None"
         if "win" in sys.platform:
             return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)
         elif "linux" in sys.platform:
@@ -515,7 +507,6 @@ class jobs(object):
 
     def delete_empty_folders(self, ipt_dir):
         rootdir = os.listdir(ipt_dir)
-        # os.chdir(ipt_dir)
         for directory in rootdir:
             if not os.listdir(ipt_dir + "/" + directory):
                 os.rmdir(ipt_dir + "/" + directory)
@@ -564,14 +555,9 @@ if __name__ == "__main__":
     try:
         jobs_obj = jobs()
         jobs_obj.start_generate()
-        # jobs_obj.print_info("I'm done checking the jobs!")
         jobs_obj.delete_empty_folders(jobs_obj.renderpath)
-        # print("Window closing in 10 minutes.")
-        byebyestr = "[{}] ".format(datetime.now().strftime(
-            '%Y-%m-%d %H:%M:%S')) + "I'm done here. Press enter and I'm gone!"
-        print(fg.white, bg.dark_blue, end="")
-        input(byebyestr)
-        print(rs.all, end="")
+        jobs_obj.print_info_input("I'm done here. Press enter and I'm gone!")
+        print(rs.all)
     except KeyboardInterrupt:
         jobs_obj.print_info("Okay, I understood!")
         if jobs_obj.thread_cpu is not None:

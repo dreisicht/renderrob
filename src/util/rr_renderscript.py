@@ -1,17 +1,11 @@
 
 import bpy  # pylint: disable=import-error
-# import pip
 import time
 import sys
 import os
+import rr_c_image  # pylint: disable=import-error
 from ast import literal_eval
-
 from multiprocessing import cpu_count
-
-import rr_c_image
-
-
-# from sty import fg, bg, ef, rs, Style, RgbBg
 from colorama import Fore, Back, Style, init
 
 
@@ -21,8 +15,6 @@ sys.path.append(user_settings_folder)
 import rr_user_commands
 
 init(convert=True)
-# bpsc = bpy.context.scene
-# bprn = bpsc.render
 
 scriptpath_glob = ""
 
@@ -68,37 +60,37 @@ def tobool(bool_val):
         # raise TypeError
 
 
-def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
-    #### FUNCTION CURRENTLY NOT BEING USED
-    # check if first function being called first time
+# def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
+#     #### FUNCTION CURRENTLY NOT BEING USED
+#     # check if first function being called first time
 
-    if parent == "":
-        counter = 0
-        for name in collection_names:
-            if name == "":
-                collection_names.pop(counter)
-            counter += 1
-        parent_collection = view_layer_data.layer_collection
-        # if function being called first time, reset number of changed
-    else:
-        parent_collection = parent
+#     if parent == "":
+#         counter = 0
+#         for name in collection_names:
+#             if name == "":
+#                 collection_names.pop(counter)
+#             counter += 1
+#         parent_collection = view_layer_data.layer_collection
+#         # if function being called first time, reset number of changed
+#     else:
+#         parent_collection = parent
 
-    # iterate through immediate children of collection
-    for collection in parent_collection.children:
-        # check name
-        if collection.name in collection_names:
-            collection.exclude = exclude
-            collection_names.pop(collection_names.index(collection.name))
-        # check if has children
-        if len(collection.children) > 0:
-            inexclude_collection(
-                collection_names, exclude, view_layer_data, parent=collection)
-        else:
-            continue
-    # IQ 300 move here: collections get pop-ed above, so the rest, that is not found, is printed here
-    if parent == "" and len(collection_names) > 0:
-        print_warning("I couldn't find collection {}!".format(
-            " and ".join(collection_names)))
+#     # iterate through immediate children of collection
+#     for collection in parent_collection.children:
+#         # check name
+#         if collection.name in collection_names:
+#             collection.exclude = exclude
+#             collection_names.pop(collection_names.index(collection.name))
+#         # check if has children
+#         if len(collection.children) > 0:
+#             inexclude_collection(
+#                 collection_names, exclude, view_layer_data, parent=collection)
+#         else:
+#             continue
+#     # IQ 300 move here: collections get pop-ed above, so the rest, that is not found, is printed here
+#     if parent == "" and len(collection_names) > 0:
+#         print_warning("I couldn't find collection {}!".format(
+#             " and ".join(collection_names)))
 
 
 def print_error(ipt_str):
@@ -137,21 +129,15 @@ def print_info(ipt_str):
 def write_cache(ipt_str):
     global scriptpath_glob
     cachefilepath = scriptpath_glob + "util/ERRORCACHE"
-    # print(cachefilepath)
     try:
         f = open(cachefilepath, "a")
     except PermissionError:
-        # print("First try failed.")
         time.sleep(0.1)
         f = open(cachefilepath, "a")
     finally:
-        # print("caching failed!")
         time.sleep(0.1)
     f.write(ipt_str + "\n")
     f.close()
-    # print("Closed.")
-
-
 
 
 def set_settings(scriptpath,
@@ -182,7 +168,6 @@ def set_settings(scriptpath,
         if scene == "" and len(bpy.data.scenes) > 1:
             print_warning(
                 "There are more than one scenes, but you didn't tell me which scene to render! So I am rendering the last used scene.")
-            # time.sleep(10)
             current_scene_data = bpy.context.scene
         elif len(bpy.data.scenes) == 1:
             current_scene_data = bpy.data.scenes[0]
@@ -191,18 +176,12 @@ def set_settings(scriptpath,
                 current_scene_data = bpy.data.scenes[scene]
             except KeyError:
                 print_error("Scene {} not found!".format(scene))
-    
-        # if no view layer given
-        # view_layer_names = literal_eval(view_layer_names)
-        # print("len(view_layer_names): {} ; view_layer_names[0] {}".format(
-            # len(view_layer_names), view_layer_names[0]))
-            
+
         # first we deactivate all View Layers:
         for view_layer in current_scene_data.view_layers:
             view_layer.use = False
-        
+
         if view_layer_names == []:
-            # print("A1")
             # if only one view_layer in scene
             if len(current_scene_data.view_layers) == 1:
                 view_layer_data = current_scene_data.view_layers[0]
@@ -211,7 +190,6 @@ def set_settings(scriptpath,
                 view_layer_data = current_scene_data.view_layers
         # if only one view_layer given
         elif len(view_layer_names) == 1 and view_layer_names != []:
-            # print("A2")
             # if only one view_layer in scene
             if len(current_scene_data.view_layers) == 1:
                 view_layer_data = current_scene_data.view_layers[0]
@@ -231,10 +209,9 @@ def set_settings(scriptpath,
                 
                 for vl in view_layer_names:
                     view_layer_data.append(current_scene_data.view_layers[vl])
-                # print("B3")
         else:
             print_error("Unexpected ViewLayer Error.")
-            
+
         if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
             for view_layer in view_layer_data:
                 view_layer.use = True
@@ -242,7 +219,7 @@ def set_settings(scriptpath,
             view_layer_data.use = True
         else:
             print_error("Unexpected ViewLayer Error.")
-                
+
         # activate add-ons:
         for add_on in add_on_list:
             print_info(str(add_on))
@@ -251,25 +228,14 @@ def set_settings(scriptpath,
                 print_info("I activated the addon {}.".format(add_on))
             except:
                 print_error("I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
-    
+
         current_scene_render = current_scene_data.render
-    
+
         try:
             if camera != '':
                 current_scene_data.camera = bpy.data.objects[camera]
         except KeyError:
             print_error("I didn't find the camera called {}.".format(camera))
-
-
-        # if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
-        #     for view_layer in view_layer_data:
-        #         inexclude_collection(deactivate_collections, True, view_layer)
-        #         inexclude_collection(activate_collections, False, view_layer)
-        # elif type(view_layer_data) is bpy.types.ViewLayer or type(view_layer_data) is list:
-        #     inexclude_collection(deactivate_collections, True, view_layer_data)
-        #     inexclude_collection(activate_collections, False, view_layer_data)
-        # else:
-        #     print_error("Inexclude handling went wrong.")
 
         # disable render border
         current_scene_render.use_border = border
@@ -297,8 +263,6 @@ def set_settings(scriptpath,
                 cycles_pref.compute_device_type = 'CUDA'
 
                 current_scene_data.cycles.device = 'GPU'
-                # print(bpsc.cycles.device)
-                # bpy.ops.render.render(True)
 
                 for device in cycles_pref.devices:
                     if "GeForce" in str(device.name):
@@ -341,11 +305,9 @@ def set_settings(scriptpath,
         # overwrite, placeholder
         current_scene_render.use_overwrite = overwrite
         current_scene_render.use_placeholder = placeholder
-        # print(current_scene_render.use_placeholder)
 
         # n-th frame
         current_scene_data.frame_step = frame_step
-        # print(bpy.context.view_layer.cycles.use_denoising)
 
         print_info("Done making the changes in your Blender file.")
         time.sleep(2)
