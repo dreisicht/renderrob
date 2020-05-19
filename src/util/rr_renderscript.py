@@ -149,8 +149,7 @@ def set_settings(scriptpath,
                  percres,
                  an_denoise,
                  denoise,
-                 overwrite,
-                 placeholder,
+                 new_version,
                  samples,
                  frame_step,
                  cycles,
@@ -311,8 +310,8 @@ def set_settings(scriptpath,
         current_scene_render.resolution_percentage = percres
 
         # overwrite, placeholder
-        current_scene_render.use_overwrite = overwrite
-        current_scene_render.use_placeholder = placeholder
+        current_scene_render.use_overwrite = False
+        current_scene_render.use_placeholder = True
 
         # n-th frame
         current_scene_data.frame_step = frame_step

@@ -293,7 +293,7 @@ class jobs(object):
         while os.path.exists(self.full_frame_path_no_ver.replace("$$", str(self.shot_iter_num).zfill(2)).replace("####", str(self.startframe).zfill(4))):
             self.shot_iter_num = self.shot_iter_num + 1
 
-        if self.overwrite and self.shot_iter_num > 1:
+        if not self.new_version and self.shot_iter_num > 1:
             self.shot_iter_num = self.shot_iter_num - 1
 
         # update full_frame_path with iteration number
@@ -322,7 +322,7 @@ class jobs(object):
         else:
             self.active = self.tobool(self.active)
 
-        self.hq = self.tobool(self.jobs_table[job_nr][16])
+        self.hq = self.tobool(self.jobs_table[job_nr][15])
         # check if highquality enabled, otherwise use lowquality settings
         if self.hq:
             self.resolution_scale = 100
@@ -364,25 +364,17 @@ class jobs(object):
         self.cpu_act = self.tobool(self.jobs_table[job_nr][11])  # done
         self.gpu_act = self.tobool(self.jobs_table[job_nr][12])  # done
         self.motion_blur = self.tobool(self.jobs_table[job_nr][13])  # done
-        self.overwrite = not self.tobool(self.jobs_table[job_nr][14])
-        self.placeholder = self.tobool(self.jobs_table[job_nr][15])
+        self.new_version = self.tobool(self.jobs_table[job_nr][14])
         self.animation_denoise = self.tobool(
-            self.jobs_table[job_nr][17])
-        self.denoise = self.tobool(self.jobs_table[job_nr][18])
+            self.jobs_table[job_nr][16])
+        self.denoise = self.tobool(self.jobs_table[job_nr][17])
         if self.blendfilepath[1] == ":":
             self.blendpath = self.blendfilepath
         else:
             self.blendpath = self.blendfolder + self.blendfilepath
-        self.scene = self.jobs_table[job_nr][19]
-        self.activate_collections = self.jobs_table[job_nr][20].replace(
-            ", ", ",").split(",")
+        self.scene = self.jobs_table[job_nr][18]
         # remove empty elements
-        self.activate_collections = [x for x in self.activate_collections if x]
-
-        self.deactivate_collections = self.jobs_table[job_nr][21].replace(
-            ", ", ",").split(",")
-        self.deactivate_collections = [x for x in self.deactivate_collections if x]
-        self.view_layer = self.jobs_table[job_nr][20].replace(
+        self.view_layer = self.jobs_table[job_nr][19].replace(
             ", ", ",").split(",")
         self.view_layer = [
             x for x in self.view_layer if x]
@@ -399,7 +391,7 @@ class jobs(object):
         self.create_output_folder()
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', '{}', {}, '{}', '{}', {}, {}, {}, {}, {}, '{}', {}, {}, {}, '{}', {}, {})".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', '{}', {}, '{}', '{}', {}, {}, {}, {}, '{}', {}, {}, {}, '{}', {}, {})".format(
             self.currentpath,
             self.currentpath,
             self.active_camera,
@@ -410,8 +402,7 @@ class jobs(object):
             self.resolution_scale,
             self.animation_denoise,
             self.denoise,
-            self.overwrite,
-            self.placeholder,
+            self.new_version,
             self.samples,
             self.framestep,
             self.cycles,
@@ -545,7 +536,7 @@ class jobs(object):
                 self.thread_gpu_an_dn = self.denoise_job(job)
 
             self.save_previous_job_data()
-            
+
         # wait if an denoising is still running
         if self.thread_gpu_an_dn is not None:
             self.thread_gpu_an_dn.wait(1048574)
