@@ -488,7 +488,9 @@ class jobs(object):
         if self.active_old:
             self.read_errors()
             # if still image
-            if self.endframe_old == "":
+            if self.startframe == "" and self.endframe == "":
+                self.print_info("If you give me start frame and end frame, I can check if all the frames are rendered!")
+            elif self.endframe_old == "":
                 searchrange = range(int(self.startframe_old), int(self.startframe_old) + 1)
             # if animation
             else:
