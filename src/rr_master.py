@@ -434,14 +434,14 @@ class jobs(object):
             render_frame_command = " -s " + \
                 str(self.startframe) + " -e " + str(self.endframe) + " -a "
 
-        command_string = (self.blenderpath +
-                          ' -b ' + self.blendpath +
+        command_string = ('"' + self.blenderpath + '"' +
+                          ' -b ' + '"' + self.blendpath + '"' +
                           scene_sub_command_string +
-                          ' -o ' + self.full_frame_path +
+                          ' -o ' + '"' + self.full_frame_path + '"' +
                           " --python-expr " + '"' + inlinepython + '"' +
                           " -F " + self.file_format_upper +
                           render_frame_command)
-        # print(command_string)
+        print(command_string)
         
         self.print_info("Rendering {} on {}".format(self.shotname +
                                           str(self.shot_iter_num), device.upper()))

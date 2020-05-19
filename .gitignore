@@ -16,3 +16,4 @@
 *.exr
 /src/util/ERRORCACHE*
 *.pdf
+*.zip
