@@ -164,6 +164,7 @@ def set_settings(scriptpath,
     
     try:
         print_info("Render Rob here. I'm starting to make my changes in your Blender file!")
+
     
         if scene == "" and len(bpy.data.scenes) > 1:
             print_warning(
@@ -239,14 +240,18 @@ def set_settings(scriptpath,
 
         # disable render border
         current_scene_render.use_border = border
+        
+
 
         if cycles is False:
+            if samples != "":
+                current_scene_data.eevee.taa_render_samples = int(samples)
             current_scene_render.engine = 'BLENDER_EEVEE'
-            current_scene_data.eevee.taa_render_samples = samples
             current_scene_data.eevee.use_motion_blur = mb
         elif cycles:
             current_scene_render.engine = 'CYCLES'
-            current_scene_data.cycles.samples = samples
+            if samples != "":
+                current_scene_data.cycles.samples = int(samples)
 
             # cpu
             if device == "cpu":
@@ -298,8 +303,11 @@ def set_settings(scriptpath,
 
         print_info("Rendering on " + str(device))
         # output settings
-        current_scene_render.resolution_x = xres
-        current_scene_render.resolution_y = yres
+        if xres != "":
+            
+            current_scene_render.resolution_x = int(xres)
+        if yres != "":
+            current_scene_render.resolution_y = int(yres)
         current_scene_render.resolution_percentage = percres
 
         # overwrite, placeholder

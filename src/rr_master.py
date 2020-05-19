@@ -281,7 +281,7 @@ class jobs(object):
         
         # Different folder for still images and animations
         # If still image rendering
-        if self.endframe == "":
+        if self.endframe == "" and self.startframe != "":
             self.frame_render_folder = self.renderpath + "stills/"
         # if animation rendering
         else:
@@ -399,7 +399,7 @@ class jobs(object):
         self.create_output_folder()
 
     def render_job(self, device):
-        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', '{}', {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, '{}', {}, {})".format(
+        inlinepython = "import sys ; sys.path.append('{}util') ; import rr_renderscript ; rr_renderscript.set_settings('{}', '{}', '{}', {}, '{}', '{}', {}, {}, {}, {}, {}, '{}', {}, {}, {}, '{}', {}, {})".format(
             self.currentpath,
             self.currentpath,
             self.active_camera,
@@ -428,7 +428,9 @@ class jobs(object):
             scene_sub_command_string = ""
         
         # if end frame empty, render single frame
-        if self.endframe == "":
+        if self.endframe == "" and self.startframe == "":
+            render_frame_command = " -a "
+        elif self.endframe == "" and self.startframe != "":
             render_frame_command = " -f " + str(self.startframe) 
         else:
             render_frame_command = " -s " + \
