@@ -434,7 +434,7 @@ class jobs(object):
                           " --python-expr " + '"' + inlinepython + '"' +
                           " -F " + self.file_format_upper +
                           render_frame_command)
-        print(command_string)
+        # print(command_string)
         
         self.print_info("Rendering {} on {}".format(self.shotname +
                                           str(self.shot_iter_num), device.upper()))

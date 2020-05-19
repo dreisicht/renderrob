@@ -25,7 +25,7 @@ def denoise_folder_explicit(scriptpath, inputdir, startframe, endframe):
             os.mkdir(outputdir)
         os.chdir(inputdir)
         myfiles = (glob.glob("*.exr"))
-        print(myfiles)
+        # print(myfiles)
         for file in myfiles:
             for framenum in range(startframe, endframe + 1):
                 if file[-8:-4] == str(framenum).zfill(4):
