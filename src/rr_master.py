@@ -519,7 +519,6 @@ class jobs(object):
 
             if hasattr(self, "active_old"):
                 self.check_renders()
-                
 
             # sleep, to avoid simultanous start, so both render first frame
             sleep(0.1)
