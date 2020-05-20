@@ -16,14 +16,16 @@
 - For better overview, usually all settings in the sheet are checked (apart from the last one, denoising).
 - If you disable Cycles (and by that enable Eevee), the irrelevant settings get disabled.
 - Separate View Layers and add-ons with a comma (space is optional)
-- If you want to render a still image, fill start and end frame with same value.
+- If you want to render a still image, fill start frame with the frame you want to render and leave end frame blank.
+- If you don't provide start frame and end frame the, Render Rob will render an animation with the start and end set in the Blender file.
 - If you want to use multiple Sheets you can configure your sheet name in the file `util/sheetname.ini`
 
 ##### Render output
 
 - If read only is enabled, a new folder with a new version number is created and used as render output.
-- The Folder and frame name consists of `filename-camera-startframe-endframe-Scene-viewlayer-quality-version`
+- The Folder and frame name consists of `filename-camera-Scene-viewlayer-quality-version`
 - Empty folders of failed renders get deleted in the end
+- Render Rob never overwrites images. If you activate `new version`, he creates a new folder for output. If new version is not activated, he continues in the folder with the highest version number and skips already rendered images. So if you want to re-render some images, delete them, and then render the job with `new version` deactivated.
 
 ##### Rendering
 
@@ -45,12 +47,10 @@
 
 If a property in the sheet gets marked yellow, this means, that a possible error is found. These are just warnings, so you still are able to start the job. In some cases it will work, in some it won't.
 
-Following things are being looked at:
+Following things are the most important ones being looked at:
 
 - Double occurrences of jobs
 - No render device selected
-- Both devices active, but no read only
-- Both devices active, but no placeholders
 - High quality animation, but no Animation Denoising
 - Animation Denoising, but exr is not selected
 - Single frame rendering (start and end frame have the same value), but Animation Denoising is activated
@@ -64,7 +64,34 @@ Following things are being looked at:
 Click on the chapter to open it:
 
 <details>
-<summary>Setting up Google API</summary>
+<summary>1. Usage of Render Rob without API setup </summary>
+If you don't want to setup your Google API, you can also work with downloaded .xlsx files.
+Here you have two options. You either copy the sheet into your Google Drive, or you download the sheet straightaway as an .xlsx file and manipulate if offline.
+
+1. Open this spreadsheet:
+https://docs.google.com/spreadsheets/d/1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ/edit?usp=sharing
+
+1. Copy the sheet into your Drive.
+
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
+
+
+1. Name it e.g. `Render Rob`.
+
+![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Sheet")
+
+3. Download the sheet as .xlsx
+
+![Text](img/readme_pics/Anmerkung%202020-05-20%20090653.jpg "Sheet")
+
+4. Place it next to the RenderRob.exe
+
+![Text](img/readme_pics/Anmerkung%202020-05-20%20091309.jpg "Sheet")
+
+</details>
+
+<details>
+<summary>2. Setting up Google API</summary>
 
 <!-- ### Setting up Google api -->
 
@@ -112,12 +139,12 @@ Click on the chapter to open it:
 <!-- ### Spreadsheet -->
 
 <details>
-<summary>Spreadsheet setup </summary>
+<summary>3. Spreadsheet setup </summary>
 
 1. Open this spreadsheet:
-https://docs.google.com/spreadsheets/d/1sRj9vS0KO8cSCMgpaX0wPaVbBxr_lR-1asJOY-VAspw/edit?usp=sharing
+https://docs.google.com/spreadsheets/d/1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ/edit?usp=sharing
 
-1. Copy the sheet into your Drive 
+1. Copy the sheet into your Drive.
 
 ![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
 
@@ -135,7 +162,7 @@ https://docs.google.com/spreadsheets/d/1sRj9vS0KO8cSCMgpaX0wPaVbBxr_lR-1asJOY-VA
 <!-- ### Filling the spreadsheet -->
 
 <details>
-<summary>Filling the spreadsheet </summary>
+<summary>4. Filling the spreadsheet </summary>
 
 After setting that up, fill in the global settings in the Sheet. The Blender Path and Render Path is mandatory, the rest is optional.
 
@@ -144,6 +171,8 @@ After setting that up, fill in the global settings in the Sheet. The Blender Pat
 Now you only have to paste your attributes of your job to be rendered, and run `renderrob.exe`!
 
 </details>
+
+
 
 ## Properties
 
@@ -154,8 +183,8 @@ Property list of the spreadsheet
 | active | ✅ | Activates or deactivates job |
 | .blend file path | ✅ | Absolute path to blend file, or relative path to the "path to blender files folder" given under globals |
 | camera | | Name of camera to be activated, optional |
-| start frame | | First frame to be rendered|
-| end frame | | Last frame to be rendered|
+| start frame | | First frame to be rendered. It is recommended to give this information, so Render Rob can check if all the frames are rendered|
+| end frame | | Last frame to be rendered. It is recommended to give this information, so Render Rob can check if all the frames are rendered|
 | X res | | Horizontal resolution |
 | Y res | | Vertical resolution|
 | samples | | Number of Cycles or Eevee passes|
