@@ -149,27 +149,26 @@ Now you only have to paste your attributes of your job to be rendered, and run `
 
 Property list of the spreadsheet
 
-| Property | Usage |
-|--- |:---|
-| active | Activates or deactivates job |
-| .blend file path | Path of blend file. Absolute path, as well as relative path to file folder in globals is possible |
-| camera | Name of camera to be activated, optional |
-| start frame | First frame to be rendered|
-| end frame | Last frame to be rendered|
-| X res | Horizontal resolution |
-| Y res | Vertical resolution|
-| samples | Number of Cycles or Eevee passes|
-| file format | Output file format. Exr refers to multilayer exr|
-| Cycles (Eevee) | If activated, Cycles is used, otherwise Eevee|
-| CPU | Usage of CPU for rendering |
-| GPU | Usage of GPU for rendering |
-| motion blur | Usage of Motion blur |
-| read only | If activated, already rendered images don't get overwritten |
-| place-holder | Creating placeholders of images being rendered |
-| high-quality | If deactivated, preview settings from globals are used|
-| animation denoise | Usage of post-process animation denoising|
-| denoise | Usage of image-denoising|
-| scene | Add name of scene to render. Only one is allowed here. Optional.|
-| view layer | Add name of view layer to render. Only one is allowed here. Optional.|
-| comments | Put your own comments of the shot here|
+| Property | Mandatory |Usage |
+|--- |:---|:---|
+| active | ✅ | Activates or deactivates job |
+| .blend file path | ✅ | Absolute path to blend file, or relative path to the "path to blender files folder" given under globals |
+| camera | | Name of camera to be activated, optional |
+| start frame | | First frame to be rendered|
+| end frame | | Last frame to be rendered|
+| X res | | Horizontal resolution |
+| Y res | | Vertical resolution|
+| samples | | Number of Cycles or Eevee passes|
+| file format | ✅ | Output file format. Exr refers to multilayer exr|
+| Cycles (Eevee) | ✅ | If activated, Cycles is used, otherwise Eevee|
+| CPU | ✅ | Usage of CPU for rendering |
+| GPU | ✅ | Usage of GPU for rendering |
+| motion blur | ✅ | Usage of Motion blur |
+| new version | ✅ | If activated, a new folder gets created. Otherwise the job gets  |
+| high-quality | ✅ | If deactivated, preview settings from globals are used|
+| animation denoise | ✅ | Usage of post-process animation denoising|
+| denoise | ✅ | Usage of image-denoising|
+| scene | | Add name of scene to render. Only one is allowed here. Optional.|
+| view layer | | Add name of view layer to render. Only one is allowed here. Optional.|
+| comments | | Put your own comments of the shot here|
 

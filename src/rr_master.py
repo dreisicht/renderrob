@@ -253,8 +253,8 @@ class jobs(object):
         filename = self.blendpath.split("/")[-1][:-6]
         self.shotname = (filename + "-" +
                          self.active_camera.replace("Camera", "Cam") + "-" +
-                         str(self.startframe) + "-" +
-                         str(self.endframe) + "-" +
+                        #  str(self.startframe) + "-" +
+                        #  str(self.endframe) + "-" +
                          str(self.scene.replace("Scene", "Sc")) + "-" +
                          str(self.view_layer_dir) + "-" +
                          self.quality_state_string + "-v")
