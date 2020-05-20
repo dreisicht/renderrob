@@ -8,7 +8,6 @@
 
 Save time managing your render jobs!
 
-
 ![ ](img/readme_pics/usage.gif)
 
 ## Who is it for?
@@ -25,7 +24,6 @@ Individuals and small teams.
 - Automatic organizing of render output folder
 - Automatic start of CPU and GPU jobs, so that all devices are always at full load
 - Built for both Windows and Linux
-<!-- screenshot!! TODO -->
 
 ![Screenshot](img/readme_pics/screenshot.jpg)
 
