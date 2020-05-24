@@ -244,7 +244,7 @@ class jobs(object):
         if self.hq:
             self.quality_state_string = "hq"
         else:
-            self.quality_state_string = "preview"
+            self.quality_state_string = "pv"
 
         # get blender file name without .blend
         
