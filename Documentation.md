@@ -20,6 +20,7 @@
 - If you don't provide start frame and end frame the, Render Rob will render an animation with the start and end set in the Blender file.
 - If you want to use multiple Sheets you can configure your sheet name in the file `util/sheetname.ini`
 - If you only want to denoise your shot, deactivate both CPU and GPU and activate Animation Denoising.
+
 ##### Render output
 
 - If read only is enabled, a new folder with a new version number is created and used as render output.
