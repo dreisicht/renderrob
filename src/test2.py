@@ -1,24 +1,19 @@
 import os
-import pprint
+import pickle
 
 import google.oauth2.credentials
 
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 
-import pickle
-
-pp = pprint.PrettyPrinter(indent=2)
-
-# The CLIENT_SECRETS_FILE variable specifies the name of a file that contains
-# the OAuth 2.0 information for this application, including its client_id and
-# client_secret.
 CLIENT_SECRETS_FILE = "src\client_secret.json"
 
 # This access scope grants read-only access to the authenticated user's Drive
 # account.
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+SCOPES = ['https://www.googleapis.com/auth/drive.file',
+          'https://www.googleapis.com/auth/spreadsheets.readonly']
 # API_SERVICE_NAME = 'drive'
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
@@ -54,12 +49,6 @@ def list_drive_files(service, **kwargs):
     pp.pprint(results)
 
 
-def copy_sheet(service):
-    service.files().create().execute()
-    sheet = service.spreadsheets()
-    sheet.create()
-    template_id = "1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ"
-
 
 def get_sheets(service):
     template_id = "1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ"
@@ -81,7 +70,42 @@ def get_sheets(service):
         for row in values:
             # Print columns A and E, which correspond to indices 0 and 4.
             print('%s, %s' % (row[0], row[4]))
+            
 
+def read_template(service):
+    # template_id = "1RfrCj7VsTxAWLXg3Y30-hl7bhRaLklKcRWbpjzO9Nhc"
+    template_id = "1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ"
+    range_name = "A1:U2"
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=template_id,
+                                range=range_name).execute()
+    values = result.get('values', [])
+    print(values)
+    
+def create_sheet(service):
+    spreadsheet = {
+        'properties': {
+            'title': "Render Rob v2.0.0"
+        }
+    }
+    spreadsheet = service.spreadsheets().create(body=spreadsheet,
+                                                fields='spreadsheetId').execute()
+    print('Spreadsheet ID: {0}'.format(spreadsheet.get('spreadsheetId')))
+    return spreadsheet.get('spreadsheetId')
+
+
+def copy_sheet(service):
+    template_id = "1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ"
+    newsheet_id = create_sheet(service)
+
+    dest_body = {
+        'destination_spreadsheet_id': newsheet_id,
+    }
+
+    newsheet = service.spreadsheets().sheets().copyTo(spreadsheetId=template_id, sheetId=0, body=dest_body).execute()
+    newsheet = service.spreadsheets().sheets().copyTo(spreadsheetId=template_id, sheetId=1, body=dest_body).execute()
+    
+    # print(newsheet)
 
 
 if __name__ == '__main__':
@@ -92,5 +116,6 @@ if __name__ == '__main__':
 #   list_drive_files(service,
 #                    orderBy='modifiedByMeTime desc',
 #                    pageSize=5)
-#   copy_sheet(service)
-    get_sheets(service)
+    copy_sheet(service)
+    # create_sheet(service)
+    # read_template(service)
