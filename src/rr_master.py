@@ -32,20 +32,22 @@ class jobs(object):
             self.print_info("I found an Excel file. I'm gonna use that one!")
             # print(self.jobs_table, global_set)
         else:
-            if not glob.glob(self.currentpath + "/key/*.json"):
-                self.print_error("I didn't find either an .xlsx file or a .json key. Please provide one of the two!")
             try:
                 self.print_info("I'm gonna go and get the data from Google Sheets.")
                 self.jobs_table, global_set = query_sheet()
                 self.print_info("I successfully downloaded the data from Google Sheets.")
-            except:
-                self.print_error("Couldn't get the data from Google Sheets. Maybe check your json key!")
+            except ArithmeticError:
+                self.print_error("Couldn't get the data from Google Sheets. Please try installing Render Rob again!")
             # print(self.jobs_table, global_set)
 
         self.blenderpath = self.path_process(global_set[0][1])[:-1]
         self.renderpath = self.path_process(global_set[1][1])
         self.blendfolder = self.path_process(global_set[2][1])
-        self.add_on_list = global_set[6][1].replace(", ", ",").split(",")
+        try:
+            self.add_on_list = global_set[6][1].replace(", ", ",").split(",")
+        except IndexError:
+            self.add_on_list = ""
+            
         # remove empty elements
         self.add_on_list = [x for x in self.add_on_list if x]
 
@@ -78,7 +80,7 @@ class jobs(object):
         elif self.blenderpath == "blender":
             pass
         elif not os.path.isfile(self.blenderpath):
-            self.print_error("I couldn't find the Blender folder. Perhaps a spelling mistake?")
+            self.print_error("I couldn't find Blender under {}. Perhaps a spelling mistake?".format(self.blenderpath))
             sys.exit()
 
         # check if render path is filled out correctly

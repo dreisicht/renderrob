@@ -1,5 +1,6 @@
 # import configparser
 import os
+import sys
 import pickle
 import webbrowser
 
@@ -9,6 +10,8 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+
+from datetime import datetime
 
 SHEETNAME = 'Render Rob 2.0'
 
@@ -21,6 +24,12 @@ SCOPES = ['https://www.googleapis.com/auth/drive.file',
 # API_SERVICE_NAME = 'drive'
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
+
+
+def print_info(ipt_str):
+    time_current = "[{}]".format(
+        datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print(time_current, ipt_str)
 
 
 def get_sheet_name():
@@ -38,8 +47,8 @@ def get_authenticated_service():
     flow = InstalledAppFlow.from_client_secrets_file(
         CLIENT_SECRETS_FILE, SCOPES)
 
-    if os.path.exists('token.pickle'):
-        with open('token.pickle', 'rb') as token:
+    if os.path.exists('src/util/token.pickle'):
+        with open('src/util/token.pickle', 'rb') as token:
             credentials = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
         if not credentials or not credentials.valid:
@@ -47,7 +56,7 @@ def get_authenticated_service():
                 credentials.refresh(Request())
     else:
         credentials = flow.run_local_server()
-        with open('token.pickle', 'wb') as token:
+        with open('src/util/token.pickle', 'wb') as token:
             pickle.dump(credentials, token)
 
     return build(API_SERVICE_NAME, API_VERSION, credentials=credentials)
@@ -151,24 +160,17 @@ def query_sheet():
     service = get_authenticated_service()
 
     try:
-        sheetcache = open("sheetcache", "r")
+        sheetcache = open("src/util/sheetcache", "r")
         spreadsheetId = sheetcache.read()
         sheetcache.close()
     except FileNotFoundError:
         spreadsheetId = copy_sheet(service)
-        sheetcache = open("sheetcache", "w")
+        sheetcache = open("src/util/sheetcache", "x")
         sheetcache.write(spreadsheetId)
         sheetcache.close()
+        print_info("Created the Render Rob Spreadsheet. Gonna quit for now, so you can fill it with your infomration.")
+        sys.exit()
 
-    # if service.spreadsheets().sheets()
-    # if sheet not in drive:
-    # copy sheets from template
-
-    # rename sheets
-    # hide the according one
-    # open in browser
-    # else:
-    # get values
     jobs_values = get_values(service, spreadsheetId, "jobs!A1:V81")
     globals_values = get_values(service, spreadsheetId, "globals!A1:C7")
     return jobs_values, globals_values

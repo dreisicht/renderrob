@@ -18,3 +18,4 @@
 *.pdf
 *.zip
 *.pickle
+*sheetcache
