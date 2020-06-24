@@ -1,7 +1,14 @@
 {
-	"access_token": "ya29.a0AfH6SMCcycKvUcHoJlQxsrq5i-aCXCM-8LogISJXyHqETYQAR5CtCZ5bRF2wxf84uQlAxYaX2rQ9-yBz-aCwS_sMEXyuSw8x-P2s4LHlg7guqBq4-iyraxFyXoWHE-REbPfvtRt4WIiCiuJjNKUnewQdOAIQJZExY2U",
-	"scope": "https://www.googleapis.com/auth/spreadsheets.readonly",
-	"token_type": "Bearer",
-	"expires_in": 3599,
-	"refresh_token": "1//04XVanf1gB0o_CgYIARAAGAQSNwF-L9Irhz2o_BoDP_vwLPoMmGzG6Oap30jy9utjUTBwJGQ1sHnAQmyiCK8TVInZomqo7v0nT0w"
+	"installed": {
+		"client_id": "243119286709-ceqv1581dilf28n3tiuspu8csj66tv7b.apps.googleusercontent.com",
+		"project_id": "renderpipeline",
+		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+		"token_uri": "https://oauth2.googleapis.com/token",
+		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+		"client_secret": "iG99SL4rYTUIZC-f9WtdrnKv",
+		"redirect_uris": [
+			"urn:ietf:wg:oauth:2.0:oob",
+			"http://localhost"
+		]
+	}
 }

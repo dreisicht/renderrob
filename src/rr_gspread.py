@@ -11,6 +11,7 @@ from googleapiclient.errors import HttpError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 
+
 from datetime import datetime
 
 SHEETNAME = 'Render Rob 2.0'
@@ -19,8 +20,7 @@ CLIENT_SECRETS_FILE = "src\client_secret.json"
 
 # This access scope grants read-only access to the authenticated user's Drive
 # account.
-SCOPES = ['https://www.googleapis.com/auth/drive.file',
-          'https://www.googleapis.com/auth/spreadsheets.readonly']
+SCOPES = ['https://www.googleapis.com/auth/drive.file']
 # API_SERVICE_NAME = 'drive'
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
@@ -75,7 +75,7 @@ def create_sheet(service):
 
 
 def copy_sheet(service):
-    template_id = "1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ"
+    template_id = "1prG29lIic0Qqc_fGq5sLdnDh1u8Nkd45MxdaCuRp1Rw"
     new_spreadsheet_id = create_sheet(service)
 
     dest_body = {
@@ -83,12 +83,12 @@ def copy_sheet(service):
     }
 
     jobs_sheet = service.spreadsheets().sheets().copyTo(
-        spreadsheetId=template_id, sheetId=0, body=dest_body).execute()
+        spreadsheetId=template_id, sheetId=259211185, body=dest_body).execute()
     jobs_sheet_id = jobs_sheet.get("sheetId")
     renameSheet(service, new_spreadsheet_id, jobs_sheet_id, "jobs")
 
     globals_sheet = service.spreadsheets().sheets().copyTo(
-        spreadsheetId=template_id, sheetId=1436513898, body=dest_body).execute()
+        spreadsheetId=template_id, sheetId=209628393, body=dest_body).execute()
     globals_sheet_id = globals_sheet.get("sheetId")
     renameSheet(service, new_spreadsheet_id, globals_sheet_id, "globals")
 
@@ -168,7 +168,7 @@ def query_sheet():
         sheetcache = open("src/util/sheetcache", "x")
         sheetcache.write(spreadsheetId)
         sheetcache.close()
-        print_info("Created the Render Rob Spreadsheet. Gonna quit for now, so you can fill it with your infomration.")
+        print_info("Created the Render Rob Spreadsheet. Gonna quit for now, so you can fill it with your information.")
         sys.exit()
 
     jobs_values = get_values(service, spreadsheetId, "jobs!A1:V81")
@@ -177,4 +177,4 @@ def query_sheet():
 
 
 if __name__ == "__main__":
-    query_sheet()
+    print(query_sheet())
