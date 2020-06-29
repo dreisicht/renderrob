@@ -60,107 +60,12 @@ Following things are the most important ones being looked at:
 
 ## Setup
 
-**ATTENTION! If you don't want to setup the Google spread API, you can download the sheet as an xlsx and put it next to the .exe** 
-
 Click on the chapter to open it:
 
-<details>
-<summary>1. Usage of Render Rob without API setup </summary>
-If you don't want to setup your Google API, you can also work with downloaded .xlsx files.
-Here you have two options. You either copy the sheet into your Google Drive, or you download the sheet straightaway as an .xlsx file and manipulate if offline.
-
-1. Open this spreadsheet:
-https://docs.google.com/spreadsheets/d/1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ/edit?usp=sharing
-
-1. Copy the sheet into your Drive.
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
-
-
-1. Name it e.g. `Render Rob`.
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Sheet")
-
-3. Download the sheet as .xlsx
-
-![Text](img/readme_pics/Anmerkung%202020-05-20%20090653.jpg "Sheet")
-
-4. Place it next to the RenderRob.exe
-
-![Text](img/readme_pics/Anmerkung%202020-05-20%20091309.jpg "Sheet")
-
-</details>
-
-<details>
-<summary>2. Setting up Google API</summary>
-
-<!-- ### Setting up Google api -->
-
-1. Open up https://console.developers.google.com, agree to terms and conditions and click on `Agree and continue`
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102222.jpg "Terms and Service")
-
-2. Click on create project
-
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125300.jpg "Dashboard")
-
-3. Name the project e.g. Render Rob and click on create
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102359.jpg "Create Project")
-
-4. Search for **Google Drive API** and enable it
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125343.jpg "Search API")
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125407.jpg "Drive API")
-<!-- ![Text](img/readme_pics/Anmerkung%202020-04-26%20102553.jpg "Descrp") -->
-
-5. Same for **Google Sheets API**
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102550.jpg "Search API")
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102636.jpg "Sheet API")
-
-6. Click on Create Credentials
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20125536.jpg "Credentials")
-
-7. fill out the form and click on `What credentials do I need?`
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102827.jpg "Credentials")
-
-8. continue filling out
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102856.jpg "Credentials")
-
-9. save the json file you get in the `Render Rob\Key` Folder
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20102919.jpg "Credentials")
-</details>
-
-<!-- ### Spreadsheet -->
-
-<details>
-<summary>3. Spreadsheet setup </summary>
-
-1. Open this spreadsheet:
-https://docs.google.com/spreadsheets/d/1Hc74LRRvTiekuYtiTYaZGC9qCOjnf9SiAurZwmgZjUQ/edit?usp=sharing
-
-1. Copy the sheet into your Drive.
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101650.jpg "Sheet")
-
-
-3. Name it `Render Rob`. If you name it different, you will have to add the name to the `sheetname.ini` located in the `user` folder.
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20101720.jpg "Sheet")
-
-4. Copy the e-mail address from step 8 (it's called Service account ID there) and share the sheet with the mail!
-
-![Text](img/readme_pics/Anmerkung%202020-04-26%20104113.jpg "Sheet")
-</details>
-
-
 <!-- ### Filling the spreadsheet -->
+
+1. Start Render Rob
+2. Follow the login
 
 <details>
 <summary>4. Filling the spreadsheet </summary>

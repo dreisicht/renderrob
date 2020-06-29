@@ -20,7 +20,8 @@ CLIENT_SECRETS_FILE = "src\client_secret.json"
 
 # This access scope grants read-only access to the authenticated user's Drive
 # account.
-SCOPES = ['https://www.googleapis.com/auth/drive.file']
+SCOPES = ['https://www.googleapis.com/auth/drive.file',
+          'https://www.googleapis.com/auth/spreadsheets.readonly']
 # API_SERVICE_NAME = 'drive'
 API_SERVICE_NAME = 'sheets'
 API_VERSION = 'v4'
