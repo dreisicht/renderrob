@@ -155,7 +155,6 @@ def cleanup_sheet(service, spreadsheetId):
     for i in range(len(sheets)):
         title = sheets[i].get("properties", {}).get("title")
         sheet_id = sheets[i].get("properties", {}).get("sheetId")
-        print(title)
         if "jobs" in title and title != "jobs":
             renameSheet(service, spreadsheetId, sheet_id, "jobs")
             title = "jobs"
