@@ -107,3 +107,5 @@ Property list of the spreadsheet
 | view layer | | Add name of view layer to render. Only one is allowed here. Optional.|
 | comments | | Put your own comments of the shot here|
 
+
+If you're wondering, why you have to copy this sheet yourself, the reason is, that Render Rob respects your privacy and therefore does not have access to your spreadsheets, but only to the one it created. So you have to manually copy the sheet there.
