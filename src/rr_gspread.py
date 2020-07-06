@@ -167,7 +167,4 @@ def cleanup_sheet(service, spreadsheetId):
 
 
 if __name__ == "__main__":
-    # print(os.getcwd())
     print(query_sheet())
-    # read_as_service_account()
-    # query_files()
