@@ -22,7 +22,8 @@ class jobs(object):
     def __init__(self):
         self.print_info("Hello from Render Rob! I'm glad to help you!")
 
-        self.currentpath = os.path.dirname(os.path.realpath(__file__)).replace("\\", "/")+"/"
+        self.currentpath = os.path.dirname(
+            os.path.realpath(__file__)).replace("\\", "/")+"/"
         self.flush_cache_file()
         # print(glob.glob(self.currentpath + "*.xlsx"))
         excel_file = glob.glob(self.currentpath + "*.xlsx")
@@ -33,11 +34,14 @@ class jobs(object):
             # print(self.jobs_table, global_set)
         else:
             try:
-                self.print_info("I'm gonna go and get the data from Google Sheets.")
+                self.print_info(
+                    "I'm gonna go and get the data from Google Sheets.")
                 self.jobs_table, global_set = query_sheet()
-                self.print_info("I successfully downloaded the data from Google Sheets.")
+                self.print_info(
+                    "I successfully downloaded the data from Google Sheets.")
             except ArithmeticError:
-                self.print_error("Couldn't get the data from Google Sheets. Please try installing Render Rob again!")
+                self.print_error(
+                    "Couldn't get the data from Google Sheets. Please try installing Render Rob again!")
             # print(self.jobs_table, global_set)
 
         self.blenderpath = self.path_process(global_set[0][1])[:-1]
@@ -47,7 +51,7 @@ class jobs(object):
             self.add_on_list = global_set[6][1].replace(", ", ",").split(",")
         except IndexError:
             self.add_on_list = ""
-            
+
         # remove empty elements
         self.add_on_list = [x for x in self.add_on_list if x]
 
@@ -63,15 +67,19 @@ class jobs(object):
 
         bg.red = Style(RgbBg(self.red[0], self.red[1], self.red[2]))
         bg.green = Style(RgbBg(self.green[0], self.green[1], self.green[2]))
-        bg.yellow = Style(RgbBg(self.yellow[0], self.yellow[1], self.yellow[2]))
+        bg.yellow = Style(
+            RgbBg(self.yellow[0], self.yellow[1], self.yellow[2]))
         bg.grey = Style(RgbBg(self.grey[0], self.grey[1], self.grey[2]))
-        bg.light_blue = Style(RgbBg(self.light_blue[0], self.light_blue[1], self.light_blue[2]))
-        bg.dark_blue = Style(RgbBg(self.dark_blue[0], self.dark_blue[1], self.dark_blue[2]))
-        bg.lighter_stone = Style(RgbBg(self.lighter_stone[0], self.lighter_stone[1], self.lighter_stone[2]))
-        bg.dark_stone = Style(RgbBg(self.dark_stone[0], self.dark_stone[1], self.dark_stone[2]))
-        
-        self.error_cache_len = 0
+        bg.light_blue = Style(
+            RgbBg(self.light_blue[0], self.light_blue[1], self.light_blue[2]))
+        bg.dark_blue = Style(
+            RgbBg(self.dark_blue[0], self.dark_blue[1], self.dark_blue[2]))
+        bg.lighter_stone = Style(
+            RgbBg(self.lighter_stone[0], self.lighter_stone[1], self.lighter_stone[2]))
+        bg.dark_stone = Style(
+            RgbBg(self.dark_stone[0], self.dark_stone[1], self.dark_stone[2]))
 
+        self.error_cache_len = 0
 
         # check if blender path is filled out correctly
         if self.blenderpath == "C:/Path/To/Blender.exe":
@@ -80,7 +88,8 @@ class jobs(object):
         elif self.blenderpath == "blender":
             pass
         elif not os.path.isfile(self.blenderpath):
-            self.print_error("I couldn't find Blender under {}. Perhaps a spelling mistake?".format(self.blenderpath))
+            self.print_error(
+                "I couldn't find Blender under {}. Perhaps a spelling mistake?".format(self.blenderpath))
             sys.exit()
 
         # check if render path is filled out correctly
@@ -89,11 +98,13 @@ class jobs(object):
                 "Please fill the path to you render folder under globals!")
             sys.exit()
         elif not os.path.exists(self.renderpath):
-            self.print_error("I couldn't find the render output folder. Perhaps a spelling mistake?")
+            self.print_error(
+                "I couldn't find the render output folder. Perhaps a spelling mistake?")
             sys.exit()
-        
+
         if not os.path.exists(self.blendfolder):
-            self.print_warning("I couldn't find the .blend file folder. Perhaps a spelling mistake?")
+            self.print_warning(
+                "I couldn't find the .blend file folder. Perhaps a spelling mistake?")
 
         self.preview_res = global_set[3][1]
         self.preview_res_active = self.tobool(global_set[3][2])
@@ -109,13 +120,12 @@ class jobs(object):
         self.thread_cpu = None
         self.thread_gpu = None
         self.thread_gpu_an_dn = None
-        
 
     def flush_cache_file(self):
         f = open(self.currentpath + "util/ERRORCACHE", "w")
         f.write("")
         f.close()
-        
+
     def read_errors(self):
         # open and read the file after the appending:
         try:
@@ -127,7 +137,7 @@ class jobs(object):
             sleep(0.1)
 
         tmp_str = f.read()
-        
+
         f.close()
         print_list = []
 
@@ -141,7 +151,6 @@ class jobs(object):
                 elif "[WARNING]" in line:
                     self.print_warning_noinput(line.replace("[WARNING]", ""))
             print_list.append(line)
-
 
     def rr_read_excel(self, path_sheet):
         wb = xlrd.open_workbook(path_sheet)
@@ -159,7 +168,8 @@ class jobs(object):
     def print_error(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(bg.red + fg.white + time_current + " [ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
+        input(bg.red + fg.white + time_current +
+              " [ERROR] " + ipt_str + " Press Enter to exit." + rs.all)
         sys.exit()
 
     @staticmethod
@@ -169,24 +179,26 @@ class jobs(object):
         print(bg.red + fg.white + time_current +
               " [ERROR] " + ipt_str + rs.all)
 
-
     @staticmethod
     def print_warning(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(bg.yellow + fg.black + time_current + "[WARNING] " + ipt_str + " Press Enter to continue." + rs.all)
-        
+        input(bg.yellow + fg.black + time_current +
+              "[WARNING] " + ipt_str + " Press Enter to continue." + rs.all)
+
     @staticmethod
     def print_warning_noinput(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        print(bg.yellow + fg.black + time_current + " [WARNING]" + ipt_str + rs.all)
+        print(bg.yellow + fg.black + time_current +
+              " [WARNING]" + ipt_str + rs.all)
 
     @staticmethod
     def print_info_input(ipt_str):
         time_current = "[{}]".format(
             datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        input(bg.dark_blue + fg.white + time_current + "[INFO] " + ipt_str + " Press Enter to continue." + rs.all)
+        input(bg.dark_blue + fg.white + time_current +
+              "[INFO] " + ipt_str + " Press Enter to continue." + rs.all)
 
     @staticmethod
     def print_info(ipt_str):
@@ -240,7 +252,6 @@ class jobs(object):
         else:
             print("Bool Error")
 
-
     def get_shotname(self):
         # preview or hq suffix
         if self.hq:
@@ -249,21 +260,22 @@ class jobs(object):
             self.quality_state_string = "pv"
 
         # get blender file name without .blend
-        
-        self.view_layer_dir = ",".join(self.view_layer).replace("View Layer", "Vl")
+
+        self.view_layer_dir = ",".join(
+            self.view_layer).replace("View Layer", "Vl")
 
         filename = self.blendpath.split("/")[-1][:-6]
         self.shotname = (filename + "-" +
                          self.active_camera.replace("Camera", "Cam") + "-" +
-                        #  str(self.startframe) + "-" +
-                        #  str(self.endframe) + "-" +
+                         #  str(self.startframe) + "-" +
+                         #  str(self.endframe) + "-" +
                          str(self.scene.replace("Scene", "Sc")) + "-" +
                          str(self.view_layer_dir) + "-" +
                          self.quality_state_string + "-v")
         self.shotname = self.shotname.replace(" ", "_")
 
     def assemble_frame_path(self):
-        return (self.frame_render_folder + self.shotname + "$$" + 
+        return (self.frame_render_folder + self.shotname + "$$" +
                 "-" + "####." + self.file_format)
 
     def get_frame_path(self):
@@ -271,16 +283,16 @@ class jobs(object):
         self.renderpath
         self.shotname
         self.endframe
-        
+
         output:
         *self.full_frame_path*
-        
+
         full_frame_path is a string, which points either to a folder (animation rendering),
         or to a single image (still image rendering)
-        
+
         '''
         self.shot_iter_num = 1
-        
+
         # Different folder for still images and animations
         # If still image rendering
         if self.endframe == "" and self.startframe != "":
@@ -299,18 +311,20 @@ class jobs(object):
             self.shot_iter_num = self.shot_iter_num - 1
 
         # update full_frame_path with iteration number
-        self.full_frame_path = self.full_frame_path_no_ver.replace("$$", str(self.shot_iter_num).zfill(2))
+        self.full_frame_path = self.full_frame_path_no_ver.replace(
+            "$$", str(self.shot_iter_num).zfill(2))
 
     def create_folder(self, ipt_str):
         if not os.path.exists(ipt_str):
-                os.mkdir(ipt_str)
-                self.print_info("Created directory " + ipt_str)
+            os.mkdir(ipt_str)
+            self.print_info("Created directory " + ipt_str)
 
     def create_output_folder(self):
-        
+
         # if job is active and read-only is enabled, create folders
         if self.active:
-            self.create_folder(self.frame_render_folder.replace("$$", str(self.shot_iter_num).zfill(2)))
+            self.create_folder(self.frame_render_folder.replace(
+                "$$", str(self.shot_iter_num).zfill(2)))
 
     def read_job(self, job_nr):
         # check if job is active, otherwise jump to next job
@@ -380,7 +394,7 @@ class jobs(object):
             ", ", ",").split(",")
         self.view_layer = [
             x for x in self.view_layer if x]
-        
+
         # If Eevee activated, disable according properties:
         if not self.cycles:
             self.animation_denoise = False
@@ -419,12 +433,12 @@ class jobs(object):
             scene_sub_command_string = " -S " + self.scene
         else:
             scene_sub_command_string = ""
-        
+
         # if end frame empty, render single frame
         if self.endframe == "" and self.startframe == "":
             render_frame_command = " -a "
         elif self.endframe == "" and self.startframe != "":
-            render_frame_command = " -f " + str(self.startframe) 
+            render_frame_command = " -f " + str(self.startframe)
         else:
             render_frame_command = " -s " + \
                 str(self.startframe) + " -e " + str(self.endframe) + " -a "
@@ -437,9 +451,9 @@ class jobs(object):
                           " -F " + self.file_format_upper +
                           render_frame_command)
         # print(command_string)
-        
+
         self.print_info("Rendering {} on {}".format(self.shotname +
-                                          str(self.shot_iter_num), device.upper()))
+                                                    str(self.shot_iter_num), device.upper()))
         if "win" in sys.platform:
             return subprocess.Popen(command_string, creationflags=CREATE_NEW_CONSOLE)
         elif "linux" in sys.platform:
@@ -449,7 +463,8 @@ class jobs(object):
         inlinepython_denoise = "import sys ; sys.path.append('{}util') ; import rr_denoisescript ; rr_denoisescript.denoise_folder_explicit('{}', '{}', {}, {})".format(
             self.currentpath,
             self.currentpath,
-            self.frame_render_folder.replace("$$", str(self.shot_iter_num).zfill(2)),
+            self.frame_render_folder.replace(
+                "$$", str(self.shot_iter_num).zfill(2)),
             self.startframe,
             self.endframe
         )
@@ -482,15 +497,19 @@ class jobs(object):
             self.read_errors()
             # if still image
             if self.startframe == "" and self.endframe == "":
-                self.print_info("If you give me start frame and end frame, I can check if all the frames are rendered!")
+                self.print_info(
+                    "If you give me start frame and end frame, I can check if all the frames are rendered!")
             elif self.endframe_old == "":
-                searchrange = range(int(self.startframe_old), int(self.startframe_old) + 1)
+                searchrange = range(int(self.startframe_old),
+                                    int(self.startframe_old) + 1)
             # if animation
             else:
-                searchrange = range(int(self.startframe_old), int(self.endframe_old) + 1)
+                searchrange = range(int(self.startframe_old),
+                                    int(self.endframe_old) + 1)
 
             if self.animation_denoise_old:
-                self.full_frame_path_old = "_dn/".join(self.full_frame_path_old.rsplit("/", 1))
+                self.full_frame_path_old = "_dn/".join(
+                    self.full_frame_path_old.rsplit("/", 1))
 
             for frame in searchrange:
                 check_path = self.full_frame_path_old.replace(
@@ -500,7 +519,6 @@ class jobs(object):
                     self.print_warning_noinput(" I checked {} and saw that something didn't work. Try rendering it again!".format(
                         self.full_frame_path_old).replace("####", str(frame).zfill(4)))
                     return None
-
 
     def delete_empty_folders(self, ipt_dir):
         rootdir = os.listdir(ipt_dir)
@@ -541,7 +559,7 @@ class jobs(object):
         # wait if an denoising is still running
         if self.thread_gpu_an_dn is not None:
             self.thread_gpu_an_dn.wait(1048574)
-        
+
         self.check_renders()
 
 
