@@ -8,9 +8,9 @@
 /key/*.json
 *__pycache__*
 *.pyc
-*.afpub
-/design
-*.afdesign
+# *.afpub
+/design/archive
+# *.afdesign
 *.xlsx*
 *.whl
 *.exr
