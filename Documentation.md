@@ -69,8 +69,11 @@ Click on the chapter to open it:
 <summary><b>1. Filling the spreadsheet</b> </summary>
 
 1. Start Render Rob. This will open a login screen in your browser.
+
 2. Select a Google account to proceed
+
 ![login](img/readme_pics/login1.jpg)
+
 3. Grant Render Rob the permission to view and manage the files it created. (It won't have any access to your files!)
 
 ![login](img/readme_pics/login2.jpg)
@@ -84,6 +87,7 @@ Close the browser tab, if this is shown:
 ![login](img/readme_pics/login4.jpg)
 
 6. Now go to the newly opened browser tab with the Render Rob template sheet. Copy both sheets to the new file, that has been just created in the background.
+
 ![login](img/readme_pics/sheet1.jpg)
 
 The new file should show up on the left, since it's the newest one.
