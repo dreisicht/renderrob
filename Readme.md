@@ -29,8 +29,8 @@ Individuals and small teams.
 
 ## Requirements
 
-- Google account or spreadsheet software like Excel or OpenOffice Calc
-- 15 minutes of time for setup
+- Google account
+- 2 minutes of time for setup
 - Blender
 
 ## Support

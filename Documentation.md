@@ -2,14 +2,14 @@
 
 ## Good to know
 
-##### Usage
+### Usage
 
 - If you want to abort all renders, you have to close all three command-line windows.
 - To stop the jobs, first close the Render Rob main window.
 - The reason motion blur is in Render Rob, is that if you get motion blur artifacts, you can easily re-render those frames without motion blur
 - You can run your own Python commands by adding them to the file `rr_user_comands.py` located in the folder `user`.
 
-##### Sheet
+### Sheet
 
 - Column a is a help for being able to select cells easier.
 - Column t is necessary. Please do not delete it.
@@ -18,17 +18,18 @@
 - Separate View Layers and add-ons with a comma (space is optional)
 - If you want to render a still image, fill start frame with the frame you want to render and leave end frame blank.
 - If you don't provide start frame and end frame the, Render Rob will render an animation with the start and end set in the Blender file.
-- If you want to use multiple Sheets you can configure your sheet name in the file `util/sheetname.ini`
+- If you want to change the sheet you are using, insert the ID of the sheet in the `sheetcache`. You can see the ID for example in the link of the sheet.
+- If you want to use a new sheet, just backup and delete the `sheetcache` file, and the setup process will start the next time you launch Render Rob.
 - If you only want to denoise your shot, deactivate both CPU and GPU and activate Animation Denoising.
 
-##### Render output
+### Render output
 
 - If read only is enabled, a new folder with a new version number is created and used as render output.
 - The Folder and frame name consists of `filename-camera-Scene-viewlayer-quality-version`
 - Empty folders of failed renders get deleted in the end
 - Render Rob never overwrites images. If you activate `new version`, he creates a new folder for output. If new version is not activated, he continues in the folder with the highest version number and skips already rendered images. So if you want to re-render some images, delete them, and then render the job with `new version` deactivated.
 
-##### Rendering
+### Rendering
 
 - Border rendering gets disabled, if high quality is active. Otherwise it remains enabled.
 - Random seed is enabled, if Animation Denoising is enabled.
@@ -39,7 +40,7 @@
 - If no View Layer is given, Render Rob renders every View Layer.
 - If Animation Denoising is activated, compositing is deactivated.
 
-##### Errors
+### Errors
 
 - If Render Rob cannot find the sheet, maybe it's not shared with the API mail address.
 - If you experience other errors, don't hesitate do drop me a message!
@@ -64,11 +65,35 @@ Click on the chapter to open it:
 
 <!-- ### Filling the spreadsheet -->
 
-1. Start Render Rob
-2. Follow the login
+<details>
+<summary><b>1. Filling the spreadsheet</b> </summary>
+
+1. Start Render Rob. This will open a login screen in your browser.
+2. Select a Google account to proceed
+![login](img/readme_pics/login1.jpg)
+3. Grant Render Rob the permission to view and manage the files it created. (It won't have any access to your files!)
+![login](img/readme_pics/login2.jpg)
+Confirm your choices.
+![login](img/readme_pics/login3.jpg)
+Close the browser tab, if this is shown:
+![login](img/readme_pics/login4.jpg)
+6. Now go to the newly opened browser tab with the Render Rob template sheet. Copy both sheets to the new file, that has been just created in the background.
+![login](img/readme_pics/sheet1.jpg)
+The new file should show up on the left, since it's the newest one.
+![login](img/readme_pics/sheet2.jpg)
+Click OK
+![login](img/readme_pics/sheet3.jpg)
+Copy the second sheet.
+![login](img/readme_pics/sheet4.jpg)
+Select the sheet again.
+![login](img/readme_pics/sheet2.jpg)
+Click OK again.
+![login](img/readme_pics/sheet3.jpg)
+Then click enter in the Render Rob terminal to continue.
+</details>
 
 <details>
-<summary>4. Filling the spreadsheet </summary>
+<summary> <b> 2. Filling the spreadsheet </b> </summary>
 
 After setting that up, fill in the global settings in the Sheet. The Blender Path and Render Path is mandatory, the rest is optional.
 
