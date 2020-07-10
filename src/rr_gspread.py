@@ -7,17 +7,32 @@ import webbrowser
 from sty import fg, bg, ef, rs, Style, RgbBg
 import sty
 
-import google.oauth2.credentials
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from datetime import datetime
+
+import google.oauth2.credentials
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 SHEETNAME = 'Render Rob 2.0'
 TEMPLATE_ID = "1prG29lIic0Qqc_fGq5sLdnDh1u8Nkd45MxdaCuRp1Rw"
-CLIENT_SECRETS_FILE = "src/client_secret.json"
 DOCS_URI = "https://docs.google.com/spreadsheets/d/"
+
+CLIENT_SECRET = {
+	"installed": {
+		"client_id": "243119286709-ceqv1581dilf28n3tiuspu8csj66tv7b.apps.googleusercontent.com",
+		"project_id": "renderpipeline",
+		"auth_uri": "https://accounts.google.com/o/oauth2/auth",
+		"token_uri": "https://oauth2.googleapis.com/token",
+		"auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+		"client_secret": "iG99SL4rYTUIZC-f9WtdrnKv",
+		"redirect_uris": [
+			"urn:ietf:wg:oauth:2.0:oob",
+			"http://localhost"
+		]
+	}
+}
 
 # This access scope grants read-only access to the authenticated user's Drive
 # account.
@@ -61,11 +76,11 @@ def print_warning(ipt_str):
 
 
 def get_authenticated_service():
-    flow = InstalledAppFlow.from_client_secrets_file(
-        CLIENT_SECRETS_FILE, ['https://www.googleapis.com/auth/drive.file'])
+    flow = InstalledAppFlow.from_client_config(
+        CLIENT_SECRET, ['https://www.googleapis.com/auth/drive.file'])
 
-    if os.path.exists('src/util/token.pickle'):
-        with open('src/util/token.pickle', 'rb') as token:
+    if os.path.exists('cache/token.pickle'):
+        with open('cache/token.pickle', 'rb') as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
         if not creds or not creds.valid:
@@ -73,7 +88,7 @@ def get_authenticated_service():
                 creds.refresh(Request())
     else:
         creds = flow.run_local_server()
-        with open('src/util/token.pickle', 'wb') as token:
+        with open('cache/token.pickle', 'wb') as token:
             pickle.dump(creds, token)
 
     return build('sheets', 'v4', credentials=creds)
@@ -146,7 +161,7 @@ def cleanup_sheet(service, spreadsheetId):
         title = sheets[i].get("properties", {}).get("title")
         sheet_id = sheets[i].get("properties", {}).get("sheetId")
         if sheet_id == 0 and len(sheets) == 1:
-            os.remove("src/util/sheetcache")
+            os.remove("cache/SHEETCACHE")
             print_error("Your sheet is empty. Next time you launch me, I will start from the beginning. " +
                   DOCS_URI + spreadsheetId)
         if "jobs" in title and title != "jobs":
@@ -156,7 +171,7 @@ def cleanup_sheet(service, spreadsheetId):
             renameSheet(service, spreadsheetId, sheet_id, "globals")
             title = "globals"
         elif len(sheets) == 1:
-            os.remove("src/util/sheetcache")
+            os.remove("cache/SHEETCACHE")
             print_error("Something went terribly wrong. I will create a new sheet if you launch me again.")
         elif title != "jobs" and title != "globals":
             delete_sheet(service, spreadsheetId, sheet_id)
@@ -171,7 +186,7 @@ def get_values(service, spreadsheetId, value_range):
             if "Unable to parse range" in eh._get_reason():
                 cleanup_sheet(service, spreadsheetId)
             if "not found" in eh._get_reason():
-                os.remove("src/util/sheetcache")
+                os.remove("cache/SHEETCACHE")
                 print_error(
                     "I couldn't find the sheet. Are you sure you didn't delete it?")
         else:
@@ -188,28 +203,45 @@ def get_values(service, spreadsheetId, value_range):
 def query_sheet():
     # get service
     service_sheets = get_authenticated_service()
-
     try:
-        sheetcache = open("src/util/sheetcache", "r")
+        sheetcache = open("cache/SHEETCACHE", "r")
         spreadsheetId = sheetcache.read()
         sheetcache.close()
     except FileNotFoundError:
         spreadsheetId = create_sheet(service_sheets)
-        sheetcache = open("src/util/sheetcache", "x")
+        sheetcache = open("cache/SHEETCACHE", "x")
         sheetcache.write(spreadsheetId)
         sheetcache.close()
         print_info_input(
-            "Created the Render Rob Spreadsheet. Please copy both 'jobs' and 'globals' sheet from the \
+            "I Created a new Render Rob Spreadsheet. Please copy both 'jobs' and 'globals' sheet from the \
                                             template to the newly created document. If you copied them")
-        for _ in range(3):
+        for _ in range(7):
             sheets = get_sheets(service_sheets, spreadsheetId)
-            if len(sheets) < 3:
+            jobs_c = 0
+            globals_c = 0
+            for sheet in sheets:
+                if "jobs" in sheet.get("properties", {}).get("title"):
+                    jobs_c += 1
+                    if jobs_c > 1:
+                        delete_sheet(service_sheets, spreadsheetId,
+                                     sheet.get("properties", {}).get("sheetId"))
+                        jobs_c = jobs_c -1
+                if "globals" in sheet.get("properties", {}).get("title"):
+                    globals_c += 1
+                    if globals_c > 1:
+                        delete_sheet(service_sheets, spreadsheetId,
+                                     sheet.get("properties", {}).get("sheetId"))
+                        globals_c = globals_c - 1
+            print(jobs_c, globals_c)
+            
+            if jobs_c != 1 or globals_c != 1:
                 print_warning(
-                    "I'm sorry, but you didn't copy both sheets to the new spreadsheet. Please try again!")
+                    "I'm sorry, but you didn't copy both sheets to the new spreadsheet. Please try again! If you want to see the sheet, it's here: {}".format(DOCS_URI + spreadsheetId))
             else:
                 break
+            
         else:
-            # os.remove("src/util/sheetcache")
+            # os.remove("cache/SHEETCACHE")
             print_error(
                 "To be honest, we were never supposed to land here. Please try Running Render Rob again!")
         cleanup_sheet(service_sheets, spreadsheetId)

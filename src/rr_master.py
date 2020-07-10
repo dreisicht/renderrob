@@ -7,7 +7,6 @@ import subprocess
 import signal
 from time import sleep
 from datetime import datetime
-# from colorama import Fore, Back, Style, init
 from sty import fg, bg, ef, rs, Style, RgbBg
 import sty
 from rr_gspread import query_sheet
@@ -16,7 +15,6 @@ import rr_image
 
 if "win" in sys.platform:
     from subprocess import CREATE_NEW_CONSOLE
-
 
 class jobs(object):
     def __init__(self):
@@ -122,17 +120,17 @@ class jobs(object):
         self.thread_gpu_an_dn = None
 
     def flush_cache_file(self):
-        f = open(self.currentpath + "util/ERRORCACHE", "w")
+        f = open(self.currentpath + "cache/ERRORCACHE", "w")
         f.write("")
         f.close()
 
     def read_errors(self):
         # open and read the file after the appending:
         try:
-            f = open(self.currentpath + "util/ERRORCACHE", "r")
+            f = open(self.currentpath + "cache/ERRORCACHE", "r")
         except PermissionError:
             sleep(0.1)
-            f = open(self.currentpath + "util/ERRORCACHE", "r")
+            f = open(self.currentpath + "cache/ERRORCACHE", "r")
         finally:
             sleep(0.1)
 
@@ -563,8 +561,6 @@ class jobs(object):
         self.check_renders()
 
 
-# initialize colorama
-# init(convert=True)
 if __name__ == "__main__":
     try:
         jobs_obj = jobs()
