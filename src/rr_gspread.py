@@ -232,7 +232,7 @@ def query_sheet():
                         delete_sheet(service_sheets, spreadsheetId,
                                      sheet.get("properties", {}).get("sheetId"))
                         globals_c = globals_c - 1
-            print(jobs_c, globals_c)
+            # print(jobs_c, globals_c)
             
             if jobs_c != 1 or globals_c != 1:
                 print_warning(
