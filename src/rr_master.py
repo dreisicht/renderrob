@@ -497,6 +497,7 @@ class jobs(object):
             if self.startframe == "" and self.endframe == "":
                 self.print_info(
                     "If you give me start frame and end frame, I can check if all the frames are rendered!")
+
             elif self.endframe_old == "":
                 searchrange = range(int(self.startframe_old),
                                     int(self.startframe_old) + 1)
@@ -519,15 +520,30 @@ class jobs(object):
                     return None
 
     def delete_empty_folders(self, ipt_dir):
-        rootdir = os.listdir(ipt_dir)
-        for directory in rootdir:
-            if not os.listdir(ipt_dir + "/" + directory):
-                os.rmdir(ipt_dir + "/" + directory)
-                self.print_info("Deleted /" + directory + "/")
+        if ipt_dir[-1:] != "/":
+            ipt_dir = ipt_dir + "/"
+        print(ipt_dir)
+        directories_files = os.listdir(ipt_dir)
+        print(directories_files)
+        for directory in directories_files:
+            #check if is dir
+            abs_dir = ipt_dir + directory
+            if os.path.isdir(abs_dir):
+                #check if is empty
+                if not os.listdir(abs_dir):
+                    os.rmdir(abs_dir)
+                    self.print_info("Deleted /" + directory + "/")
 
     def start_generate(self):
         for job in range(1, len(self.jobs_table)):
             self.read_job(job)
+            # check if blend file exists
+            if not os.path.exists(self.blendpath):
+                self.print_warning_noinput(
+                    f"I didn't find {self.blendpath}. Please check if it exists!")
+                # set self.active_old so that there is not gonna be a check of this render
+                self.active_old = False
+                continue
 
             if self.active and self.cpu_act:
                 self.thread_cpu = self.render_job("cpu")

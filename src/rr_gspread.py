@@ -207,6 +207,7 @@ def query_sheet():
         sheetcache = open("cache/SHEETCACHE", "r")
         spreadsheetId = sheetcache.read()
         sheetcache.close()
+        print_info(f"I'm using this cached spreadsheet: {DOCS_URI + spreadsheetId}")
     except FileNotFoundError:
         spreadsheetId = create_sheet(service_sheets)
         sheetcache = open("cache/SHEETCACHE", "x")

@@ -21,6 +21,7 @@
 - If you want to change the sheet you are using, insert the ID of the sheet in the `sheetcache`. You can see the ID for example in the link of the sheet.
 - If you want to use a new sheet, just backup and delete the `sheetcache` file, and the setup process will start the next time you launch Render Rob.
 - If you only want to denoise your shot, deactivate both CPU and GPU and activate Animation Denoising.
+- If you're wondering, why you have to copy this sheet yourself, the reason is, that Render Rob respects your privacy and therefore does not have access to your spreadsheets, but only to the one it created. So you have to manually copy the sheet there.
 
 ### Render output
 
@@ -152,6 +153,3 @@ Property list of the spreadsheet
 | scene | | Add name of scene to render. Only one is allowed here. Optional.|
 | view layer | | Add name of view layer to render. Only one is allowed here. Optional.|
 | comments | | Put your own comments of the shot here|
-
-
-If you're wondering, why you have to copy this sheet yourself, the reason is, that Render Rob respects your privacy and therefore does not have access to your spreadsheets, but only to the one it created. So you have to manually copy the sheet there.
