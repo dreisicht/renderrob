@@ -6,7 +6,7 @@ import os
 import rr_c_image  # pylint: disable=import-error
 from ast import literal_eval
 from multiprocessing import cpu_count
-from colorama import Fore, Back, Style, init
+# from colorama import Fore, Back, Style, init
 
 
 user_settings_folder = str(__file__).replace("\\", "/").replace("/util/rr_renderscript.py", "/user")
@@ -14,12 +14,20 @@ print(user_settings_folder)
 sys.path.append(user_settings_folder)
 import rr_user_commands
 
-init(convert=True)
+# init(convert=True)
 
 scriptpath_glob = ""
 
 def hex_to_rgb(h):
     return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+
+
+RESET_ALL = '\u001b[0m'
+BACK_CYAN = '\u001b[46m'
+BACK_RED = '\u001b[41m'
+BACK_YELLOW = '\u001b[43m'
+FORE_BLACK = '\u001b[30m'
+FORE_WHITE = '\u001b[37m'
 
 
 # red = hex_to_rgb("980030")
@@ -95,9 +103,9 @@ def tobool(bool_val):
 
 def print_error(ipt_str):
     ipt_str = str(ipt_str)
-    print(Back.RED, Fore.WHITE, end="")
+    print(BACK_RED, FORE_WHITE, end="")
     print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
-    print(Style.RESET_ALL, end="")
+    print(RESET_ALL, end="")
     write_cache("[ERROR]" + ipt_str)
     time.sleep(3)
     sys.exit()
@@ -105,24 +113,24 @@ def print_error(ipt_str):
 
 def print_warning(ipt_str):
     ipt_str = str(ipt_str)
-    print(Back.YELLOW, Fore.BLACK, end="")
+    print(BACK_YELLOW, FORE_BLACK, end="")
     print("[WARNING] " + ipt_str)
-    print(Style.RESET_ALL, end="")
+    print(RESET_ALL, end="")
     write_cache("[WARNING]" + ipt_str)
     time.sleep(1)
 
 
 def print_info_input(ipt_str):
     ipt_str = str(ipt_str)
-    print(Back.CYAN, Fore.BLACK, end="")
+    print(BACK_CYAN, FORE_BLACK, end="")
     input("[INFO] " + ipt_str)
-    print(Style.RESET_ALL, end="")
+    print(RESET_ALL, end="")
     # write_cache("[INFO]" + ipt_str)
 
 
 def print_info(ipt_str):
     ipt_str = str(ipt_str)
-    print(Back.CYAN, Fore.BLACK + "[INFO] " + ipt_str + Style.RESET_ALL)
+    print(BACK_CYAN, FORE_BLACK + "[INFO] " + ipt_str + RESET_ALL)
     # write_cache("[INFO]" + ipt_str)
 
 

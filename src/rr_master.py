@@ -522,9 +522,9 @@ class jobs(object):
     def delete_empty_folders(self, ipt_dir):
         if ipt_dir[-1:] != "/":
             ipt_dir = ipt_dir + "/"
-        print(ipt_dir)
+        # print(ipt_dir)
         directories_files = os.listdir(ipt_dir)
-        print(directories_files)
+        # print(directories_files)
         for directory in directories_files:
             #check if is dir
             abs_dir = ipt_dir + directory
@@ -538,7 +538,7 @@ class jobs(object):
         for job in range(1, len(self.jobs_table)):
             self.read_job(job)
             # check if blend file exists
-            if not os.path.exists(self.blendpath):
+            if self.active and not os.path.exists(self.blendpath):
                 self.print_warning_noinput(
                     f"I didn't find {self.blendpath}. Please check if it exists!")
                 # set self.active_old so that there is not gonna be a check of this render
