@@ -442,13 +442,13 @@ class jobs(object):
                 str(self.startframe) + " -e " + str(self.endframe) + " -a "
 
         command_string = ('"' + self.blenderpath + '"' +
-                          ' -b ' + '"' + self.blendpath + '"' +
+                          ' -b' + ' -y ' + '"' + self.blendpath + '"' +
                           scene_sub_command_string +
                           ' -o ' + '"' + self.full_frame_path + '"' +
                           " --python-expr " + '"' + inlinepython + '"' +
                           " -F " + self.file_format_upper +
                           render_frame_command)
-        # print(command_string)
+        print(command_string)
 
         self.print_info("Rendering {} on {}".format(self.shotname +
                                                     str(self.shot_iter_num), device.upper()))
@@ -466,8 +466,9 @@ class jobs(object):
             self.startframe,
             self.endframe
         )
-        command_string_denoise = (self.blenderpath + ' -b ' +
+        command_string_denoise = (self.blenderpath +
                                   ' --python-expr ' + '"' + inlinepython_denoise + '"')
+        print(command_string_denoise)
         self.print_info("Denoising " + self.shotname + str(self.shot_iter_num))
         if "win" in sys.platform:
             return subprocess.Popen(command_string_denoise, creationflags=CREATE_NEW_CONSOLE)

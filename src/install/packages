@@ -1,0 +1,6 @@
+sudo apt install python3-pip
+python -m pip install xlrd
+python -m pip install sty
+python -m pip install --upgrade google-auth
+python -m pip install google_auth_oauthlib
+python -m pip install google-api-python-client
