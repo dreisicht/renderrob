@@ -1,9 +1,8 @@
 {
-	"python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
-	"spellright.language": [
-		"de"
-	],
-	"spellright.documentTypes": [
-		"latex"
-	]
+  "python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
+  "spellright.language": ["de"],
+  "spellright.documentTypes": ["latex"],
+  "python.testing.unittestArgs": ["-v", "-s", "./test", "-p", "*_test.py"],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": true
 }

@@ -4,11 +4,11 @@ import bpy
 
 def bake_particles():
   for scene in bpy.data.scenes:
-    for object in scene.objects:
-      for modifier in object.modifiers:
+    for obj in scene.objects:
+      for modifier in obj.modifiers:
         if modifier.type == 'PARTICLE_SYSTEM':
           print("Baking particles")
-          override = {'scene': scene, 'active_object': object, 'point_cache': modifier.particle_system.point_cache}
+          override = {'scene': scene, 'active_object': obj, 'point_cache': modifier.particle_system.point_cache}
           bpy.ops.ptcache.free_bake(override)
           bpy.ops.ptcache.bake(override, bake=True)
 

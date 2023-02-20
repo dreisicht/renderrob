@@ -76,8 +76,9 @@ def print_warning(ipt_str):
 
 
 def get_authenticated_service():
-  if os.path.exists('cache/token.pickle'):
-    with open('cache/token.pickle', 'rb') as token:
+  token_path = "cache/token.pickle"
+  if os.path.exists(token_path):
+    with open(token_path, 'rb') as token:
       creds = pickle.load(token)
   # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -87,7 +88,7 @@ def get_authenticated_service():
     flow = InstalledAppFlow.from_client_config(
         CLIENT_SECRET, ['https://www.googleapis.com/auth/drive.file'])
     creds = flow.run_local_server()
-    with open('cache/token.pickle', 'wb') as token:
+    with open(token_path, 'wb') as token:
       pickle.dump(creds, token)
 
   return build('sheets', 'v4', credentials=creds)
@@ -181,10 +182,10 @@ def get_values(service, spreadsheetId, value_range):
     try:
       result = service.spreadsheets().values().get(spreadsheetId=spreadsheetId, majorDimension="ROWS",
                                                    range=value_range).execute()
-    except HttpError as eh:
-      if "Unable to parse range" in eh._get_reason():
+    except HttpError as http_error:
+      if "Unable to parse range" in http_error._get_reason():
         cleanup_sheet(service, spreadsheetId)
-      if "not found" in eh._get_reason():
+      if "not found" in http_error._get_reason():
         os.remove("cache/SHEETCACHE")
         print_error(
             "I couldn't find the sheet. Are you sure you didn't delete it?")
@@ -203,13 +204,13 @@ def query_sheet():
   # get service
   service_sheets = get_authenticated_service()
   try:
-    sheetcache = open("cache/SHEETCACHE", "r")
+    sheetcache = open("cache/SHEETCACHE", "r", encoding="UTF-8")
     spreadsheetId = sheetcache.read()
     sheetcache.close()
     print_info(f"I'm using this cached spreadsheet: {DOCS_URI + spreadsheetId}")
   except FileNotFoundError:
     spreadsheetId = create_sheet(service_sheets)
-    sheetcache = open("cache/SHEETCACHE", "x")
+    sheetcache = open("cache/SHEETCACHE", "x", encoding="UTF-8")
     sheetcache.write(spreadsheetId)
     sheetcache.close()
     print_info_input(
