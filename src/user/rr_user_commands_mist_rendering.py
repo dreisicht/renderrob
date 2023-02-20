@@ -1,6 +1,7 @@
 # Place your custom python commands here. They get exectued in very job before rendering a frame.
 import bpy
 
+
 def bake_particles():
   for scene in bpy.data.scenes:
     for object in scene.objects:
@@ -10,6 +11,8 @@ def bake_particles():
           override = {'scene': scene, 'active_object': object, 'point_cache': modifier.particle_system.point_cache}
           bpy.ops.ptcache.free_bake(override)
           bpy.ops.ptcache.bake(override, bake=True)
+
+
 bake_particles()
 bpy.context.scene.view_layers["main"].use_pass_cryptomatte_material = False
 # bpy.context.scene.view_layers["env"].use = True

@@ -6,7 +6,10 @@ import rr_c_image  # pylint: disable=import-error
 from ast import literal_eval
 from multiprocessing import cpu_count
 # from colorama import Fore, Back, Style, init
-
+try:
+  import rr_user_commands
+except ImportError:
+  from user import rr_user_commands
 
 user_settings_folder = str(__file__).replace(
     "\\", "/").replace("/util/rr_renderscript.py", "/user")
@@ -19,7 +22,7 @@ scriptpath_glob = ""
 
 
 def hex_to_rgb(h):
-    return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
+  return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 
 
 RESET_ALL = '\u001b[0m'
@@ -50,22 +53,22 @@ FORE_WHITE = '\u001b[37m'
 
 
 def tobool(bool_val):
-    if type(bool_val) == str:
-        if bool_val.upper() == "FALSE":
-            return False
-        elif bool_val.upper() == "TRUE":
-            return True
-        else:
-            print("Bool Error")
-            # raise TypeError
-    elif type(bool_val) == int:
-        if bool_val == 0:
-            return False
-        elif bool_val == 1:
-            return True
+  if type(bool_val) == str:
+    if bool_val.upper() == "FALSE":
+      return False
+    elif bool_val.upper() == "TRUE":
+      return True
     else:
-        print("Error")
-        # raise TypeError
+      print("Bool Error")
+      # raise TypeError
+  elif type(bool_val) == int:
+    if bool_val == 0:
+      return False
+    elif bool_val == 1:
+      return True
+  else:
+    print("Error")
+    # raise TypeError
 
 
 # def inexclude_collection(collection_names, exclude, view_layer_data, parent=""):
@@ -102,50 +105,50 @@ def tobool(bool_val):
 
 
 def print_error(ipt_str):
-    ipt_str = str(ipt_str)
-    print(BACK_RED, FORE_WHITE, end="")
-    print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
-    print(RESET_ALL, end="")
-    write_cache("[ERROR]" + ipt_str)
-    time.sleep(3)
-    sys.exit()
+  ipt_str = str(ipt_str)
+  print(BACK_RED, FORE_WHITE, end="")
+  print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
+  print(RESET_ALL, end="")
+  write_cache("[ERROR]" + ipt_str)
+  time.sleep(3)
+  sys.exit()
 
 
 def print_warning(ipt_str):
-    ipt_str = str(ipt_str)
-    print(BACK_YELLOW, FORE_BLACK, end="")
-    print("[WARNING] " + ipt_str)
-    print(RESET_ALL, end="")
-    write_cache("[WARNING]" + ipt_str)
-    time.sleep(1)
+  ipt_str = str(ipt_str)
+  print(BACK_YELLOW, FORE_BLACK, end="")
+  print("[WARNING] " + ipt_str)
+  print(RESET_ALL, end="")
+  write_cache("[WARNING]" + ipt_str)
+  time.sleep(1)
 
 
 def print_info_input(ipt_str):
-    ipt_str = str(ipt_str)
-    print(BACK_CYAN, FORE_BLACK, end="")
-    input("[INFO] " + ipt_str)
-    print(RESET_ALL, end="")
-    # write_cache("[INFO]" + ipt_str)
+  ipt_str = str(ipt_str)
+  print(BACK_CYAN, FORE_BLACK, end="")
+  input("[INFO] " + ipt_str)
+  print(RESET_ALL, end="")
+  # write_cache("[INFO]" + ipt_str)
 
 
 def print_info(ipt_str):
-    ipt_str = str(ipt_str)
-    print(BACK_CYAN, FORE_BLACK + "[INFO] " + ipt_str + RESET_ALL)
-    # write_cache("[INFO]" + ipt_str)
+  ipt_str = str(ipt_str)
+  print(BACK_CYAN, FORE_BLACK + "[INFO] " + ipt_str + RESET_ALL)
+  # write_cache("[INFO]" + ipt_str)
 
 
 def write_cache(ipt_str):
-    global scriptpath_glob
-    cachefilepath = scriptpath_glob + "util/ERRORCACHE"
-    try:
-        f = open(cachefilepath, "a")
-    except PermissionError:
-        time.sleep(0.1)
-        f = open(cachefilepath, "a")
-    finally:
-        time.sleep(0.1)
-    f.write(ipt_str + "\n")
-    f.close()
+  global scriptpath_glob
+  cachefilepath = scriptpath_glob + "util/ERRORCACHE"
+  try:
+    f = open(cachefilepath, "a")
+  except PermissionError:
+    time.sleep(0.1)
+    f = open(cachefilepath, "a")
+  finally:
+    time.sleep(0.1)
+  f.write(ipt_str + "\n")
+  f.close()
 
 
 def set_settings(scriptpath,
@@ -166,188 +169,188 @@ def set_settings(scriptpath,
                  view_layer_names,
                  add_on_list):
 
-    global scriptpath_glob
-    scriptpath_glob = scriptpath
+  global scriptpath_glob
+  scriptpath_glob = scriptpath
+
+  try:
+    print_info(
+        "Render Rob here. I'm starting to make my changes in your Blender file!")
+
+    if scene == "" and len(bpy.data.scenes) > 1:
+      print_warning(
+          "There are more than one scenes, but you didn't tell me which scene to render! So I am rendering the last used scene.")
+      current_scene_data = bpy.context.scene
+    elif len(bpy.data.scenes) == 1:
+      current_scene_data = bpy.data.scenes[0]
+    else:
+      try:
+        current_scene_data = bpy.data.scenes[scene]
+      except KeyError:
+        print_error("Scene {} not found!".format(scene))
+
+    # first we deactivate all View Layers:
+    for view_layer in current_scene_data.view_layers:
+      view_layer.use = False
+
+    if view_layer_names == []:
+      # if only one view_layer in scene
+      if len(current_scene_data.view_layers) == 1:
+        view_layer_data = current_scene_data.view_layers[0]
+      else:
+        print_info(
+            "I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
+        view_layer_data = current_scene_data.view_layers
+    # if only one view_layer given
+    elif len(view_layer_names) == 1 and view_layer_names != []:
+      # if only one view_layer in scene
+      if len(current_scene_data.view_layers) == 1:
+        view_layer_data = current_scene_data.view_layers[0]
+      # if more than one view layer in scene
+      else:
+        try:
+          view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
+        except KeyError:
+          print_error("View Layer {} not found. Please check the name in the sheet!".format(
+              view_layer_names[0]))  # TODO: test
+    # if more than one view_layer given:
+    elif len(view_layer_names) > 1:
+      # print("A3")
+      if len(current_scene_data.view_layers) < len(view_layer_names):
+        print_error("You gave me more View Layers given than existing! ({})".format(
+            ", ".join(view_layer_names)))
+      else:
+        view_layer_data = []
+
+        for vl in view_layer_names:
+          view_layer_data.append(current_scene_data.view_layers[vl])
+    else:
+      print_error("Unexpected ViewLayer Error.")
+
+    if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
+      for view_layer in view_layer_data:
+        view_layer.use = True
+    elif type(view_layer_data) is bpy.types.ViewLayer:
+      view_layer_data.use = True
+    else:
+      print_error("Unexpected ViewLayer Error.")
+
+    # activate add-ons:
+    for add_on in add_on_list:
+      print_info(str(add_on))
+      try:
+        bpy.ops.preferences.addon_enable(module=add_on)
+        print_info("I activated the addon {}.".format(add_on))
+      except AssertionError:
+        print_error(
+            "I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
+
+    current_scene_render = current_scene_data.render
 
     try:
-        print_info(
-            "Render Rob here. I'm starting to make my changes in your Blender file!")
+      if camera != '':
+        current_scene_data.camera = bpy.data.objects[camera]
+    except KeyError:
+      print_error("I didn't find the camera called {}.".format(camera))
 
-        if scene == "" and len(bpy.data.scenes) > 1:
-            print_warning(
-                "There are more than one scenes, but you didn't tell me which scene to render! So I am rendering the last used scene.")
-            current_scene_data = bpy.context.scene
-        elif len(bpy.data.scenes) == 1:
-            current_scene_data = bpy.data.scenes[0]
-        else:
-            try:
-                current_scene_data = bpy.data.scenes[scene]
-            except KeyError:
-                print_error("Scene {} not found!".format(scene))
+    # disable render border
+    current_scene_render.use_border = border
 
-        # first we deactivate all View Layers:
-        for view_layer in current_scene_data.view_layers:
-            view_layer.use = False
+    if cycles is False:
+      if samples != "":
+        current_scene_data.eevee.taa_render_samples = int(samples)
+      current_scene_render.engine = 'BLENDER_EEVEE'
+      current_scene_data.eevee.use_motion_blur = mb
+    elif cycles:
+      current_scene_render.engine = 'CYCLES'
+      if samples != "":
+        current_scene_data.cycles.samples = int(samples)
 
-        if view_layer_names == []:
-            # if only one view_layer in scene
-            if len(current_scene_data.view_layers) == 1:
-                view_layer_data = current_scene_data.view_layers[0]
-            else:
-                print_info(
-                    "I'm rendering every active View Layer! You can specify the View Layer to be rendered in the sheet!")
-                view_layer_data = current_scene_data.view_layers
-        # if only one view_layer given
-        elif len(view_layer_names) == 1 and view_layer_names != []:
-            # if only one view_layer in scene
-            if len(current_scene_data.view_layers) == 1:
-                view_layer_data = current_scene_data.view_layers[0]
-            # if more than one view layer in scene
-            else:
-                try:
-                    view_layer_data = current_scene_data.view_layers[view_layer_names[0]]
-                except KeyError:
-                    print_error("View Layer {} not found. Please check the name in the sheet!".format(
-                        view_layer_names[0]))  # TODO: test
-        # if more than one view_layer given:
-        elif len(view_layer_names) > 1:
-            # print("A3")
-            if len(current_scene_data.view_layers) < len(view_layer_names):
-                print_error("You gave me more View Layers given than existing! ({})".format(
-                    ", ".join(view_layer_names)))
-            else:
-                view_layer_data = []
+      # cpu
+      if device == "cpu":
+        current_scene_render.threads_mode = 'FIXED'
+        current_scene_render.threads = cpu_count() - 2
+        current_scene_data.cycles.device = 'CPU'
+        try:
+          current_scene_render.tile_x = 64
+          current_scene_render.tile_y = 64
+        except AttributeError:
+          print_info('You are using the Cycles-x!')
 
-                for vl in view_layer_names:
-                    view_layer_data.append(current_scene_data.view_layers[vl])
-        else:
-            print_error("Unexpected ViewLayer Error.")
+      # gpu
+      if device == "gpu":
+        cycles_pref = bpy.context.preferences.addons['cycles'].preferences
+        try:
+          cycles_pref.get_devices()
+        except ValueError:
+          print_info(
+              "Cycles didn't like me asking about the devices.")
+        cycles_pref.compute_device_type = 'OPTIX'
 
-        if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
-            for view_layer in view_layer_data:
-                view_layer.use = True
-        elif type(view_layer_data) is bpy.types.ViewLayer:
-            view_layer_data.use = True
-        else:
-            print_error("Unexpected ViewLayer Error.")
+        current_scene_data.cycles.device = 'GPU'
 
-        # activate add-ons:
-        for add_on in add_on_list:
-            print_info(str(add_on))
-            try:
-                bpy.ops.preferences.addon_enable(module=add_on)
-                print_info("I activated the addon {}.".format(add_on))
-            except:
-                print_error(
-                    "I Couldn't find the addon {}. Maybe it's not installed yet?".format(add_on))
+        for device in cycles_pref.devices:
+          if "OPTIX" in str(device.type):
+            device.use = True
+            print_info("Using device" + str(device.name))
+          if "CPU" in str(device.type):
+            device.use = False
 
-        current_scene_render = current_scene_data.render
+          # print_info(device.name, device.use)
 
         try:
-            if camera != '':
-                current_scene_data.camera = bpy.data.objects[camera]
-        except KeyError:
-            print_error("I didn't find the camera called {}.".format(camera))
+          current_scene_render.tile_x = 256
+          current_scene_render.tile_y = 256
+        except AttributeError:
+          print_info('You are using the Cycles-x!')
 
-        # disable render border
-        current_scene_render.use_border = border
+      # motion blur
+      current_scene_render.use_motion_blur = mb
 
-        if cycles is False:
-            if samples != "":
-                current_scene_data.eevee.taa_render_samples = int(samples)
-            current_scene_render.engine = 'BLENDER_EEVEE'
-            current_scene_data.eevee.use_motion_blur = mb
-        elif cycles:
-            current_scene_render.engine = 'CYCLES'
-            if samples != "":
-                current_scene_data.cycles.samples = int(samples)
+      # denoising data
+      if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
+        for view_layer in view_layer_data:
 
-            # cpu
-            if device == "cpu":
-                current_scene_render.threads_mode = 'FIXED'
-                current_scene_render.threads = cpu_count() - 2
-                current_scene_data.cycles.device = 'CPU'
-                try:
-                    current_scene_render.tile_x = 64
-                    current_scene_render.tile_y = 64
-                except AttributeError:
-                    print_info('You are using the Cycles-x!')
+          view_layer.cycles.denoising_store_passes = an_denoise
+          view_layer.cycles.use_denoising = denoise
+      elif type(view_layer_data) is bpy.types.ViewLayer:
+        view_layer_data.cycles.denoising_store_passes = an_denoise
+        view_layer_data.cycles.use_denoising = denoise
+      else:
+        print_error("Denoising Handling went wrong.")
 
-            # gpu
-            if device == "gpu":
-                cycles_pref = bpy.context.preferences.addons['cycles'].preferences
-                try:
-                    cycles_pref.get_devices()
-                except ValueError:
-                    print_info(
-                        "Cycles didn't like me asking about the devices.")
-                cycles_pref.compute_device_type = 'OPTIX'
+      # disable compositing if animation_denoising
+      current_scene_render.use_compositing = not an_denoise
+      current_scene_data.use_nodes = not an_denoise
+      current_scene_data.cycles.use_animated_seed = an_denoise
+    current_scene_render.use_compositing = False
+    current_scene_data.use_nodes = False
+    current_scene_data.cycles.use_animated_seed = True
 
-                current_scene_data.cycles.device = 'GPU'
+    print_info("Rendering on " + str(device))
+    # output settings
+    if xres != "":
+      current_scene_render.resolution_x = int(xres)
+    if yres != "":
+      current_scene_render.resolution_y = int(yres)
+    current_scene_render.resolution_percentage = percres
 
-                for device in cycles_pref.devices:
-                    if "OPTIX" in str(device.type):
-                        device.use = True
-                        print_info("Using device" + str(device.name))
-                    if "CPU" in str(device.type):
-                        device.use = False
+    # overwrite, placeholder
+    current_scene_render.use_overwrite = False
+    current_scene_render.use_placeholder = False
 
-                    # print_info(device.name, device.use)
+    # n-th frame
+    current_scene_data.frame_step = frame_step
 
-                try:
-                    current_scene_render.tile_x = 256
-                    current_scene_render.tile_y = 256
-                except AttributeError:
-                    print_info('You are using the Cycles-x!')
+    rr_user_commands.main()
 
-            # motion blur
-            current_scene_render.use_motion_blur = mb
-
-            # denoising data
-            if type(view_layer_data) is bpy.types.bpy_prop_collection or type(view_layer_data) is list:
-                for view_layer in view_layer_data:
-
-                    view_layer.cycles.denoising_store_passes = an_denoise
-                    view_layer.cycles.use_denoising = denoise
-            elif type(view_layer_data) is bpy.types.ViewLayer:
-                view_layer_data.cycles.denoising_store_passes = an_denoise
-                view_layer_data.cycles.use_denoising = denoise
-            else:
-                print_error("Denoising Handling went wrong.")
-
-            # disable compositing if animation_denoising
-            current_scene_render.use_compositing = not an_denoise
-            current_scene_data.use_nodes = not an_denoise
-            current_scene_data.cycles.use_animated_seed = an_denoise
-        current_scene_render.use_compositing = False
-        current_scene_data.use_nodes = False
-        current_scene_data.cycles.use_animated_seed = True
-
-        print_info("Rendering on " + str(device))
-        # output settings
-        if xres != "":
-            current_scene_render.resolution_x = int(xres)
-        if yres != "":
-            current_scene_render.resolution_y = int(yres)
-        current_scene_render.resolution_percentage = percres
-
-        # overwrite, placeholder
-        current_scene_render.use_overwrite = False
-        current_scene_render.use_placeholder = False
-
-        # n-th frame
-        current_scene_data.frame_step = frame_step
-        
-        import rr_user_commands
-
-        print_info("Done making the changes in your Blender file.")
-        time.sleep(2)
-    except Exception as e:
-        print_info(e)
-        write_cache("[ERROR]" + str(e))
-        print_info("I'm out!")
-        time.sleep(2)
-        sys.exit()
+    print_info("Done making the changes in your Blender file.")
+    time.sleep(2)
+  except AssertionError as e:
+    print_info(e)
+    write_cache("[ERROR]" + str(e))
+    print_info("I'm out!")
+    time.sleep(2)
+    sys.exit()
 
 
 # set_settings('Camera_top', 'cpu', True, 1920, 1080, 25, True, False, False, True, 4, 1, True, True, ['objects 1', 'objects 2'], ['objects'], 'Scene', ['View Layer'], ['animation_nodes', 'asdf'])
