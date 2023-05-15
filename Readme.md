@@ -41,68 +41,7 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 
 ## Setup
 
-Click on the chapter to open it:
-
-<!-- ### Filling the spreadsheet -->
-
-<details>
-<summary><b><u>1. Setting up the spreadsheet</u></b> </summary>
-
-1. Start Render Rob. This will open a login screen in your browser.
-
-2. Select a Google account to proceed
-
-![login](img/screenshots/login1.jpg)
-
-3. Grant Render Rob the permission to view and manage the files it created. (It won't have any access to your files!)
-
-![login](img/screenshots/login2.jpg)
-
-Confirm your choices.
-
-![login](img/screenshots/login3.jpg)
-
-Close the browser tab, if this is shown:
-
-![login](img/screenshots/login4.jpg)
-
-6. Now go to the newly opened browser tab with the Render Rob template sheet. Copy both sheets to the new file, that has been just created in the background.
-
-![login](img/screenshots/sheet1.jpg)
-
-The new file should show up on the left, since it's the newest one.
-
-![login](img/screenshots/sheet2.jpg)
-
-Click OK
-
-![login](img/screenshots/sheet3.jpg)
-
-Copy the second sheet.
-
-![login](img/screenshots/sheet4.jpg)
-
-Select the sheet again.
-
-![login](img/screenshots/sheet2.jpg)
-
-Click OK again.
-
-![login](img/screenshots/sheet3.jpg)
-
-Then click enter in the Render Rob terminal to continue.
-</details>
-
-<details>
-<summary><b><u>2. Filling the spreadsheet</u></b></summary>
-
-After setting that up, fill in the global settings in the Sheet. The Blender Path and Render Path is mandatory, the rest is optional.
-
-![Text](img/screenshots/Anmerkung%202020-04-26%20134758.jpg)
-
-Now you only have to paste your attributes of your job to be rendered, and run `renderrob.exe`!
-
-</details>
+<https://console.cloud.google.com/apis/library/drive.googleapis.com>
 
 ## Good to know
 
