@@ -2,7 +2,22 @@
   "python.pythonPath": "C:\\Users\\peter\\AppData\\Local\\Programs\\Python\\Python38\\python.exe",
   "spellright.language": ["de"],
   "spellright.documentTypes": ["latex"],
-  "python.testing.unittestArgs": ["-v", "-s", "./test", "-p", "*_test.py"],
+  "python.testing.unittestArgs": ["-v", "-s", "./src", "-p", "*_test.py"],
   "python.testing.pytestEnabled": false,
-  "python.testing.unittestEnabled": true
+  "python.testing.unittestEnabled": true,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.autopep8"
+  },
+  "python.formatting.provider": "none",
+  "cSpell.words": [
+    "ceqv",
+    "dilf",
+    "googleusercontent",
+    "ietf",
+    "Mxda",
+    "renderpipeline",
+    "tiuspu",
+    "Wtdrn",
+    "YTUIZC"
+  ]
 }
