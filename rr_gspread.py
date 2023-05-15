@@ -12,8 +12,14 @@ SHEETNAME = 'Render Rob 2.0'
 TEMPLATE_SHEET_ID = "1prG29lIic0Qqc_fGq5sLdnDh1u8Nkd45MxdaCuRp1Rw"
 DOCS_URI = "https://docs.google.com/spreadsheets/d/"
 SCOPES = ['https://www.googleapis.com/auth/drive.file']
-CREDENTIALS_PATH = "cache/credentials.json"
 TOKEN_PATH = "cache/token.pickle"
+
+
+def get_credentials_path() -> str:
+  """Returns the credentials path."""
+  for filename in os.listdir("cache/"):
+    if filename.endswith(".json"):
+      return "cache/" + filename
 
 
 def authorize_user() -> any:
@@ -29,7 +35,7 @@ def authorize_user() -> any:
       creds.refresh(Request())
     else:
       flow = InstalledAppFlow.from_client_secrets_file(
-          CREDENTIALS_PATH, scopes=SCOPES
+          get_credentials_path(), scopes=SCOPES
       )
       creds = flow.run_local_server(port=0)
     with open(TOKEN_PATH, "wb") as token_file:
