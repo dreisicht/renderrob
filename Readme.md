@@ -8,7 +8,7 @@
 
 Save time managing your render jobs!
 
-![ ](img/readme_pics/usage.gif)
+![ ](img/screenshots/usage.gif)
 
 ## Who is it for?
 
@@ -25,7 +25,7 @@ Individuals and small teams.
 - Automatic start of CPU and GPU jobs, so that all devices are always at full load
 - Built for both Windows and Linux
 
-![Screenshot](img/readme_pics/screenshot.jpg)
+![Screenshot](img/screenshots/screenshot.jpg)
 
 ## Requirements
 
@@ -52,43 +52,43 @@ Click on the chapter to open it:
 
 2. Select a Google account to proceed
 
-![login](img/readme_pics/login1.jpg)
+![login](img/screenshots/login1.jpg)
 
 3. Grant Render Rob the permission to view and manage the files it created. (It won't have any access to your files!)
 
-![login](img/readme_pics/login2.jpg)
+![login](img/screenshots/login2.jpg)
 
 Confirm your choices.
 
-![login](img/readme_pics/login3.jpg)
+![login](img/screenshots/login3.jpg)
 
 Close the browser tab, if this is shown:
 
-![login](img/readme_pics/login4.jpg)
+![login](img/screenshots/login4.jpg)
 
 6. Now go to the newly opened browser tab with the Render Rob template sheet. Copy both sheets to the new file, that has been just created in the background.
 
-![login](img/readme_pics/sheet1.jpg)
+![login](img/screenshots/sheet1.jpg)
 
 The new file should show up on the left, since it's the newest one.
 
-![login](img/readme_pics/sheet2.jpg)
+![login](img/screenshots/sheet2.jpg)
 
 Click OK
 
-![login](img/readme_pics/sheet3.jpg)
+![login](img/screenshots/sheet3.jpg)
 
 Copy the second sheet.
 
-![login](img/readme_pics/sheet4.jpg)
+![login](img/screenshots/sheet4.jpg)
 
 Select the sheet again.
 
-![login](img/readme_pics/sheet2.jpg)
+![login](img/screenshots/sheet2.jpg)
 
 Click OK again.
 
-![login](img/readme_pics/sheet3.jpg)
+![login](img/screenshots/sheet3.jpg)
 
 Then click enter in the Render Rob terminal to continue.
 </details>
@@ -98,7 +98,7 @@ Then click enter in the Render Rob terminal to continue.
 
 After setting that up, fill in the global settings in the Sheet. The Blender Path and Render Path is mandatory, the rest is optional.
 
-![Text](img/readme_pics/Anmerkung%202020-04-26%20134758.jpg)
+![Text](img/screenshots/Anmerkung%202020-04-26%20134758.jpg)
 
 Now you only have to paste your attributes of your job to be rendered, and run `renderrob.exe`!
 
