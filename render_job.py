@@ -1,15 +1,40 @@
 """Data structure for storing render job information."""
 
 from __future__ import annotations
+
 from typing import List
-from PySide6.QtWidgets import QTableWidgetItem, QComboBox, QCheckBox
+
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QTableWidget,
+                               QTableWidgetItem)
 
 
 class RenderJob():
   """Data structure for storing render job information."""
 
-  def __init__(self, table, row) -> None:
+  def __init__(self) -> None:
     """Initialize the render job."""
+    self.active: bool = True
+    self.file: str = ""
+    self.camera: str = ""
+    self.start: str = ""
+    self.end: str = ""
+    self.x_res: str = ""
+    self.y_res: str = ""
+    self.samples: str = ""
+    self.file_format: str = ""
+    self.engine: str = ""
+    self.device: str = ""
+    self.motion_blur: bool = False
+    self.new_version: bool = False
+    self.high_quality: bool = False
+    self.animation_denoise: bool = False
+    self.denoise: bool = False
+    self.scene: str = ""
+    self.view_layer: str = ""
+    self.comments: str = ""
+
+  def from_row(self, table: QTableWidget, row: int) -> None:
+    """Create a render job from a table row."""
     self.active = self.get_text(table.cellWidget(row, 0), widget="checkbox")
     self.file = self.get_text(table.item(row, 1))
     self.camera = self.get_text(table.item(row, 2))
@@ -40,8 +65,21 @@ class RenderJob():
       return item.findChild(QCheckBox).isChecked()
     return item.text()
 
+  def to_dict(self):
+    """Convert the render job to a dictionary."""
+    result = {}
+    for key, value in self.__dict__.items():
+      result[key] = value
+    return result
 
-def render_jobs_from_table_widget(table) -> List[RenderJob]:
+
+def jobs_from_table_widget(table: QTableWidget) -> List[RenderJob]:
   """Get all render jobs from a table widget."""
   for i in range(table.rowCount()):
-    yield RenderJob(table, i)
+    rjb = RenderJob()
+    rjb.from_row(table, i)
+    yield rjb
+
+
+if __name__ == "__main__":
+  print(RenderJob().to_dict())

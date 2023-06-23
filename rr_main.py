@@ -1,12 +1,14 @@
 """Main file to open RenderRob."""
 import sys
+import json
 
-from PySide6.QtCore import QCoreApplication, QFile, QIODevice, QProcess, Qt
+from PySide6.QtCore import QCoreApplication, QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication
 
 import render_job
-import ui_utils
+from render_rob_state import RenderRobState
+import table_utils
 
 
 class MainWindow():
@@ -14,123 +16,84 @@ class MainWindow():
 
   def __init__(self) -> None:
     """Initialize the main window."""
+    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     self.window = None
     self.table = None
-    self.load_ui_from_file("rr.ui")
+    self.state = RenderRobState()
+    self.main()
 
-  def load_ui_from_file(self, ui_file_name: str) -> None:
-    """Load a UI file from the given path and return the widget."""
-    QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
+  def main(self) -> None:
+    """Provide main function."""
     app = QApplication(sys.argv)
+    window = self.load_ui_from_file("window.ui")
+    self.window = window
+    self.table = window.tableWidget
+    table_utils.post_process_row(self.table, 0)
+    self.post_process_progress_bar()
+    self.window.show()
+    self.make_main_window_connections()
+
+    sys.exit(app.exec())
+
+  def on_accepted(self) -> None:
+    """Handle the accepted signal from the settings dialog."""
+    print("Accepted")
+
+  def make_settings_connections(self, window) -> None:
+    """Make connections for the settings dialog."""
+    window.buttonBox.accepted.connect(self.on_accepted)
+
+  def open_settings_dialog(self) -> None:
+    """Open the settings dialog."""
+    window = self.load_ui_from_file("settings.ui")
+    window.exec()
+
+  def save_state(self) -> None:
+    """Save the state to a JSON file."""
+    self.state.render_jobs = list(render_job.jobs_from_table_widget(self.table))
+    print(self.state.render_jobs)
+    print(self.state.to_dict())
+    with open("state.json", "w", encoding="UTF-8") as json_file:
+      json.dump(self.state.to_dict(), json_file)
+
+  def load_ui_from_file(self, ui_file_name: str) -> QUiLoader:
+    """Load a UI file from the given path and return the widget."""
     ui_file = QFile(ui_file_name)
     if not ui_file.open(QIODevice.ReadOnly):
       print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
       sys.exit(-1)
     loader = QUiLoader()
-    self.window = loader.load(ui_file)
-    self.table = self.window.tableWidget
+    window = loader.load(ui_file)
 
     ui_file.close()
-    if not self.window:
+    if not window:
       print(loader.errorString())
       sys.exit(-1)
+    return window
 
-    self.post_process_row(0)
-    self.post_process_progress_bar()
-    self.make_connections()
-    self.window.show()
+  def open_file(self) -> None:
+    """Open a RenderRob file."""
+    print("Open file")
 
-    sys.exit(app.exec())
-
-  def move_row_down(self) -> None:
-    """Move the currently selected row down."""
-    row = self.table.currentRow()
-    column = self.table.currentColumn()
-    if row < self.table.rowCount() - 1:
-      combobox_values = list(ui_utils.get_combobox_indexes(self.table, row))
-      checkbox_values = list(ui_utils.get_checkbox_values(self.table, row))
-      self.table.insertRow(row + 2)
-      for i in range(self.table.columnCount()):
-        self.table.setItem(row + 2, i, self.table.takeItem(row, i))
-        self.table.setCurrentCell(row + 2, column)
-      self.table.removeRow(row)
-      ui_utils.fill_row(self.table, row + 1)
-      ui_utils.set_combobox_indexes(self.table, row + 1, combobox_values)
-      ui_utils.set_checkbox_values(self.table, row + 1, checkbox_values)
-
-  def move_row_up(self) -> None:
-    """Move the currently selected row up."""
-    row = self.table.currentRow()
-    column = self.table.currentColumn()
-    if row > 0:
-      combobox_values = list(ui_utils.get_combobox_indexes(self.table, row))
-      checkbox_values = list(ui_utils.get_checkbox_values(self.table, row))
-      self.table.insertRow(row - 1)
-      for i in range(self.table.columnCount()):
-        self.table.setItem(row - 1, i, self.table.takeItem(row + 1, i))
-        self.table.setCurrentCell(row - 1, column)
-      self.table.removeRow(row + 1)
-      ui_utils.fill_row(self.table, row - 1)
-      ui_utils.set_combobox_indexes(self.table, row - 1, combobox_values)
-      ui_utils.set_checkbox_values(self.table, row - 1, checkbox_values)
-
-  def add_row_below(self) -> None:
-    """Add a row below the current row."""
-    current_row = self.table.currentRow()
-    self.table.insertRow(current_row + 1)
-    ui_utils.fill_row(self.table, current_row + 1)
-
-  def remove_active_row(self) -> None:
-    """Remove the currently selected row."""
-    current_row = self.table.currentRow()
-    self.table.removeRow(current_row)
-
-  def make_connections(self) -> None:
+  def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
-    self.window.add_button.clicked.connect(self.add_row_below)
-    self.window.delete_button.clicked.connect(self.remove_active_row)
-    self.window.up_button.clicked.connect(self.move_row_up)
-    self.window.down_button.clicked.connect(self.move_row_down)
-    self.window.render_button.clicked.connect(self.render_jobs)
-
-  def post_process_row(self, row: int) -> None:
-    """Post-process the table after loading it from a UI file."""
-    self.table.horizontalHeader().setDefaultAlignment(
-        Qt.AlignHCenter | Qt.Alignment(Qt.TextWordWrap))
-    self.table.horizontalHeader().setMinimumHeight(50)
-    self.table.setHorizontalHeaderLabels(
-        ["Active",
-         "File",
-         "Camera",
-         "Start",
-         "End",
-         "X\nRes",
-         "Y\nRes",
-         "Samples",
-         "File\nFormat",
-         "Engine",
-         "Device",
-         "Motion\nBlur",
-         "New\nVersion",
-         "High\nQuality",
-         "Animation\nDenoise",
-         "Denoise",
-         "Scene",
-         "View\nLayer",
-         "Comments",
-         "View\nOutput"
-         ])
-    self.table.resizeColumnsToContents()
-    ui_utils.fill_row(self.table, row)
+    self.window.add_button.clicked.connect(table_utils.add_row_below(self.table))
+    self.window.delete_button.clicked.connect(table_utils.remove_active_row(self.table))
+    self.window.up_button.clicked.connect(table_utils.move_row_up(self.table))
+    self.window.down_button.clicked.connect(table_utils.move_row_down(self.table))
+    self.window.render_button.clicked.connect(self.start_render)
+    self.window.actionOpen.triggered.connect(self.open_file)
+    self.window.actionSave.triggered.connect(self.save_state)
+    self.window.actionSettings.triggered.connect(self.open_settings_dialog)
 
   def post_process_progress_bar(self) -> None:
     """Post-process a window after loading it from a UI file."""
     self.window.progressBar.setValue(0)
 
-  def render_jobs(self) -> None:
+  def start_render(self) -> None:
     """Render operator called by the Render button."""""
-    for i in (render_job.render_jobs_from_table_widget(self.table)):
-      print(vars(i))
+    for i in (render_job.jobs_from_table_widget(self.table)):
+      print(i.to_dict())
 
 
 if __name__ == "__main__":

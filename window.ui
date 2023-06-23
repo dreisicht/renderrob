@@ -105,7 +105,7 @@
          </property>
          <property name="icon">
           <iconset theme="address-book-new">
-           <normaloff>.</normaloff>.</iconset>
+           <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
          </property>
         </column>
         <column>
@@ -206,7 +206,7 @@
         <item row="0" column="0">
          <property name="icon">
           <iconset theme="call-start">
-           <normaloff>.</normaloff>.</iconset>
+           <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
          </property>
         </item>
         <item row="0" column="1">
@@ -278,13 +278,14 @@
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuSettings">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
-     <string>Settings</string>
+     <string>Edit</string>
     </property>
+    <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuSettings"/>
+   <addaction name="menuEdit"/>
   </widget>
   <action name="actionSave">
    <property name="text">
@@ -319,6 +320,16 @@
   <action name="actionb_rrp">
    <property name="text">
     <string>b.rrp</string>
+   </property>
+  </action>
+  <action name="actionOpen_Settings">
+   <property name="text">
+    <string>Open Settings</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
    </property>
   </action>
  </widget>
