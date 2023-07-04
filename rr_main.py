@@ -30,8 +30,8 @@ class MainWindow():
     self.table = window.tableWidget
     table_utils.post_process_row(self.table, 0)
     self.post_process_progress_bar()
-    self.window.show()
     self.make_main_window_connections()
+    self.window.show()
 
     sys.exit(app.exec())
 
@@ -77,10 +77,12 @@ class MainWindow():
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
-    self.window.add_button.clicked.connect(table_utils.add_row_below(self.table))
-    self.window.delete_button.clicked.connect(table_utils.remove_active_row(self.table))
-    self.window.up_button.clicked.connect(table_utils.move_row_up(self.table))
-    self.window.down_button.clicked.connect(table_utils.move_row_down(self.table))
+    table_utils.TABLE = self.table
+    self.window.add_button.clicked.connect(table_utils.add_row_below)
+    self.window.delete_button.clicked.connect(table_utils.remove_active_row)
+    self.window.up_button.clicked.connect(table_utils.move_row_up)
+    self.window.down_button.clicked.connect(table_utils.move_row_down)
+
     self.window.render_button.clicked.connect(self.start_render)
     self.window.actionOpen.triggered.connect(self.open_file)
     self.window.actionSave.triggered.connect(self.save_state)
