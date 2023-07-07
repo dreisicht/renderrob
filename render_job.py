@@ -6,6 +6,7 @@ from typing import List
 
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QTableWidget,
                                QTableWidgetItem)
+import table_utils
 
 
 class RenderJob():
@@ -57,10 +58,10 @@ class RenderJob():
 
   def get_text(self, item: QTableWidgetItem, widget=None) -> str:
     """Get the text from a table item."""
-    if not item:
-      return ""
     if widget == "dropdown":
       return item.findChild(QComboBox).currentText()
+    if not item:
+      return ""
     if widget == "checkbox":
       return item.findChild(QCheckBox).isChecked()
     return item.text()
@@ -79,6 +80,31 @@ def jobs_from_table_widget(table: QTableWidget) -> List[RenderJob]:
     rjb = RenderJob()
     rjb.from_row(table, i)
     yield rjb
+
+
+def jobs_to_table_widget(table: QTableWidget, jobs: List[RenderJob]) -> None:
+  """Set all render jobs in a table widget."""
+  for i, job in enumerate(jobs):
+    table.setRowCount(i + 1)
+    table_utils.post_process_row(table, i)
+    table.setItem(i, 1, QTableWidgetItem(job.file))
+    table.setItem(i, 2, QTableWidgetItem(job.camera))
+    table.setItem(i, 3, QTableWidgetItem(job.start))
+    table.setItem(i, 4, QTableWidgetItem(job.end))
+    table.setItem(i, 5, QTableWidgetItem(job.x_res))
+    table.setItem(i, 6, QTableWidgetItem(job.y_res))
+    table.setItem(i, 7, QTableWidgetItem(job.samples))
+    table.setItem(i, 8, QTableWidgetItem(job.file_format))
+    table.setItem(i, 9, QTableWidgetItem(job.engine))
+    table.setItem(i, 10, QTableWidgetItem(job.device))
+    table.setCellWidget(i, 11, table_utils.make_checkbox(job.motion_blur))
+    table.setCellWidget(i, 12, table_utils.make_checkbox(job.new_version))
+    table.setCellWidget(i, 13, table_utils.make_checkbox(job.high_quality))
+    table.setCellWidget(i, 14, table_utils.make_checkbox(job.animation_denoise))
+    table.setCellWidget(i, 15, table_utils.make_checkbox(job.denoise))
+    table.setItem(i, 16, QTableWidgetItem(job.scene))
+    table.setItem(i, 17, QTableWidgetItem(job.view_layer))
+    table.setItem(i, 18, QTableWidgetItem(job.comments))
 
 
 if __name__ == "__main__":

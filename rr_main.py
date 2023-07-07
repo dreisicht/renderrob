@@ -4,7 +4,7 @@ import json
 
 from PySide6.QtCore import QCoreApplication, QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QFileDialog
 
 import render_job
 from render_rob_state import RenderRobState
@@ -51,10 +51,18 @@ class MainWindow():
   def save_state(self) -> None:
     """Save the state to a JSON file."""
     self.state.render_jobs = list(render_job.jobs_from_table_widget(self.table))
-    print(self.state.render_jobs)
-    print(self.state.to_dict())
+    # print(self.state.render_jobs)
+    # print(self.state.to_dict())
     with open("state.json", "w", encoding="UTF-8") as json_file:
       json.dump(self.state.to_dict(), json_file)
+
+  def open_file(self) -> None:
+    """Open a RenderRob file."""
+    # TODO(b/): Change file to .rr file.
+    file_name, _ = QFileDialog.getOpenFileName(
+        self.window, "Open File", "", "RenderRob Files (*.json)")
+    self.state.open_from_json(file_name)
+    self.state.to_table(self.table)
 
   def load_ui_from_file(self, ui_file_name: str) -> QUiLoader:
     """Load a UI file from the given path and return the widget."""
@@ -70,10 +78,6 @@ class MainWindow():
       print(loader.errorString())
       sys.exit(-1)
     return window
-
-  def open_file(self) -> None:
-    """Open a RenderRob file."""
-    print("Open file")
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""

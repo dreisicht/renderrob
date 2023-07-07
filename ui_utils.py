@@ -13,8 +13,6 @@ DEVICES = ["gpu", "cpu"]
 def get_combobox_indexes(table: QTableWidget, row: int) -> list:
   """Get all values of combo boxes in a row."""
   for i in COMBOBOX_COLUMNS:
-    # if not table.cellWidget(row, i):
-    #   continue
     yield table.cellWidget(row, i).currentIndex()
 
 

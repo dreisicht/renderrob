@@ -4,6 +4,9 @@ import json
 from dataclasses import dataclass
 from typing import List
 
+from PySide6.QtWidgets import QTableWidget
+
+import ui_utils
 from render_job import RenderJob
 
 
@@ -57,6 +60,34 @@ class RenderRobState:
         render_job.view_layer = job_dict["view_layer"]
         render_job.comments = job_dict["comments"]
         self.render_jobs.append(render_job)
+
+  def to_table(self, table: QTableWidget) -> None:
+    """Load the state into a table."""
+    for i, render_job in enumerate(self.render_jobs):
+      ui_utils.set_checkbox_values(table, i, [render_job.active,
+                                              render_job.motion_blur,
+                                              render_job.new_version,
+                                              render_job.high_quality,
+                                              render_job.animation_denoise,
+                                              render_job.denoise])
+
+      file_format_id = ui_utils.FILE_FORMATS.index(render_job.file_format)
+      render_engine_id = ui_utils.RENDER_ENGINES.index(render_job.engine)
+      device_id = ui_utils.DEVICES.index(render_job.device)
+      ui_utils.set_combobox_indexes(
+          table, i, [file_format_id, render_engine_id, device_id])
+
+      table.setItem(i, 1, render_job.file)
+      table.setItem(i, 2, render_job.camera)
+      table.setItem(i, 3, render_job.start)
+      table.setItem(i, 4, render_job.end)
+      table.setItem(i, 5, render_job.x_res)
+      table.setItem(i, 6, render_job.y_res)
+      table.setItem(i, 7, render_job.samples)
+      table.setItem(i, 16, render_job.scene)
+      table.setItem(i, 17, render_job.view_layer)
+      table.setItem(i, 18, render_job.comments)
+      # table_utils.post_process_row(table, i)
 
   def to_dict(self):
     """Convert the state to a dictionary."""
