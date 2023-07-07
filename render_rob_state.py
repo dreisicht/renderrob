@@ -4,7 +4,7 @@ import json
 from dataclasses import dataclass
 from typing import List
 
-from PySide6.QtWidgets import QTableWidget
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 import ui_utils
 from render_job import RenderJob
@@ -71,22 +71,26 @@ class RenderRobState:
                                               render_job.animation_denoise,
                                               render_job.denoise])
 
+      if render_job.file_format not in ui_utils.FILE_FORMATS or \
+              render_job.engine not in ui_utils.RENDER_ENGINES or \
+              render_job.device not in ui_utils.DEVICES:
+        raise ValueError("Error: Invalid file format, render engine, or device.")
       file_format_id = ui_utils.FILE_FORMATS.index(render_job.file_format)
       render_engine_id = ui_utils.RENDER_ENGINES.index(render_job.engine)
       device_id = ui_utils.DEVICES.index(render_job.device)
       ui_utils.set_combobox_indexes(
           table, i, [file_format_id, render_engine_id, device_id])
 
-      table.setItem(i, 1, render_job.file)
-      table.setItem(i, 2, render_job.camera)
-      table.setItem(i, 3, render_job.start)
-      table.setItem(i, 4, render_job.end)
-      table.setItem(i, 5, render_job.x_res)
-      table.setItem(i, 6, render_job.y_res)
-      table.setItem(i, 7, render_job.samples)
-      table.setItem(i, 16, render_job.scene)
-      table.setItem(i, 17, render_job.view_layer)
-      table.setItem(i, 18, render_job.comments)
+      table.setItem(i, 1, QTableWidgetItem(render_job.file))
+      table.setItem(i, 2, QTableWidgetItem(render_job.camera))
+      table.setItem(i, 3, QTableWidgetItem(render_job.start))
+      table.setItem(i, 4, QTableWidgetItem(render_job.end))
+      table.setItem(i, 5, QTableWidgetItem(render_job.x_res))
+      table.setItem(i, 6, QTableWidgetItem(render_job.y_res))
+      table.setItem(i, 7, QTableWidgetItem(render_job.samples))
+      table.setItem(i, 16, QTableWidgetItem(render_job.scene))
+      table.setItem(i, 17, QTableWidgetItem(render_job.view_layer))
+      table.setItem(i, 18, QTableWidgetItem(render_job.comments))
       # table_utils.post_process_row(table, i)
 
   def to_dict(self):

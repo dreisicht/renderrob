@@ -44,9 +44,9 @@ class RenderJob():
     self.x_res = self.get_text(table.item(row, 5))
     self.y_res = self.get_text(table.item(row, 6))
     self.samples = self.get_text(table.item(row, 7))
-    self.file_format = self.get_text(table.item(row, 8), widget="dropdown")
-    self.engine = self.get_text(table.item(row, 9), widget="dropdown")
-    self.device = self.get_text(table.item(row, 10), widget="dropdown")
+    self.file_format = self.get_text(table.cellWidget(row, 8), widget="dropdown")
+    self.engine = self.get_text(table.cellWidget(row, 9), widget="dropdown")
+    self.device = self.get_text(table.cellWidget(row, 10), widget="dropdown")
     self.motion_blur = self.get_text(table.cellWidget(row, 11), widget="checkbox")
     self.new_version = self.get_text(table.cellWidget(row, 12), widget="checkbox")
     self.high_quality = self.get_text(table.cellWidget(row, 13), widget="checkbox")
@@ -58,10 +58,10 @@ class RenderJob():
 
   def get_text(self, item: QTableWidgetItem, widget=None) -> str:
     """Get the text from a table item."""
-    if widget == "dropdown":
-      return item.findChild(QComboBox).currentText()
     if not item:
       return ""
+    if widget == "dropdown":
+      return item.currentText()
     if widget == "checkbox":
       return item.findChild(QCheckBox).isChecked()
     return item.text()
@@ -97,11 +97,11 @@ def jobs_to_table_widget(table: QTableWidget, jobs: List[RenderJob]) -> None:
     table.setItem(i, 8, QTableWidgetItem(job.file_format))
     table.setItem(i, 9, QTableWidgetItem(job.engine))
     table.setItem(i, 10, QTableWidgetItem(job.device))
-    table.setCellWidget(i, 11, table_utils.make_checkbox(job.motion_blur))
-    table.setCellWidget(i, 12, table_utils.make_checkbox(job.new_version))
-    table.setCellWidget(i, 13, table_utils.make_checkbox(job.high_quality))
-    table.setCellWidget(i, 14, table_utils.make_checkbox(job.animation_denoise))
-    table.setCellWidget(i, 15, table_utils.make_checkbox(job.denoise))
+    # table.setCellWidget(i, 11, table_utils.make_checkbox(job.motion_blur))
+    # table.setCellWidget(i, 12, table_utils.make_checkbox(job.new_version))
+    # table.setCellWidget(i, 13, table_utils.make_checkbox(job.high_quality))
+    # table.setCellWidget(i, 14, table_utils.make_checkbox(job.animation_denoise))
+    # table.setCellWidget(i, 15, table_utils.make_checkbox(job.denoise))
     table.setItem(i, 16, QTableWidgetItem(job.scene))
     table.setItem(i, 17, QTableWidgetItem(job.view_layer))
     table.setItem(i, 18, QTableWidgetItem(job.comments))

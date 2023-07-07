@@ -58,7 +58,7 @@ class MainWindow():
 
   def open_file(self) -> None:
     """Open a RenderRob file."""
-    # TODO(b/): Change file to .rr file.
+    # TODO(b/1234567): Change file to .rr file.
     file_name, _ = QFileDialog.getOpenFileName(
         self.window, "Open File", "", "RenderRob Files (*.json)")
     self.state.open_from_json(file_name)
