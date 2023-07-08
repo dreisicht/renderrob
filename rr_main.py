@@ -51,8 +51,6 @@ class MainWindow():
   def save_state(self) -> None:
     """Save the state to a JSON file."""
     self.state.render_jobs = list(render_job.jobs_from_table_widget(self.table))
-    # print(self.state.render_jobs)
-    # print(self.state.to_dict())
     with open("state.json", "w", encoding="UTF-8") as json_file:
       json.dump(self.state.to_dict(), json_file)
 

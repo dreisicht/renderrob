@@ -2,12 +2,33 @@
 
 import json
 from dataclasses import dataclass
-from typing import List
+from typing import List, ClassVar
 
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 import ui_utils
 from render_job import RenderJob
+import table_utils
+
+
+@dataclass
+class PreviewAttributes:
+  """Class to store the preview attributes."""
+
+  samples: int = 32
+  nth_frame: int = 5
+  resolution: int = 100
+
+
+@dataclass
+class Settings:
+  """Class to store the settings of RenderRob."""
+
+  blender_path: str = ""
+  output_path: str = ""
+  blender_files_path: str = ""
+  addons_to_activate: ClassVar[List[str]] = [""]
+  preview: PreviewAttributes = PreviewAttributes()
 
 
 @dataclass
@@ -16,27 +37,15 @@ class RenderRobState:
 
   def __init__(self) -> None:
     """Initialize the state."""
-    self.blender_path: str = ""
-    self.output_folder: str = ""
-    self.blender_files_folder: str = ""
-    self.preview_samples: int = 0
-    self.preview_nth_frame: int = 0
-    self.preview_resolution: int = 100
-    self.addons_to_activate: List[str] = []
-    self.render_jobs: List[RenderJob] = []
+    self.settings = Settings()
+    self.render_jobs = []
 
   def open_from_json(self, json_path: str) -> None:
     """Open the state from a JSON file."""
     print(f"Loading state from {json_path}")
     with open(json_path, "r", encoding="UTF-8") as json_file:
       json_dict = json.load(json_file)
-      self.blender_path = json_dict["blender_path"]
-      self.output_folder = json_dict["output_folder"]
-      self.blender_files_folder = json_dict["blender_files_folder"]
-      self.preview_samples = json_dict["preview_samples"]
-      self.preview_nth_frame = json_dict["preview_nth_frame"]
-      self.preview_resolution = json_dict["preview_resolution"]
-      self.addons_to_activate = json_dict["addons_to_activate"]
+      self.settings = json_dict["settings"]
       self.render_jobs = []
       for job_dict in json_dict["render_jobs"]:
         render_job = RenderJob()
@@ -63,7 +72,11 @@ class RenderRobState:
 
   def to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
+    for i in range(table.rowCount()):
+      table.removeRow(0)
     for i, render_job in enumerate(self.render_jobs):
+      table.insertRow(i)
+      table_utils.post_process_row(table, i)
       ui_utils.set_checkbox_values(table, i, [render_job.active,
                                               render_job.motion_blur,
                                               render_job.new_version,

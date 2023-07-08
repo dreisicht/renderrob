@@ -23,7 +23,7 @@ def set_combobox_indexes(table: QTableWidget, row: int, values: list[int]) -> No
 
 
 def get_checkbox_values(table: QTableWidget, row: int) -> list:
-  """Get all values of combo boxes in a row."""
+  """Get all values of checkboxes in a row."""
   for i in CHECKBOX_COLUMNS:
     widget = table.cellWidget(row, i)
     checkbox_item = widget.findChild(QCheckBox)
@@ -31,7 +31,7 @@ def get_checkbox_values(table: QTableWidget, row: int) -> list:
 
 
 def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> None:
-  """Set all values of combo boxes in a row."""
+  """Set all values of checkboxes in a row."""
   for j, i in enumerate(CHECKBOX_COLUMNS):
     widget = table.cellWidget(row, i)
     checkbox_item = widget.findChild(QCheckBox)
