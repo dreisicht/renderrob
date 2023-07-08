@@ -2,7 +2,7 @@
 import unittest
 
 from render_job import RenderJob
-from render_rob_state import PreviewAttributes, Settings, RenderRobState
+from render_rob_state import PreviewAttributes, RenderRobState, Settings
 
 
 class TestRenderRobState(unittest.TestCase):
