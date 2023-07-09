@@ -55,8 +55,11 @@ class TestRenderRobState(unittest.TestCase):
                                      output_path='test_data/output',
                                      blender_files_path='test_data/blender_files',
                                      preview=PreviewAttributes(samples=10,
+                                                               samples_use=False,
                                                                nth_frame=2,
-                                                               resolution=50))}
+                                                               nth_frame_use=False,
+                                                               resolution=50,
+                                                               resolution_use=False))}
     self.assertEqual(rrs.to_dict(), ref_dict)
 
 

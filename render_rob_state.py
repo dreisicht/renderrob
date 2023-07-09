@@ -2,13 +2,13 @@
 
 import json
 from dataclasses import dataclass
-from typing import List, ClassVar
+from typing import ClassVar, List
 
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
+import table_utils
 import ui_utils
 from render_job import RenderJob
-import table_utils
 
 
 @dataclass
@@ -16,8 +16,11 @@ class PreviewAttributes:
   """Class to store the preview attributes."""
 
   samples: int = 32
+  samples_use: bool = False
   nth_frame: int = 5
+  nth_frame_use: bool = False
   resolution: int = 100
+  resolution_use: bool = False
 
 
 @dataclass

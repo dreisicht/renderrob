@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import List
 
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QTableWidget,
-                               QTableWidgetItem)
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
+
 import table_utils
 
 

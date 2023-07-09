@@ -1,13 +1,33 @@
 """Util functions for helping build the render rob UI."""
 
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QWidget, QTableWidget
+import sys
+
+from PySide6.QtCore import QFile, QIODevice, Qt
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
+                               QWidget)
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
 FILE_FORMATS = ["png", "tiff", "exr", "jpg"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
+
+
+def load_ui_from_file(ui_file_name: str) -> QUiLoader:
+  """Load a UI file from the given path and return the widget."""
+  ui_file = QFile(ui_file_name)
+  if not ui_file.open(QIODevice.ReadOnly):
+    print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
+    sys.exit(-1)
+  loader = QUiLoader()
+  window = loader.load(ui_file)
+
+  ui_file.close()
+  if not window:
+    print(loader.errorString())
+    sys.exit(-1)
+  return window
 
 
 def get_combobox_indexes(table: QTableWidget, row: int) -> list:

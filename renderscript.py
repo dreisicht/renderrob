@@ -1,9 +1,11 @@
-import bpy
-import time
 import sys
-import rr_c_image
+import time
 from multiprocessing import cpu_count
+
+import bpy
+
 import print_utils
+import rr_c_image
 
 
 def set_settings(camera,
