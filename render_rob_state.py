@@ -111,7 +111,8 @@ class RenderRobState:
 
   def to_dict(self):
     """Convert the state to a dictionary."""
-    result = {}
+    result = {}  # TODO: dict conversion fails here. Remember to use __dict__ attribute for conversion.
+
     for key, value in self.__dict__.items():
       if isinstance(value, list):
         result[key] = []
