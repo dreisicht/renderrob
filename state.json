@@ -1,0 +1,80 @@
+{
+  "settings": {
+    "blender_path": "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
+    "output_path": "",
+    "blender_files_path": "",
+    "preview": {
+      "samples": 32,
+      "samples_use": false,
+      "nth_frame": 5,
+      "nth_frame_use": false,
+      "resolution": 100,
+      "resolution_use": false
+    }
+  },
+  "render_jobs": [
+    {
+      "active": true,
+      "file": "a",
+      "camera": "b",
+      "start": "c",
+      "end": "d",
+      "x_res": "e",
+      "y_res": "f",
+      "samples": "g",
+      "file_format": "tiff",
+      "engine": "eevee",
+      "device": "gpu",
+      "motion_blur": true,
+      "new_version": false,
+      "high_quality": true,
+      "animation_denoise": false,
+      "denoise": true,
+      "scene": "q",
+      "view_layer": "c",
+      "comments": "v"
+    },
+    {
+      "active": true,
+      "file": "h",
+      "camera": "i",
+      "start": "j",
+      "end": "k",
+      "x_res": "l",
+      "y_res": "m",
+      "samples": "n",
+      "file_format": "exr",
+      "engine": "cycles",
+      "device": "cpu",
+      "motion_blur": false,
+      "new_version": true,
+      "high_quality": false,
+      "animation_denoise": true,
+      "denoise": false,
+      "scene": "q",
+      "view_layer": "e",
+      "comments": "r"
+    },
+    {
+      "active": true,
+      "file": "o",
+      "camera": "p",
+      "start": "q",
+      "end": "r",
+      "x_res": "s",
+      "y_res": "t",
+      "samples": "u",
+      "file_format": "jpg",
+      "engine": "eevee",
+      "device": "gpu",
+      "motion_blur": true,
+      "new_version": false,
+      "high_quality": true,
+      "animation_denoise": false,
+      "denoise": true,
+      "scene": "n",
+      "view_layer": "m",
+      "comments": ","
+    }
+  ]
+}

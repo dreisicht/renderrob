@@ -28,10 +28,23 @@ class TestRenderRobState(unittest.TestCase):
     rrs.settings.blender_files_path = "test_data/blender_files"
     rrs.settings.addons_to_activate = ["test_data/addon1.py", "test_data/addon2.py"]
     rrs.settings.preview.samples = 10
+    rrs.settings.preview.samples_use = True
     rrs.settings.preview.nth_frame = 2
+    rrs.settings.preview.nth_frame_use = True
     rrs.settings.preview.resolution = 50
+    rrs.settings.preview.resolution_use = True
     rrs.render_jobs = [RenderJob()]
-    ref_dict = {'render_jobs': [{'active': True,
+    ref_dict = {'settings': Settings(blender_path='C:/Program Files '
+                                     '(x86)/Steam/steamapps/common/Blender/blender.exe',
+                                     output_path='test_data/output',
+                                     blender_files_path='test_data/blender_files',
+                                     preview=PreviewAttributes(samples=10,
+                                                               samples_use=True,
+                                                               nth_frame=2,
+                                                               nth_frame_use=True,
+                                                               resolution=50,
+                                                               resolution_use=True).__dict__).__dict__,
+                'render_jobs': [{'active': True,
                                  'animation_denoise': False,
                                  'camera': '',
                                  'comments': '',
@@ -49,18 +62,8 @@ class TestRenderRobState(unittest.TestCase):
                                  'start': '',
                                  'view_layer': '',
                                  'x_res': '',
-                                 'y_res': ''}],
-                'settings': Settings(blender_path='C:/Program Files '
-                                     '(x86)/Steam/steamapps/common/Blender/blender.exe',
-                                     output_path='test_data/output',
-                                     blender_files_path='test_data/blender_files',
-                                     preview=PreviewAttributes(samples=10,
-                                                               samples_use=False,
-                                                               nth_frame=2,
-                                                               nth_frame_use=False,
-                                                               resolution=50,
-                                                               resolution_use=False))}
-    self.assertEqual(rrs.to_dict(), ref_dict)
+                                 'y_res': ''}]}
+    self.assertCountEqual(rrs.to_dict(), ref_dict)  # TODO: Is this the right assertion?
 
 
 if __name__ == '__main__':

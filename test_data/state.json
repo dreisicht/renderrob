@@ -6,8 +6,11 @@
     "addons_to_activate": [],
     "preview": {
       "samples": 32,
+      "samples_use": false,
       "nth_frame": 5,
-      "resolution": 100
+      "nth_frame_use": false,
+      "resolution": 100,
+      "resolution_use": false
     }
   },
   "render_jobs": [
