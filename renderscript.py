@@ -4,7 +4,7 @@ from multiprocessing import cpu_count
 
 import bpy
 
-import print_utils
+import utils.print_utils as print_utils
 import rr_c_image
 
 

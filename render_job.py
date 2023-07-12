@@ -6,7 +6,7 @@ from typing import List
 
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
-import table_utils
+import utils.table_utils as table_utils
 
 
 class RenderJob():
@@ -65,13 +65,6 @@ class RenderJob():
     if widget == "checkbox":
       return item.findChild(QCheckBox).isChecked()
     return item.text()
-
-  def to_dict(self):
-    """Convert the render job to a dictionary."""
-    result = {}
-    for key, value in self.__dict__.items():
-      result[key] = value
-    return result
 
 
 def jobs_from_table_widget(table: QTableWidget) -> List[RenderJob]:

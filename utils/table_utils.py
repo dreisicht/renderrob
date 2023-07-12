@@ -1,8 +1,8 @@
 """Utility functions for table operations."""
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget
+from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
-import ui_utils
+import utils.ui_utils as ui_utils
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is

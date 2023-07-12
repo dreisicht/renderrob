@@ -6,12 +6,11 @@ from PySide6.QtCore import QCoreApplication, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QFileDialog
 
-import render_job
-import table_utils
-import ui_utils
-from render_rob_state import RenderRobState
+import utils.table_utils as table_utils
+import utils.ui_utils as ui_utils
 
-STATE = RenderRobState()
+from proto import state_pb2
+STATE = state_pb2.render_rob_state()  # pylint: disable=no-member
 
 
 class SettingsWindow():
@@ -97,8 +96,10 @@ class MainWindow():
     # TODO(b/1234567): Change file to .rr file.
     file_name, _ = QFileDialog.getOpenFileName(
         self.window, "Open File", "", "RenderRob Files (*.json)")
-    STATE.open_from_json(file_name)
-    STATE.to_table(self.table)
+    with open(file_name, "r", encoding="UTF-8") as pb_file:
+      pb_str = pb_file.read()
+    STATE.ParseFromString(pb_str)
+    table_utils.state_to_table(self.table, STATE)
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
