@@ -1,6 +1,6 @@
 """Utility functions for table operations."""
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QTableWidget, QHeaderView
 
 import utils.ui_utils as ui_utils
 
@@ -58,8 +58,9 @@ def remove_active_row() -> None:
 
 def post_process_row(table: QTableWidget, row: int) -> None:
   """Post-process the table after loading it from a UI file."""
-  table.horizontalHeader().setDefaultAlignment(
-      Qt.AlignHCenter | Qt.Alignment(Qt.TextWordWrap))
+  # table.horizontalHeader().setDefaultAlignment(
+  #     Qt.AlignHCenter | Qt.Alignment(Qt.TextWordWrap))
+  table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
   table.horizontalHeader().setMinimumHeight(50)
   table.setHorizontalHeaderLabels(
       ["Active",
