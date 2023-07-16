@@ -81,7 +81,6 @@ def post_process_row(table: QTableWidget, row: int) -> None:
        "Scene",
        "View\nLayer",
        "Comments",
-       "View\nOutput"
        ])
   table.resizeColumnsToContents()
   ui_utils.fill_row(table, row)

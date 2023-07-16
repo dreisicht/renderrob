@@ -5,7 +5,7 @@ import sys
 from PySide6.QtCore import QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
-                               QWidget)
+                               QWidget, QPushButton)
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]

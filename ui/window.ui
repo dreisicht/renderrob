@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1077</width>
+    <width>1528</width>
     <height>683</height>
    </rect>
   </property>
@@ -30,6 +30,33 @@
          <widget class="QPushButton" name="stop_button">
           <property name="text">
            <string>Stop</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton">
+          <property name="text">
+           <string>Open folder</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="text">
+           <string>Play</string>
           </property>
          </widget>
         </item>
@@ -198,12 +225,10 @@
           <string>Comments</string>
          </property>
         </column>
-        <column>
-         <property name="text">
-          <string>View Output</string>
-         </property>
-        </column>
         <item row="0" column="0">
+         <property name="text">
+          <string/>
+         </property>
          <property name="icon">
           <iconset theme="call-start">
            <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
@@ -246,7 +271,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1077</width>
+     <width>1528</width>
      <height>22</height>
     </rect>
    </property>
