@@ -9,7 +9,6 @@ from proto import state_pb2
 from utils import ui_utils
 from utils import table_utils
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
-from typing import Iterator, List
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -101,3 +100,6 @@ class StateSaver:
       render_job.view_layer = get_text(table.item(i, 17))
       render_job.comments = get_text(table.item(i, 18))
       self.state.render_jobs.append(render_job)
+
+
+STATESAVER = StateSaver()

@@ -1,16 +1,13 @@
 """Main file to open RenderRob."""
-import json
 import sys
 
 from PySide6.QtCore import QCoreApplication, Qt
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QFileDialog
 
 import utils.table_utils as table_utils
 import utils.ui_utils as ui_utils
-import state_saver
-
-STATESAVER = state_saver.StateSaver()
+from state_saver import STATESAVER
+import settings_window
 
 
 class MainWindow():
@@ -63,7 +60,7 @@ class MainWindow():
     self.window.render_button.clicked.connect(self.start_render)
     self.window.actionOpen.triggered.connect(self.open_file)
     self.window.actionSave.triggered.connect(self.save_state)
-    self.window.actionSettings.triggered.connect(SettingsWindow)
+    self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
 
   def post_process_progress_bar(self) -> None:
     """Post-process a window after loading it from a UI file."""
