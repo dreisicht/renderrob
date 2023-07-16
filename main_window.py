@@ -1,13 +1,17 @@
 """Main file to open RenderRob."""
 import sys
-
-from PySide6.QtCore import QCoreApplication, Qt
+import os
+from PySide6.QtCore import QCoreApplication, QProcess, Qt
+from PySide6.QtGui import QTextCursor, QAction
 from PySide6.QtWidgets import QApplication, QFileDialog
 
+import settings_window
 import utils.table_utils as table_utils
 import utils.ui_utils as ui_utils
+from proto import cache_pb2
 from state_saver import STATESAVER
-import settings_window
+
+MAX_NUMBER_OF_RECENT_FILES = 5
 
 
 class MainWindow():
@@ -18,36 +22,125 @@ class MainWindow():
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     self.window = None
     self.table = None
+    self.cache = cache_pb2.RenderRobCache()
+    self.recent_file_actions = []
     self.main()
 
   def main(self) -> None:
     """Provide main function."""
     app = QApplication(sys.argv)
+    if os.path.exists(".rr_cache"):
+      self.load_cache()
+
     main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
     self.table = main_window.tableWidget
     table_utils.post_process_row(self.table, 0)
+    self.refresh_recent_files_menu()
     self.post_process_progress_bar()
     self.make_main_window_connections()
     self.window.show()
 
+    self.save_cache()
     sys.exit(app.exec())
 
-  def save_state(self) -> None:
-    """Save the state to a JSON file."""
+  def save_cache(self) -> None:
+    """Store the cache to a file."""
+    cache_str = self.cache.SerializeToString()
+    with open(".rr_cache", "wb") as cache_file:
+      cache_file.write(cache_str)
+
+  def load_cache(self) -> None:
+    """Load the cache from a file."""
+    with open(".rr_cache", "rb") as cache_file:
+      cache_str = cache_file.read()
+    self.cache.ParseFromString(cache_str)
+
+  def save_as_file(self) -> None:
+    """Save the state to a serialized proto file with a dialog."""
     STATESAVER.table_to_state(self.table)
-    with open("state.pb", "wb") as protobuf:
+    file_name, _ = QFileDialog.getSaveFileName(
+        self.window, "Save File", "", "RenderRob Files (*.rrp)")
+    with open(file_name, "wb") as protobuf:
+      protobuf.write(STATESAVER.state.SerializeToString(protobuf))
+    self.cache.current_file = file_name
+    if file_name not in self.cache.recent_files:
+      self.cache.recent_files.append(file_name)
+    self.refresh_recent_files_menu()
+
+  def save_file(self) -> None:
+    """Save the state to a serialized proto file without a dialog."""
+    STATESAVER.table_to_state(self.table)
+    with open(self.cache.current_file, "wb") as protobuf:
       protobuf.write(STATESAVER.state.SerializeToString(protobuf))
 
-  def open_file(self) -> None:
-    """Open a RenderRob file."""
-    # TODO(b/1234567): Change file to .rr file.
+  def open_recent_file0(self) -> None:
+    """Open the 0st recent file."""
+    self.open_file(self.cache.recent_files[0])
+
+  def open_recent_file1(self) -> None:
+    """Open the 1st recent file."""
+    self.open_file(self.cache.recent_files[1])
+
+  def open_recent_file2(self) -> None:
+    """Open the 2st recent file."""
+    self.open_file(self.cache.recent_files[2])
+
+  def open_recent_file3(self) -> None:
+    """Open the 3st recent file."""
+    self.open_file(self.cache.recent_files[3])
+
+  def open_recent_file4(self) -> None:
+    """Open the 4st recent file."""
+    self.open_file(self.cache.recent_files[4])
+
+  def clear_recent_files(self) -> None:
+    """Clear the recent files."""
+    del self.cache.recent_files[:]
+    # for action in self.recent_file_actions:
+    self.window.menuOpen_Recent.clear()
+    self.recent_file_actions = []
+
+  def refresh_recent_files_menu(self) -> None:
+    """Add the recent files to the file menu."""
+    self.window.menuOpen_Recent.clear()
+    open_recent_functions = [
+        self.open_recent_file0,
+        self.open_recent_file1,
+        self.open_recent_file2,
+        self.open_recent_file3,
+        self.open_recent_file4,
+    ]
+    for i, file_path in enumerate(self.cache.recent_files):
+      action_recent = QAction(os.path.basename(
+          file_path), self.window.menuOpen_Recent)
+      self.recent_file_actions.append(action_recent)
+      action_recent.triggered.connect(open_recent_functions[i])
+      self.window.menuOpen_Recent.addAction(action_recent)
+
+    self.window.menuOpen_Recent.addSeparator()
+    if self.cache.recent_files:
+      action_clear = QAction("Clear Recent Files", self.window.menuOpen_Recent)
+      self.recent_file_actions.append(action_clear)
+      action_clear.triggered.connect(self.clear_recent_files)
+      self.window.menuOpen_Recent.addAction(action_clear)
+
+  def open_file_dialog(self) -> None:
+    """Open a RenderRob file with a dialog."""
     file_name, _ = QFileDialog.getOpenFileName(
-        self.window, "Open File", "", "RenderRob Files (*.pb)")
+        self.window, "Open File", "", "RenderRob Files (*.rrp)")
+    self.open_file(file_name)
+
+  def open_file(self, file_name: str) -> None:
+    """Open a RenderRob file."""
     with open(file_name, "rb") as pb_file:
       pb_str = pb_file.read()
     STATESAVER.state.ParseFromString(pb_str)
     STATESAVER.state_to_table(self.table)
+    self.cache.current_file = file_name
+    if file_name not in self.cache.recent_files:
+      self.cache.recent_files.append(file_name)
+    self.refresh_recent_files_menu()
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
@@ -58,17 +151,40 @@ class MainWindow():
     self.window.down_button.clicked.connect(table_utils.move_row_down)
 
     self.window.render_button.clicked.connect(self.start_render)
-    self.window.actionOpen.triggered.connect(self.open_file)
-    self.window.actionSave.triggered.connect(self.save_state)
+    self.window.stop_button.clicked.connect(self.stop_render)
+    self.window.actionOpen.triggered.connect(self.open_file_dialog)
+    self.window.actionSave.triggered.connect(self.save_file)
+    self.window.actionSave_As.triggered.connect(self.save_as_file)
     self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
 
   def post_process_progress_bar(self) -> None:
     """Post-process a window after loading it from a UI file."""
     self.window.progressBar.setValue(0)
 
+  def handle_output(self):
+    """Output the subprocess output to the QTextEdit widget."""
+    data = self.process.readAllStandardOutput()
+    output = data.data().decode()
+    self.window.textEdit.moveCursor(QTextCursor.End)
+    self.window.textEdit.insertPlainText(output)
+
   def start_render(self) -> None:
     """Render operator called by the Render button."""""
-    print(STATESAVER.state.__dict__)
+    self.process = QProcess()
+    # TODO: Take data from state.
+    self.process.setProgram(
+        "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe")
+    self.process.setArguments(['-b', 'C:/Users/peter/Documents/repositories/qt_test/americana_test.blend',
+                               '-o', 'C:/Users/peter/Documents/repositories/qt_test/americana_test_subprocess.png',
+                               '-f', '1'])
+
+    self.process.readyReadStandardOutput.connect(self.handle_output)
+    print("Starting Render process.")
+    self.process.start()
+
+  def stop_render(self) -> None:
+    """Interrupt the render operator."""
+    self.process.kill()
 
 
 if __name__ == "__main__":

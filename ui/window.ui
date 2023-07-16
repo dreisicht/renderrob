@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1017</width>
+    <width>1077</width>
     <height>683</height>
    </rect>
   </property>
@@ -229,14 +229,7 @@
      </layout>
     </item>
     <item>
-     <widget class="QListWidget" name="listWidget">
-      <property name="minimumSize">
-       <size>
-        <width>0</width>
-        <height>396</height>
-       </size>
-      </property>
-     </widget>
+     <widget class="QTextEdit" name="textEdit"/>
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
@@ -253,7 +246,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1017</width>
+     <width>1077</width>
      <height>22</height>
     </rect>
    </property>
@@ -265,11 +258,9 @@
      <property name="title">
       <string>Open Recent</string>
      </property>
-     <addaction name="actiona_rrp"/>
-     <addaction name="actionb_rrp"/>
-     <addaction name="separator"/>
-     <addaction name="actionDelete_Recent_Files"/>
     </widget>
+    <addaction name="actionNew"/>
+    <addaction name="separator"/>
     <addaction name="actionOpen"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="separator"/>
@@ -277,6 +268,7 @@
     <addaction name="actionSave_As"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -330,6 +322,11 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>New</string>
    </property>
   </action>
  </widget>
