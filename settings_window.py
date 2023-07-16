@@ -63,4 +63,7 @@ class SettingsWindow():
     STATESAVER.state.settings.preview.resolution = int(
         resolution) if resolution else 0
 
-    STATESAVER.state.settings.addons = self.window.lineEdit_4.text()
+    del STATESAVER.state.settings.addons[:]
+    addons_str = self.window.lineEdit_4.text()
+    for addon in addons_str.split(";"):
+      STATESAVER.state.settings.addons.append(addon)
