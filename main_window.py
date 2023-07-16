@@ -13,59 +13,6 @@ import state_saver
 STATESAVER = state_saver.StateSaver()
 
 
-class SettingsWindow():
-  """Settings dialog for RenderRob."""
-
-  def __init__(self) -> None:
-    """Open the settings dialog."""
-    self.window = ui_utils.load_ui_from_file("settings.ui")
-    # Load state into the settings dialog.
-    self.make_settings_window_connections(self.window)
-
-    self.window.lineEdit_3.setText(STATESAVER.state.settings.blender_path)
-    self.window.lineEdit_2.setText(STATESAVER.state.settings.output_path)
-    self.window.lineEdit.setText(STATESAVER.state.settings.blender_files_path)
-
-    self.window.checkBox_2.setCheckState(
-        Qt.Checked if STATESAVER.state.settings.preview.samples_use else Qt.Unchecked)
-    self.window.checkBox_3.setCheckState(
-        Qt.Checked if STATESAVER.state.settings.preview.nth_frame_use else Qt.Unchecked)
-    self.window.checkBox.setCheckState(
-        Qt.Checked if STATESAVER.state.settings.preview.resolution_use else Qt.Unchecked)
-
-    self.window.spinBox_3.setValue(
-        int(STATESAVER.state.settings.preview.samples))
-    self.window.spinBox_2.setValue(
-        int(STATESAVER.state.settings.preview.nth_frame))
-    self.window.spinBox.setValue(
-        int(STATESAVER.state.settings.preview.resolution))
-
-    self.window.lineEdit_4.setText(
-        ";".join(STATESAVER.state.settings.addons_to_activate))
-
-    self.window.exec()
-
-  def make_settings_window_connections(self, window: QUiLoader) -> None:
-    """Make connections for buttons in settings dialog.."""
-    window.buttonBox.accepted.connect(self.save_settings_state)
-
-  def save_settings_state(self) -> None:
-    """Save the state from the settings dialog into the global state."""
-    STATESAVER.state.settings.blender_path = self.window.lineEdit_3.text()
-    STATESAVER.state.settings.output_path = self.window.lineEdit_2.text()
-    STATESAVER.state.settings.blender_files_path = self.window.lineEdit.text()
-
-    STATESAVER.state.settings.preview.samples_use = self.window.checkBox_2.isChecked()
-    STATESAVER.state.settings.preview.nth_frame_use = self.window.checkBox_3.isChecked()
-    STATESAVER.state.settings.preview.resolution_use = self.window.checkBox.isChecked()
-
-    STATESAVER.state.settings.preview.samples = self.window.spinBox_3.cleanText()
-    STATESAVER.state.settings.preview.nth_frame = self.window.spinBox_2.cleanText()
-    STATESAVER.state.settings.preview.resolution = self.window.spinBox.cleanText()
-
-    STATESAVER.state.settings.addons_to_activate = self.window.lineEdit_4.text()
-
-
 class MainWindow():
   """Main window for RenderRob."""
 
@@ -79,7 +26,7 @@ class MainWindow():
   def main(self) -> None:
     """Provide main function."""
     app = QApplication(sys.argv)
-    main_window = ui_utils.load_ui_from_file("window.ui")
+    main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
     self.table = main_window.tableWidget
     table_utils.post_process_row(self.table, 0)
