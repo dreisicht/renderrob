@@ -5,7 +5,7 @@ from multiprocessing import cpu_count
 import bpy
 
 import utils.print_utils as print_utils
-import rr_c_image
+import utils.rr_c_image as rr_c_image
 
 
 def set_settings(camera,
