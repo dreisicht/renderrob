@@ -1,8 +1,9 @@
 """Main file to open RenderRob."""
-import sys
 import os
+import sys
+
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QTextCursor, QAction
+from PySide6.QtGui import QAction, QTextCursor
 from PySide6.QtWidgets import QApplication, QFileDialog
 
 import settings_window
@@ -23,7 +24,6 @@ class MainWindow():
     self.window = None
     self.table = None
     self.cache = cache_pb2.RenderRobCache()
-    self.recent_file_actions = []
     self.main()
 
   def main(self) -> None:
@@ -54,6 +54,7 @@ class MainWindow():
     """Load the cache from a file."""
     with open(".rr_cache", "rb") as cache_file:
       cache_str = cache_file.read()
+    self.cache.current_file = ""
     self.cache.ParseFromString(cache_str)
 
   def save_as_file(self) -> None:
@@ -73,6 +74,18 @@ class MainWindow():
     STATESAVER.table_to_state(self.table)
     with open(self.cache.current_file, "wb") as protobuf:
       protobuf.write(STATESAVER.state.SerializeToString(protobuf))
+
+  def new_file(self) -> None:
+    """Create a new file."""
+    self.cache.current_file = ""
+    STATESAVER.state.FromString(b"")
+    self.table.clear()
+    table_utils.post_process_row(self.table, 0)
+
+  def quit(self) -> None:
+    """Quit the application."""
+    self.save_cache()
+    QCoreApplication.quit()
 
   def open_recent_file0(self) -> None:
     """Open the 0st recent file."""
@@ -97,7 +110,6 @@ class MainWindow():
   def clear_recent_files(self) -> None:
     """Clear the recent files."""
     del self.cache.recent_files[:]
-    # for action in self.recent_file_actions:
     self.window.menuOpen_Recent.clear()
     self.recent_file_actions = []
 
@@ -114,16 +126,15 @@ class MainWindow():
     for i, file_path in enumerate(self.cache.recent_files):
       action_recent = QAction(os.path.basename(
           file_path), self.window.menuOpen_Recent)
-      self.recent_file_actions.append(action_recent)
       action_recent.triggered.connect(open_recent_functions[i])
       self.window.menuOpen_Recent.addAction(action_recent)
 
     self.window.menuOpen_Recent.addSeparator()
     if self.cache.recent_files:
       action_clear = QAction("Clear Recent Files", self.window.menuOpen_Recent)
-      self.recent_file_actions.append(action_clear)
       action_clear.triggered.connect(self.clear_recent_files)
       self.window.menuOpen_Recent.addAction(action_clear)
+    self.save_cache()
 
   def open_file_dialog(self) -> None:
     """Open a RenderRob file with a dialog."""
@@ -139,7 +150,9 @@ class MainWindow():
     STATESAVER.state_to_table(self.table)
     self.cache.current_file = file_name
     if file_name not in self.cache.recent_files:
-      self.cache.recent_files.append(file_name)
+      self.cache.recent_files.insert(0, file_name)
+      if len(self.cache.recent_files) > MAX_NUMBER_OF_RECENT_FILES:
+        self.cache.recent_files.pop()
     self.refresh_recent_files_menu()
 
   def make_main_window_connections(self) -> None:
@@ -156,6 +169,8 @@ class MainWindow():
     self.window.actionSave.triggered.connect(self.save_file)
     self.window.actionSave_As.triggered.connect(self.save_as_file)
     self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
+    self.window.actionNew.triggered.connect(self.new_file)
+    self.window.actionQuit.triggered.connect(self.quit)
 
   def post_process_progress_bar(self) -> None:
     """Post-process a window after loading it from a UI file."""
