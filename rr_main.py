@@ -8,9 +8,9 @@ from PySide6.QtWidgets import QApplication, QFileDialog
 
 import utils.table_utils as table_utils
 import utils.ui_utils as ui_utils
+import state_saver
 
-from proto import state_pb2
-STATE = state_pb2.render_rob_state()  # pylint: disable=no-member
+STATESAVER = state_saver.StateSaver()
 
 
 class SettingsWindow():
@@ -22,22 +22,26 @@ class SettingsWindow():
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
 
-    self.window.lineEdit_3.setText(STATE.settings.blender_path)
-    self.window.lineEdit_2.setText(STATE.settings.output_path)
-    self.window.lineEdit.setText(STATE.settings.blender_files_path)
+    self.window.lineEdit_3.setText(STATESAVER.state.settings.blender_path)
+    self.window.lineEdit_2.setText(STATESAVER.state.settings.output_path)
+    self.window.lineEdit.setText(STATESAVER.state.settings.blender_files_path)
 
     self.window.checkBox_2.setCheckState(
-        Qt.Checked if STATE.settings.preview.samples_use else Qt.Unchecked)
+        Qt.Checked if STATESAVER.state.settings.preview.samples_use else Qt.Unchecked)
     self.window.checkBox_3.setCheckState(
-        Qt.Checked if STATE.settings.preview.nth_frame_use else Qt.Unchecked)
+        Qt.Checked if STATESAVER.state.settings.preview.nth_frame_use else Qt.Unchecked)
     self.window.checkBox.setCheckState(
-        Qt.Checked if STATE.settings.preview.resolution_use else Qt.Unchecked)
+        Qt.Checked if STATESAVER.state.settings.preview.resolution_use else Qt.Unchecked)
 
-    self.window.spinBox_3.setValue(int(STATE.settings.preview.samples))
-    self.window.spinBox_2.setValue(int(STATE.settings.preview.nth_frame))
-    self.window.spinBox.setValue(int(STATE.settings.preview.resolution))
+    self.window.spinBox_3.setValue(
+        int(STATESAVER.state.settings.preview.samples))
+    self.window.spinBox_2.setValue(
+        int(STATESAVER.state.settings.preview.nth_frame))
+    self.window.spinBox.setValue(
+        int(STATESAVER.state.settings.preview.resolution))
 
-    self.window.lineEdit_4.setText(";".join(STATE.settings.addons_to_activate))
+    self.window.lineEdit_4.setText(
+        ";".join(STATESAVER.state.settings.addons_to_activate))
 
     self.window.exec()
 
@@ -47,19 +51,19 @@ class SettingsWindow():
 
   def save_settings_state(self) -> None:
     """Save the state from the settings dialog into the global state."""
-    STATE.settings.blender_path = self.window.lineEdit_3.text()
-    STATE.settings.output_path = self.window.lineEdit_2.text()
-    STATE.settings.blender_files_path = self.window.lineEdit.text()
+    STATESAVER.state.settings.blender_path = self.window.lineEdit_3.text()
+    STATESAVER.state.settings.output_path = self.window.lineEdit_2.text()
+    STATESAVER.state.settings.blender_files_path = self.window.lineEdit.text()
 
-    STATE.settings.preview.samples_use = self.window.checkBox_2.isChecked()
-    STATE.settings.preview.nth_frame_use = self.window.checkBox_3.isChecked()
-    STATE.settings.preview.resolution_use = self.window.checkBox.isChecked()
+    STATESAVER.state.settings.preview.samples_use = self.window.checkBox_2.isChecked()
+    STATESAVER.state.settings.preview.nth_frame_use = self.window.checkBox_3.isChecked()
+    STATESAVER.state.settings.preview.resolution_use = self.window.checkBox.isChecked()
 
-    STATE.settings.preview.samples = self.window.spinBox_3.cleanText()
-    STATE.settings.preview.nth_frame = self.window.spinBox_2.cleanText()
-    STATE.settings.preview.resolution = self.window.spinBox.cleanText()
+    STATESAVER.state.settings.preview.samples = self.window.spinBox_3.cleanText()
+    STATESAVER.state.settings.preview.nth_frame = self.window.spinBox_2.cleanText()
+    STATESAVER.state.settings.preview.resolution = self.window.spinBox.cleanText()
 
-    STATE.settings.addons_to_activate = self.window.lineEdit_4.text()
+    STATESAVER.state.settings.addons_to_activate = self.window.lineEdit_4.text()
 
 
 class MainWindow():
@@ -87,19 +91,19 @@ class MainWindow():
 
   def save_state(self) -> None:
     """Save the state to a JSON file."""
-    STATE.render_jobs = list(render_job.jobs_from_table_widget(self.table))
-    with open("state.json", "w", encoding="UTF-8") as json_file:
-      json.dump(STATE.to_dict(), json_file)
+    STATESAVER.table_to_state(self.table)
+    with open("state.pb", "wb") as protobuf:
+      protobuf.write(STATESAVER.state.SerializeToString(protobuf))
 
   def open_file(self) -> None:
     """Open a RenderRob file."""
     # TODO(b/1234567): Change file to .rr file.
     file_name, _ = QFileDialog.getOpenFileName(
-        self.window, "Open File", "", "RenderRob Files (*.json)")
-    with open(file_name, "r", encoding="UTF-8") as pb_file:
+        self.window, "Open File", "", "RenderRob Files (*.pb)")
+    with open(file_name, "rb") as pb_file:
       pb_str = pb_file.read()
-    STATE.ParseFromString(pb_str)
-    table_utils.state_to_table(self.table, STATE)
+    STATESAVER.state.ParseFromString(pb_str)
+    STATESAVER.state_to_table(self.table)
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
@@ -120,8 +124,7 @@ class MainWindow():
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""""
-    for i in (render_job.jobs_from_table_widget(self.table)):
-      print(i.to_dict())
+    print(STATESAVER.state.__dict__)
 
 
 if __name__ == "__main__":

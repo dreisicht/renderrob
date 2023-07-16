@@ -19,18 +19,18 @@ message settings {
     repeated string addons = 5;
 }
 enum file_format{
-    PNG = 0;
-    TIFF = 1;
-    EXR = 2;
-    JPG = 3;
+    png = 0;
+    tiff = 1;
+    exr = 2;
+    jpg = 3;
 }
 enum render_engine{
-    CYCLES = 0;
-    EEVEE = 1;
+    cycles = 0;
+    eevee = 1;
 }
 enum device{
-    GPU = 0;
-    CPU = 1;
+    gpu = 0;
+    cpu = 1;
 }
 message render_job {
     bool active = 1;
@@ -38,18 +38,20 @@ message render_job {
     string camera = 3;
     int32 start = 4;
     int32 end = 5;
-    int32 samples = 6;
-    file_format file_format = 7;
-    render_engine render_engine = 8;
-    device device = 9;
-    bool motion_blur = 10;
-    bool new_version = 11;
-    bool high_quality = 12;
-    bool animation_denoise = 13;
-    bool denoise = 14;
-    string scene = 15;
-    string view_layer = 16;
-    string comments = 17;
+    int32 x_res = 6;
+    int32 y_res = 7;
+    int32 samples = 8;
+    file_format file_format = 9;
+    render_engine engine = 10;
+    device device = 11;
+    bool motion_blur = 12;
+    bool new_version = 13;
+    bool high_quality = 14;
+    bool animation_denoise = 15;
+    bool denoise = 16;
+    string scene = 17;
+    string view_layer = 18;
+    string comments = 19;
 }
 
 message render_rob_state {

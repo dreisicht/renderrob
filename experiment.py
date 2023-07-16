@@ -2,7 +2,8 @@ from proto import state_pb2
 
 STATE = state_pb2.render_rob_state()  # pylint: disable=no-member
 
-STATE.settings.blender_path = "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe"
+STATE.settings.blender_path = (
+    "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe")
 STATE.settings.addons.append("test")
 STATE.settings.addons.append("test2")
 STATE.settings.output_path = "C:/Users/rober/Desktop"
