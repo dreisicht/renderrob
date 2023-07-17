@@ -12,22 +12,7 @@ import utils.rr_c_image as rr_c_image
 class RenderSettingsSetter:
   """Class to set the render settings in Blender."""
 
-  def __init__(self,
-               camera_name: str,
-               render_device: str,
-               motion_blur: bool,
-               xres: int,
-               yres: int,
-               percres: int,
-               an_denoise: bool,
-               denoise: bool,
-               samples: int,
-               frame_step: int,
-               render_engine: str,
-               border: bool,
-               scene_name: str,
-               view_layer_names: List[str],
-               add_on_list: List[str]) -> None:
+  def __init__(self, scene: str = None, view_layers: List[str] = None) -> None:
     """Initialize the render settings setter and set the settings."""
     rr_c_image.draw_image()
 
@@ -37,20 +22,12 @@ class RenderSettingsSetter:
     self.current_scene_data = None
     self.view_layer_data = None
     self.current_scene_render = None
-    self.set_scene(scene_name)
-    self.set_view_layer(view_layer_names)
-    self.activate_addons(add_on_list)
-    self.set_camera(camera_name)
-    self.set_render_settings(render_device, border,
-                             samples, motion_blur, render_engine)
-    self.set_denoising_settings(an_denoise, denoise)
-    self.set_output_settings(samples, frame_step, xres, yres, percres)
-
-    print_utils.print_info("Done making the changes in your Blender file.")
+    self.set_scene(scene)
+    self.set_view_layers(view_layers)
 
   def set_scene(self, scene_name: str) -> None:
     """Set the scene to be rendered."""
-    if scene_name == "" and len(bpy.data.scenes) > 1:
+    if not scene_name and len(bpy.data.scenes) > 1:
       print_utils.print_warning(
           "There are more than one scenes, but you didn't tell me which scene to render! So I am"
           " rendering the last used scene.")
@@ -62,13 +39,17 @@ class RenderSettingsSetter:
         self.current_scene_data = bpy.data.scenes[scene_name]
       except KeyError:
         print_utils.print_error(f"Scene {scene_name} not found!")
+    self.current_scene_render = self.current_scene_data.render
 
-  def set_view_layer(self, view_layer_names: List[str]):
+  def set_view_layers(self, view_layer_names: List[str]):
     """Set the view layer to be rendered."""
     for view_layer in self.current_scene_data.view_layers:
       view_layer.use = False
 
-    if view_layer_names == []:
+    if isinstance(view_layer_names, str):
+      raise ValueError("View Layer names should be a list of strings.")
+
+    if not view_layer_names:
       if len(self.current_scene_data.view_layers) == 1:
         self.view_layer_data = self.current_scene_data.view_layers[0]
       else:
@@ -109,47 +90,34 @@ class RenderSettingsSetter:
   def activate_addons(self, add_on_list: List[str]) -> None:
     """Activate the addons."""
     for addon in add_on_list:
-      print_utils.print_info(str(addon))
       try:
         bpy.ops.preferences.addon_enable(module=addon)
         print_utils.print_info(f"I activated the addon {addon}.")
-      except AssertionError:
+      except ModuleNotFoundError:
         print_utils.print_error(
             f"I Couldn't find the addon {addon}. Maybe it's not installed yet?")
 
   def set_camera(self, camera_name: str,) -> None:
     """Set the camera to be rendered."""
     try:
-      if camera_name != '':
+      if camera_name:
         self.current_scene_data.camera = bpy.data.objects[camera_name]
     except KeyError:
       print_utils.print_error(f"I didn't find the camera called {camera_name}.")
 
   def set_render_settings(self, render_device: str, border: bool, samples: int, motion_blur: bool, engine: str) -> None:
     """Set the render settings."""
-    self.current_scene_render = self.current_scene_data.render
-
     self.current_scene_render.use_border = border
 
     if engine == "EEVEE":
-      if samples != "":
+      if samples:
         self.current_scene_data.eevee.taa_render_samples = int(samples)
       self.current_scene_render.engine = 'BLENDER_EEVEE'
       self.current_scene_data.eevee.use_motion_blur = motion_blur
     elif engine == "CYCLES":
       self.current_scene_render.engine = 'CYCLES'
-      if samples != "":
+      if samples:
         self.current_scene_data.cycles.samples = int(samples)
-
-      if render_device == "cpu":
-        self.current_scene_render.threads_mode = 'FIXED'
-        self.current_scene_render.threads = cpu_count() - 2
-        self.current_scene_data.cycles.device = 'CPU'
-        try:
-          self.current_scene_render.tile_x = 64
-          self.current_scene_render.tile_y = 64
-        except AttributeError:
-          print_utils.print_info('You are using the Cycles-x!')
 
       if render_device == "gpu":
         cycles_pref = bpy.context.preferences.addons['cycles'].preferences
@@ -158,6 +126,7 @@ class RenderSettingsSetter:
         except ValueError:
           print_utils.print_info(
               "Cycles didn't like me asking about the devices.")
+        # TODO: #1 Add support for multiple GPU types.
         cycles_pref.compute_device_type = 'OPTIX'
 
         self.current_scene_data.cycles.device = 'GPU'
@@ -201,9 +170,9 @@ class RenderSettingsSetter:
 
   def set_output_settings(self, samples: int, frame_step: int, xres: int, yres: int, percres: int) -> None:
     """Set the output settings."""
-    if xres != "":
+    if xres:
       self.current_scene_render.resolution_x = int(xres)
-    if yres != "":
+    if yres:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
@@ -211,3 +180,14 @@ class RenderSettingsSetter:
     self.current_scene_render.use_placeholder = False
 
     self.current_scene_data.frame_step = frame_step
+
+
+rss = RenderSettingsSetter("Scene", ["View Layer"])
+rss.activate_addons(["mesh_f2"])
+rss.set_camera("Camera")
+rss.set_render_settings(render_device="CPU", border=False, samples=128,
+                        motion_blur=False, engine="CYCLES")
+rss.set_denoising_settings(an_denoise=False, denoise=False)
+rss.set_output_settings(samples=128, frame_step=1,
+                        xres=1920, yres=1080, percres=100)
+print("Finished setting settings.")

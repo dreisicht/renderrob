@@ -1,4 +1,5 @@
 """Utility functions for printing to the console."""
+import os
 import sys
 import time
 
@@ -8,6 +9,7 @@ BACK_RED = '\u001b[41m'
 BACK_YELLOW = '\u001b[43m'
 FORE_BLACK = '\u001b[30m'
 FORE_WHITE = '\u001b[37m'
+CACHEFILEPATH = "ERRORCACHE"
 
 
 def hex_to_rgb(hex_col):
@@ -68,12 +70,14 @@ def print_info(ipt_str):
 
 def write_cache(ipt_str):
   """Write an error message to the error cache."""
-  cachefilepath = "util/ERRORCACHE"
+  if not os.path.exists(CACHEFILEPATH):
+    with open(CACHEFILEPATH, "w", encoding="utf-8") as f:
+      f.write("")
   try:
-    f = open(cachefilepath, "a", encoding="utf-8")
+    f = open(CACHEFILEPATH, "a", encoding="utf-8")
   except PermissionError:
     time.sleep(0.1)
-    f = open(cachefilepath, "a", encoding="utf-8")
+    f = open(CACHEFILEPATH, "a", encoding="utf-8")
   finally:
     time.sleep(0.1)
   f.write(ipt_str + "\n")
