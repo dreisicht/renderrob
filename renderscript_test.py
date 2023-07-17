@@ -1,3 +1,5 @@
+"""Tests for renderscript.py."""
+
 import unittest
 from unittest.mock import patch
 
@@ -7,6 +9,7 @@ import renderscript
 
 
 class TestRenderSettingsSetter(unittest.TestCase):
+  """Tests for the RenderSettingsSetter class."""
 
   def setUp(self):
     self.rss = renderscript.RenderSettingsSetter()
@@ -147,10 +150,6 @@ class TestRenderSettingsSetter(unittest.TestCase):
     self.assertEqual(scene.render.resolution_y, 1080)
     self.assertEqual(scene.render.resolution_percentage, 50)
     self.assertEqual(scene.frame_step, 2)
-
-
-def mock_enable_addon(module):
-  pass
 
 
 if __name__ == "__main__":
