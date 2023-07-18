@@ -1,4 +1,5 @@
 """Settings dialog for RenderRob."""
+import os
 
 from PySide6.QtCore import Qt
 from PySide6.QtUiTools import QUiLoader
@@ -12,6 +13,7 @@ class SettingsWindow():
 
   def __init__(self) -> None:
     """Open the settings dialog."""
+    self.discover_blender_path()
     self.window = ui_utils.load_ui_from_file("ui/settings.ui")
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
@@ -67,3 +69,15 @@ class SettingsWindow():
     addons_str = self.window.lineEdit_4.text()
     for addon in addons_str.split(";"):
       STATESAVER.state.settings.addons.append(addon)
+
+  @staticmethod
+  def discover_blender_path() -> None:
+    """Discover the path to Blender."""
+    steam_path = "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe"
+    program_files_path = "C:/Program Files/Blender Foundation/Blender/blender.exe"
+    if STATESAVER.state.settings.blender_path:
+      return
+    if os.path.exists(steam_path):
+      STATESAVER.state.settings.blender_path = steam_path
+    elif os.path.exists(program_files_path):
+      STATESAVER.state.settings.blender_path = program_files_path

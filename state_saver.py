@@ -4,7 +4,7 @@ Note: Only the state of the table is being handled here. The state of the settin
 is being handled in the settings window class.
 """
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
-
+import os
 from proto import state_pb2
 from utils import ui_utils
 from utils import table_utils

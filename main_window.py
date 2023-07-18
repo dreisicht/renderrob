@@ -184,14 +184,17 @@ class MainWindow():
     self.window.textEdit.insertPlainText(output)
 
   def start_render(self) -> None:
-    """Render operator called by the Render button."""""
-    self.process = QProcess()
-    # TODO: Take data from state.
-    self.process.setProgram(
-        "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe")
-    self.process.setArguments(['-b', 'C:/Users/peter/Documents/repositories/qt_test/americana_test.blend',
-                               '-o', 'C:/Users/peter/Documents/repositories/qt_test/americana_test_subprocess.png',
-                               '-f', '1'])
+    """Render operator called by the Render button."""
+    STATESAVER.table_to_state(self.table)
+    for job in STATESAVER.state.render_jobs:
+      if not job.active:
+        continue
+      self.process = QProcess()
+      self.process.setProgram(STATESAVER.settings.blender_path)
+      self.process.setArguments(["-b", job.file,
+                                 "-y"
+                                "-o", "C:/Users/peter/Documents/repositories/qt_test/americana_test_subprocess.png",
+                                 "-f", "1"])
 
     self.process.readyReadStandardOutput.connect(self.handle_output)
     print("Starting Render process.")
