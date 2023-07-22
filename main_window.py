@@ -11,7 +11,8 @@ import utils.table_utils as table_utils
 import utils.ui_utils as ui_utils
 from proto import cache_pb2
 from state_saver import STATESAVER
-
+import shot_name_builder
+from render_job_to_rss import render_job_to_render_settings_setter
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 
@@ -57,6 +58,13 @@ class MainWindow():
     self.cache.current_file = ""
     self.cache.ParseFromString(cache_str)
 
+  def add_filepath_to_cache(self, file_name):
+    """Add a filepath to the cache."""
+    if file_name not in self.cache.recent_files:
+      self.cache.recent_files.insert(0, file_name)
+      if len(self.cache.recent_files) > MAX_NUMBER_OF_RECENT_FILES:
+        self.cache.recent_files.pop()
+
   def save_as_file(self) -> None:
     """Save the state to a serialized proto file with a dialog."""
     STATESAVER.table_to_state(self.table)
@@ -65,8 +73,7 @@ class MainWindow():
     with open(file_name, "wb") as protobuf:
       protobuf.write(STATESAVER.state.SerializeToString(protobuf))
     self.cache.current_file = file_name
-    if file_name not in self.cache.recent_files:
-      self.cache.recent_files.append(file_name)
+    self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
 
   def save_file(self) -> None:
@@ -149,10 +156,7 @@ class MainWindow():
     STATESAVER.state.ParseFromString(pb_str)
     STATESAVER.state_to_table(self.table)
     self.cache.current_file = file_name
-    if file_name not in self.cache.recent_files:
-      self.cache.recent_files.insert(0, file_name)
-      if len(self.cache.recent_files) > MAX_NUMBER_OF_RECENT_FILES:
-        self.cache.recent_files.pop()
+    self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
 
   def make_main_window_connections(self) -> None:
@@ -189,16 +193,35 @@ class MainWindow():
     for job in STATESAVER.state.render_jobs:
       if not job.active:
         continue
-      self.process = QProcess()
-      self.process.setProgram(STATESAVER.settings.blender_path)
-      self.process.setArguments(["-b", job.file,
-                                 "-y"
-                                "-o", "C:/Users/peter/Documents/repositories/qt_test/americana_test_subprocess.png",
-                                 "-f", "1"])
+      snb = shot_name_builder.ShotNameBuilder(
+          job, STATESAVER.state.settings.output_path)
+      inline_python = render_job_to_render_settings_setter(
+          job, STATESAVER.state.settings)
 
-    self.process.readyReadStandardOutput.connect(self.handle_output)
-    print("Starting Render process.")
-    self.process.start()
+      if job.start != "" and job.end == "":
+        render_frame_command = f"-f {str(job.start)}"
+      elif job.start != "" and job.end != "":
+        render_frame_command = f"-s {str(job.start)} -e {str(job.end)} -a"
+      elif job.start == "" and job.end == "":
+        render_frame_command = "-f 1"
+      else:
+        raise ValueError("Invalid start and end frame values.")
+
+      self.process = QProcess()
+      self.process.setProgram(STATESAVER.state.settings.blender_path)
+
+      args = ["-b", job.file,
+              "-y",
+              "-o", snb.frame_path,
+              "-F", ui_utils.FILE_FORMATS[job.file_format],
+              "--python-expr", inline_python,
+              ]
+      args.extend(render_frame_command.split(" "))
+      self.process.setArguments(args)
+      # print(self.process.arguments())
+      self.process.readyReadStandardOutput.connect(self.handle_output)
+      print("Starting Render process.")
+      self.process.start()
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""

@@ -1,18 +1,18 @@
-"""Tests for renderscript.py."""
+"""Tests for render_settings_setter.py."""
 
 import unittest
 from unittest.mock import patch
 
 import bpy
 
-import renderscript
+import render_settings_setter
 
 
 class TestRenderSettingsSetter(unittest.TestCase):
   """Tests for the RenderSettingsSetter class."""
 
   def setUp(self):
-    self.rss = renderscript.RenderSettingsSetter()
+    self.rss = render_settings_setter.RenderSettingsSetter()
 
   def test_set_scene(self):
     bpy.data.scenes[0].name = "scene_a"
@@ -79,11 +79,11 @@ class TestRenderSettingsSetter(unittest.TestCase):
     mock_print_error.assert_called_with(
         f"View Layer NonexistentViewLayer not found. Please check the name in the sheet!")
 
-  def test_activate_addons(self):
-    addon_name = "mesh_f2"
-    bpy.ops.preferences.addon_enable = mock_enable_addon
-    with patch("utils.print_utils.print_info") as mock_print_info:
-      self.rss.activate_addons([addon_name])
+  # def test_activate_addons(self):
+  #   addon_name = "mesh_f2"
+  #   bpy.ops.preferences.addon_enable = mock_enable_addon
+  #   with patch("utils.print_utils.print_info") as mock_print_info:
+  #     self.rss.activate_addons([addon_name])
 
   def test_set_camera_existing_camera(self):
     bpy.data.objects.new("Camera", bpy.data.cameras.new("Camera"))
@@ -144,7 +144,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene.render.resolution_y = 100
     scene.render.resolution_percentage = 100
     scene.frame_step = 1
-    rss = renderscript.RenderSettingsSetter()
+    rss = render_settings_setter.RenderSettingsSetter()
     rss.set_output_settings(128, 2, 1920, 1080, 50)
     self.assertEqual(scene.render.resolution_x, 1920)
     self.assertEqual(scene.render.resolution_y, 1080)

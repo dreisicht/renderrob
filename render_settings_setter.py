@@ -105,16 +105,16 @@ class RenderSettingsSetter:
     except KeyError:
       print_utils.print_error(f"I didn't find the camera called {camera_name}.")
 
-  def set_render_settings(self, render_device: str, border: bool, samples: int, motion_blur: bool, engine: str) -> None:
+  def set_render_settings(self, render_device: str, border: bool, samples: str, motion_blur: bool, engine: str) -> None:
     """Set the render settings."""
     self.current_scene_render.use_border = border
 
-    if engine == "EEVEE":
+    if engine == "eevee":
       if samples:
         self.current_scene_data.eevee.taa_render_samples = int(samples)
       self.current_scene_render.engine = 'BLENDER_EEVEE'
       self.current_scene_data.eevee.use_motion_blur = motion_blur
-    elif engine == "CYCLES":
+    elif engine == "cycles":
       self.current_scene_render.engine = 'CYCLES'
       if samples:
         self.current_scene_data.cycles.samples = int(samples)
@@ -138,13 +138,10 @@ class RenderSettingsSetter:
           if "CPU" in str(cycles_device.type):
             cycles_device.use = False
 
-        try:
-          self.current_scene_render.tile_x = 256
-          self.current_scene_render.tile_y = 256
-        except AttributeError:
-          print_utils.print_info('You are using the Cycles-x!')
-
       self.current_scene_render.use_motion_blur = motion_blur
+
+    else:
+      raise ValueError(f"Invalid render engine {engine}.")
     print_utils.print_info("Rendering on " + str(render_device))
 
   def set_denoising_settings(self, an_denoise: bool, denoise: bool) -> None:
@@ -168,7 +165,7 @@ class RenderSettingsSetter:
     self.current_scene_data.use_nodes = False
     self.current_scene_data.cycles.use_animated_seed = True
 
-  def set_output_settings(self, samples: int, frame_step: int, xres: int, yres: int, percres: int) -> None:
+  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int) -> None:
     """Set the output settings."""
     if xres:
       self.current_scene_render.resolution_x = int(xres)
@@ -176,18 +173,8 @@ class RenderSettingsSetter:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
-    self.current_scene_render.use_overwrite = False
+    # TODO: Make use_overwrite dependent from render_job.new_version.
+    self.current_scene_render.use_overwrite = True
     self.current_scene_render.use_placeholder = False
 
     self.current_scene_data.frame_step = frame_step
-
-
-rss = RenderSettingsSetter("Scene", ["View Layer"])
-rss.activate_addons(["mesh_f2"])
-rss.set_camera("Camera")
-rss.set_render_settings(render_device="CPU", border=False, samples=128,
-                        motion_blur=False, engine="CYCLES")
-rss.set_denoising_settings(an_denoise=False, denoise=False)
-rss.set_output_settings(samples=128, frame_step=1,
-                        xres=1920, yres=1080, percres=100)
-print("Finished setting settings.")

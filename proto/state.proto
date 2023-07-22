@@ -36,11 +36,11 @@ message render_job {
     bool active = 1;
     string file = 2;
     string camera = 3;
-    int32 start = 4;
-    int32 end = 5;
-    int32 x_res = 6;
-    int32 y_res = 7;
-    int32 samples = 8;
+    string start = 4;
+    string end = 5;
+    string x_res = 6;
+    string y_res = 7;
+    string samples = 8;
     file_format file_format = 9;
     render_engine engine = 10;
     device device = 11;
@@ -50,7 +50,7 @@ message render_job {
     bool animation_denoise = 15;
     bool denoise = 16;
     string scene = 17;
-    string view_layer = 18;
+    repeated string view_layers = 18;
     string comments = 19;
 }
 

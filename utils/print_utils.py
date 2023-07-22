@@ -40,7 +40,7 @@ def print_error(ipt_str):
   print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
   print(RESET_ALL, end="")
   write_cache("[ERROR]" + ipt_str)
-  time.sleep(3)
+  # time.sleep(3)
   sys.exit()
 
 
@@ -51,7 +51,7 @@ def print_warning(ipt_str):
   print("[WARNING] " + ipt_str)
   print(RESET_ALL, end="")
   write_cache("[WARNING]" + ipt_str)
-  time.sleep(1)
+  # time.sleep(1)
 
 
 def print_info_input(ipt_str):
@@ -76,9 +76,9 @@ def write_cache(ipt_str):
   try:
     f = open(CACHEFILEPATH, "a", encoding="utf-8")
   except PermissionError:
-    time.sleep(0.1)
+    # time.sleep(0.1)
     f = open(CACHEFILEPATH, "a", encoding="utf-8")
-  finally:
-    time.sleep(0.1)
+  # finally:
+  #   time.sleep(0.1)
   f.write(ipt_str + "\n")
   f.close()

@@ -54,7 +54,7 @@ class StateSaver:
                                                render_job.engine,
                                                render_job.device])
       table.setItem(i, 16, QTableWidgetItem(render_job.scene))
-      table.setItem(i, 17, QTableWidgetItem(render_job.view_layer))
+      table.setItem(i, 17, QTableWidgetItem(";".join(render_job.view_layers)))
       table.setItem(i, 18, QTableWidgetItem(render_job.comments))
 
   def table_to_state(self, table: QTableWidget) -> None:
@@ -64,21 +64,18 @@ class StateSaver:
       render_job = state_pb2.render_job()
       render_job.active = get_text(
           table.cellWidget(i, 0), widget="checkbox")
-      render_job.file = get_text(table.item(i, 1))
+      # TODO: Do the file post-processing when the user enters a path.
+      render_job.file = get_text(table.item(i, 1)).replace(
+          '"', "").replace("\\", "/")
       render_job.camera = get_text(table.item(i, 2))
 
-      # Int values need to be checked not to be empty, otherwise they can't be
-      # converted to int.
-      start = get_text(table.item(i, 3))
-      render_job.start = int(start) if start else 0
-      end = get_text(table.item(i, 4))
-      render_job.end = int(end) if end else 0
-      x_res = get_text(table.item(i, 5))
-      render_job.x_res = int(x_res) if x_res else 0
-      y_res = get_text(table.item(i, 6))
-      render_job.y_res = int(y_res) if y_res else 0
-      samples = get_text(table.item(i, 7))
-      render_job.samples = int(samples) if samples else 0
+      # NOTE: The values are strings and not ints, since the user can leave the
+      # fields empty.
+      render_job.start = get_text(table.item(i, 3))
+      render_job.end = get_text(table.item(i, 4))
+      render_job.x_res = get_text(table.item(i, 5))
+      render_job.y_res = get_text(table.item(i, 6))
+      render_job.samples = get_text(table.item(i, 7))
 
       render_job.file_format = get_text(
           table.cellWidget(i, 8), widget="dropdown")
@@ -97,7 +94,9 @@ class StateSaver:
       render_job.denoise = get_text(
           table.cellWidget(i, 15), widget="checkbox")
       render_job.scene = get_text(table.item(i, 16))
-      render_job.view_layer = get_text(table.item(i, 17))
+      del render_job.view_layers[:]
+      new_view_layer_list = get_text(table.item(i, 17)).split(";")
+      render_job.view_layers.extend(new_view_layer_list)
       render_job.comments = get_text(table.item(i, 18))
       self.state.render_jobs.append(render_job)
 
