@@ -184,8 +184,8 @@ class MainWindow():
     """Output the subprocess output to the QTextEdit widget."""
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
-    self.window.textEdit.moveCursor(QTextCursor.End)
-    self.window.textEdit.insertPlainText(output)
+    self.window.textBrowser.moveCursor(QTextCursor.End)
+    self.window.textBrowser.insertPlainText(output)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""

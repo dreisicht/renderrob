@@ -6,255 +6,277 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1528</width>
-    <height>683</height>
+    <width>2023</width>
+    <height>934</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout">
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+      <widget class="QWidget" name="verticalLayoutWidget_2">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QPushButton" name="render_button">
-          <property name="text">
-           <string>Render</string>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <property name="bottomMargin">
+           <number>5</number>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="stop_button">
-          <property name="text">
-           <string>Stop</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Open folder</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_2">
-          <property name="text">
-           <string>Play</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="up_button">
-          <property name="text">
-           <string>Up</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="down_button">
-          <property name="text">
-           <string>Down</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="add_button">
-          <property name="text">
-           <string>Add</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="delete_button">
-          <property name="text">
-           <string>Delete</string>
-          </property>
-         </widget>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QPushButton" name="render_button">
+                <property name="text">
+                 <string>Render</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="stop_button">
+                <property name="text">
+                 <string>Stop</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_3">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton">
+                <property name="text">
+                 <string>Open folder</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_2">
+                <property name="text">
+                 <string>Play</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="up_button">
+                <property name="text">
+                 <string>Up</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="down_button">
+                <property name="text">
+                 <string>Down</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="verticalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>20</width>
+                  <height>40</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="add_button">
+                <property name="text">
+                 <string>Add</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="delete_button">
+                <property name="text">
+                 <string>Delete</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTableWidget" name="tableWidget">
+              <attribute name="horizontalHeaderCascadingSectionResizes">
+               <bool>true</bool>
+              </attribute>
+              <row>
+               <property name="text">
+                <string/>
+               </property>
+              </row>
+              <column>
+               <property name="text">
+                <string>Active</string>
+               </property>
+               <property name="icon">
+                <iconset theme="address-book-new">
+                 <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>File</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Camera</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Start</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>End</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>X res</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Y res</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Samples</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>File \n format</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Engine</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Device</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Motion &lt;br&gt; Blur</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>New version</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>High Quality</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Animation Denoise</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Denoise</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Scene</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>View Layer</string>
+               </property>
+              </column>
+              <column>
+               <property name="text">
+                <string>Comments</string>
+               </property>
+              </column>
+              <item row="0" column="0">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="icon">
+                <iconset theme="call-start">
+                 <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
+               </property>
+              </item>
+              <item row="0" column="1">
+               <property name="text">
+                <string/>
+               </property>
+              </item>
+              <item row="0" column="3">
+               <property name="text">
+                <string/>
+               </property>
+              </item>
+              <item row="0" column="4">
+               <property name="text">
+                <string/>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
        </layout>
-      </item>
-      <item>
-       <widget class="QTableWidget" name="tableWidget">
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>true</bool>
-        </attribute>
-        <row>
-         <property name="text">
-          <string/>
-         </property>
-        </row>
-        <column>
-         <property name="text">
-          <string>Active</string>
-         </property>
-         <property name="icon">
-          <iconset theme="address-book-new">
-           <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>File</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Camera</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Start</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>End</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>X res</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Y res</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Samples</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>File \n format</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Engine</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Device</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Motion &lt;br&gt; Blur</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>New version</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>High Quality</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Animation Denoise</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Denoise</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Scene</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>View Layer</string>
-         </property>
-        </column>
-        <column>
-         <property name="text">
-          <string>Comments</string>
-         </property>
-        </column>
-        <item row="0" column="0">
-         <property name="text">
-          <string/>
-         </property>
-         <property name="icon">
-          <iconset theme="call-start">
-           <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
-         </property>
+      </widget>
+      <widget class="QWidget" name="verticalLayoutWidget_3">
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <item>
+         <widget class="QTextBrowser" name="textBrowser"/>
         </item>
-        <item row="0" column="1">
-         <property name="text">
-          <string/>
-         </property>
-        </item>
-        <item row="0" column="3">
-         <property name="text">
-          <string/>
-         </property>
-        </item>
-        <item row="0" column="4">
-         <property name="text">
-          <string/>
-         </property>
-        </item>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item>
-     <widget class="QTextEdit" name="textEdit"/>
+       </layout>
+      </widget>
+     </widget>
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
@@ -265,13 +287,12 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1528</width>
+     <width>2023</width>
      <height>22</height>
     </rect>
    </property>
@@ -304,6 +325,7 @@
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionSave">
    <property name="text">
     <string>Save</string>
