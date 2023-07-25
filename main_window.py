@@ -1,18 +1,20 @@
 """Main file to open RenderRob."""
 import os
 import sys
+import time
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QTextCursor
+from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import QApplication, QFileDialog
 
 import settings_window
+import shot_name_builder
 import utils.table_utils as table_utils
 import utils.ui_utils as ui_utils
-from proto import cache_pb2
-from state_saver import STATESAVER
-import shot_name_builder
+from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
+from state_saver import STATESAVER
+
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 
@@ -24,6 +26,7 @@ class MainWindow():
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     self.window = None
     self.table = None
+    self.number_active_jobs = 0
     self.cache = cache_pb2.RenderRobCache()
     self.main()
 
@@ -36,10 +39,12 @@ class MainWindow():
     main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
     self.table = main_window.tableWidget
-    table_utils.post_process_row(self.table, 0)
     self.refresh_recent_files_menu()
-    self.post_process_progress_bar()
+    self.window.progressBar.setValue(0)
+    self.window.progressBar.setMinimum(0)
+    self.window.progressBar.setMaximum(100)
     self.make_main_window_connections()
+    self.new_file()
     self.window.show()
 
     self.save_cache()
@@ -84,10 +89,12 @@ class MainWindow():
 
   def new_file(self) -> None:
     """Create a new file."""
+    for _ in range(self.table.rowCount()):
+      self.table.removeRow(0)
     self.cache.current_file = ""
     STATESAVER.state.FromString(b"")
-    self.table.clear()
     table_utils.post_process_row(self.table, 0)
+    table_utils.add_row_below()
 
   def quit(self) -> None:
     """Quit the application."""
@@ -176,56 +183,87 @@ class MainWindow():
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
 
-  def post_process_progress_bar(self) -> None:
-    """Post-process a window after loading it from a UI file."""
-    self.window.progressBar.setValue(0)
-
   def handle_output(self):
     """Output the subprocess output to the QTextEdit widget."""
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
+    color_format = QTextCharFormat()
+    if '\u001b[46m' in output:
+      color_format.setForeground(QColor(Qt.white))
+      color_format.setBackground(QColor(Qt.blue))
+    elif '\u001b[30m' in output:
+      color_format.setForeground(QColor(Qt.black))
+      color_format.setBackground(QColor(Qt.white))
+
     self.window.textBrowser.moveCursor(QTextCursor.End)
+    self.window.textBrowser.setCurrentCharFormat(color_format)
     self.window.textBrowser.insertPlainText(output)
+
+    if "Blender quit" in output:
+      progress_value_current = self.window.progressBar.value()
+      progress_value = int(100 / self.number_active_jobs)
+      self.window.progressBar.setValue(
+          progress_value_current + progress_value)
+
+  def get_active_jobs_number(self) -> int:
+    """Get the number of active jobs."""
+    counter = 0
+    for job in STATESAVER.state.render_jobs:
+      if job.active:
+        counter += 1
+    return counter
+
+  def render_job(self, job: state_pb2.render_job) -> None:
+    """Render a job."""
+    snb = shot_name_builder.ShotNameBuilder(
+        job, STATESAVER.state.settings.output_path)
+    inline_python = render_job_to_render_settings_setter(
+        job, STATESAVER.state.settings)
+
+    if job.start != "" and job.end == "":
+      render_frame_command = f"-f {str(job.start)}"
+    elif job.start != "" and job.end != "":
+      render_frame_command = f"-s {str(job.start)} -e {str(job.end)} -a"
+    elif job.start == "" and job.end == "":
+      render_frame_command = "-f 1"
+    else:
+      raise ValueError("Invalid start and end frame values.")
+
+    self.process = QProcess()
+    self.process.setProgram(STATESAVER.state.settings.blender_path)
+    self.process.finished.connect(self.continue_render)
+
+    args = ["-b", job.file,
+            "-y",
+            "-o", snb.frame_path,
+            "-F", ui_utils.FILE_FORMATS[job.file_format],
+            "--python-expr", inline_python,
+            ]
+    args.extend(render_frame_command.split(" "))
+    self.process.setArguments(args)
+    self.process.readyReadStandardOutput.connect(self.handle_output)
+    print("Starting Render process.")
+    self.process.start()
+
+  def continue_render(self) -> None:
+    # Ignoring exit_code and QProcess.ExitStatus for now.
+    if STATESAVER.state.render_jobs:
+      job = STATESAVER.state.render_jobs.pop(0)
+      if not job.active:
+        self.continue_render()
+      else:
+        self.render_job(job)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
     STATESAVER.table_to_state(self.table)
-    for job in STATESAVER.state.render_jobs:
-      if not job.active:
-        continue
-      snb = shot_name_builder.ShotNameBuilder(
-          job, STATESAVER.state.settings.output_path)
-      inline_python = render_job_to_render_settings_setter(
-          job, STATESAVER.state.settings)
-
-      if job.start != "" and job.end == "":
-        render_frame_command = f"-f {str(job.start)}"
-      elif job.start != "" and job.end != "":
-        render_frame_command = f"-s {str(job.start)} -e {str(job.end)} -a"
-      elif job.start == "" and job.end == "":
-        render_frame_command = "-f 1"
-      else:
-        raise ValueError("Invalid start and end frame values.")
-
-      self.process = QProcess()
-      self.process.setProgram(STATESAVER.state.settings.blender_path)
-
-      args = ["-b", job.file,
-              "-y",
-              "-o", snb.frame_path,
-              "-F", ui_utils.FILE_FORMATS[job.file_format],
-              "--python-expr", inline_python,
-              ]
-      args.extend(render_frame_command.split(" "))
-      self.process.setArguments(args)
-      # print(self.process.arguments())
-      self.process.readyReadStandardOutput.connect(self.handle_output)
-      print("Starting Render process.")
-      self.process.start()
+    self.number_active_jobs = self.get_active_jobs_number()
+    self.continue_render()
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
     self.process.kill()
+    self.window.progressBar.setValue(0)
 
 
 if __name__ == "__main__":

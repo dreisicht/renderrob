@@ -4,6 +4,7 @@ Note: Only the state of the table is being handled here. The state of the settin
 is being handled in the settings window class.
 """
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
+from PySide6.QtCore import Qt
 import os
 from proto import state_pb2
 from utils import ui_utils
@@ -31,13 +32,16 @@ class StateSaver:
 
   def state_to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
-    for i in range(table.rowCount()):
+    for _ in range(table.rowCount()):
       table.removeRow(0)
     for i, render_job in enumerate(self.state.render_jobs):
       table.insertRow(i)
-      table_utils.post_process_row(table, i)
 
-      table.setItem(i, 1, QTableWidgetItem(render_job.file))
+      table_utils.post_process_row(table, i)
+      # TODO: Restore.
+      item = QTableWidgetItem(render_job.file)
+      item.setTextAlignment(Qt.AlignRight)
+      table.setItem(i, 1, item)
       table.setItem(i, 2, QTableWidgetItem(render_job.camera))
       table.setItem(i, 3, QTableWidgetItem(str(render_job.start)))
       table.setItem(i, 4, QTableWidgetItem(str(render_job.end)))
@@ -56,6 +60,7 @@ class StateSaver:
       table.setItem(i, 16, QTableWidgetItem(render_job.scene))
       table.setItem(i, 17, QTableWidgetItem(";".join(render_job.view_layers)))
       table.setItem(i, 18, QTableWidgetItem(render_job.comments))
+      table_utils.set_text_alignment(table, i)
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""

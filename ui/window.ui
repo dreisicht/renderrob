@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2023</width>
+    <width>1355</width>
     <height>934</height>
    </rect>
   </property>
@@ -33,15 +33,33 @@
              <layout class="QVBoxLayout" name="verticalLayout">
               <item>
                <widget class="QPushButton" name="render_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 80px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
                  <string>Render</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/camera.svg</normaloff>icons/camera.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="stop_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Stop</string>
+                 <string>  Stop</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/stop.svg</normaloff>icons/stop.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -60,15 +78,33 @@
               </item>
               <item>
                <widget class="QPushButton" name="pushButton">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Open folder</string>
+                 <string>Play</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/play.svg</normaloff>icons/play.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="pushButton_2">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Play</string>
+                 <string>Open</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/folder.svg</normaloff>icons/folder.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -87,15 +123,33 @@
               </item>
               <item>
                <widget class="QPushButton" name="up_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Up</string>
+                 <string>   Up  </string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/caret-up.svg</normaloff>icons/caret-up.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="down_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
                  <string>Down</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/caret-down.svg</normaloff>icons/caret-down.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -114,15 +168,33 @@
               </item>
               <item>
                <widget class="QPushButton" name="add_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Add</string>
+                 <string>     Add</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/play-list-add.svg</normaloff>icons/play-list-add.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
                <widget class="QPushButton" name="delete_button">
+                <property name="styleSheet">
+                 <string notr="true">min-height: 30px;
+min-width: 40px;
+icon-size: 25px;</string>
+                </property>
                 <property name="text">
-                 <string>Delete</string>
+                 <string>Remove</string>
+                </property>
+                <property name="icon">
+                 <iconset>
+                  <normaloff>icons/play-list-remove.svg</normaloff>icons/play-list-remove.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -130,6 +202,12 @@
             </item>
             <item>
              <widget class="QTableWidget" name="tableWidget">
+              <property name="sizeAdjustPolicy">
+               <enum>QAbstractScrollArea::AdjustToContents</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>false</bool>
+              </property>
               <attribute name="horizontalHeaderCascadingSectionResizes">
                <bool>true</bool>
               </attribute>
@@ -241,6 +319,14 @@
                <property name="text">
                 <string/>
                </property>
+               <property name="font">
+                <font>
+                 <bold>true</bold>
+                </font>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
                <property name="icon">
                 <iconset theme="call-start">
                  <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
@@ -250,15 +336,144 @@
                <property name="text">
                 <string/>
                </property>
+               <property name="textAlignment">
+                <set>AlignTrailing|AlignVCenter</set>
+               </property>
+              </item>
+              <item row="0" column="2">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
               </item>
               <item row="0" column="3">
                <property name="text">
                 <string/>
                </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
               </item>
               <item row="0" column="4">
                <property name="text">
                 <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="5">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="6">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="7">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="8">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="9">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="10">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="11">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="12">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="13">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="14">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="15">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="16">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="17">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
+               </property>
+              </item>
+              <item row="0" column="18">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textAlignment">
+                <set>AlignCenter</set>
                </property>
               </item>
              </widget>
@@ -272,7 +487,16 @@
       <widget class="QWidget" name="verticalLayoutWidget_3">
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <item>
-         <widget class="QTextBrowser" name="textBrowser"/>
+         <widget class="QTextBrowser" name="textBrowser">
+          <property name="font">
+           <font>
+            <family>Ebrima</family>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -292,7 +516,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>2023</width>
+     <width>1355</width>
      <height>22</height>
     </rect>
    </property>
