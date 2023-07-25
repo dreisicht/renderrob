@@ -183,7 +183,7 @@ class MainWindow():
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
 
-  def handle_output(self):
+  def _handle_output(self):
     """Output the subprocess output to the QTextEdit widget."""
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
@@ -205,7 +205,7 @@ class MainWindow():
       self.window.progressBar.setValue(
           progress_value_current + progress_value)
 
-  def get_active_jobs_number(self) -> int:
+  def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
     counter = 0
     for job in STATESAVER.state.render_jobs:
@@ -231,7 +231,7 @@ class MainWindow():
 
     self.process = QProcess()
     self.process.setProgram(STATESAVER.state.settings.blender_path)
-    self.process.finished.connect(self.continue_render)
+    self.process.finished.connect(self._continue_render)
 
     args = ["-b", job.file,
             "-y",
@@ -241,24 +241,24 @@ class MainWindow():
             ]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
-    self.process.readyReadStandardOutput.connect(self.handle_output)
+    self.process.readyReadStandardOutput.connect(self._handle_output)
     print("Starting Render process.")
     self.process.start()
 
-  def continue_render(self) -> None:
+  def _continue_render(self) -> None:
     # Ignoring exit_code and QProcess.ExitStatus for now.
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
-        self.continue_render()
+        self._continue_render()
       else:
         self.render_job(job)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
     STATESAVER.table_to_state(self.table)
-    self.number_active_jobs = self.get_active_jobs_number()
-    self.continue_render()
+    self.number_active_jobs = self._get_active_jobs_number()
+    self._continue_render()
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
