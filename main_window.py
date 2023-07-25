@@ -1,8 +1,8 @@
 """Main file to open RenderRob."""
 import os
-import sys
-import subprocess
 import platform
+import subprocess
+import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
@@ -238,6 +238,7 @@ class MainWindow():
       subprocess.call(('xdg-open', filepath))
 
   def open_output_folder(self) -> None:
+    """Open the output folder of the currently selected job."""
     pass
 
   def render_job(self, job: state_pb2.render_job) -> None:
