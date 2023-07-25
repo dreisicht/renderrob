@@ -313,14 +313,23 @@ class MainWindow():
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def _continue_render(self) -> None:
+  def _continue_render(self, exit_code: int) -> None:
     # Ignoring exit_code and QProcess.ExitStatus for now.
     print_utils.print_info("Continuing render.")
-    self.color_row_background(self.current_job_index, QColor(Qt.green))
+    if self.current_job_index == 0:
+      self.color_row_background(self.current_job_index, QColor(128, 128, 128))
+    else:
+      if exit_code == 0:
+        self.color_row_background(self.current_job_index - 1, QColor(Qt.green))
+      elif exit_code == 664:
+        self.color_row_background(self.current_job_index - 1, QColor(Qt.white))
+      else:
+        self.color_row_background(self.current_job_index - 1, QColor(Qt.yellow))
+      self.color_row_background(self.current_job_index, QColor(128, 128, 128))
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
-        self._continue_render()
+        self._continue_render(664)
       else:
         print_utils.print_info(f"Starting render of {job.file}")
         self.current_job_index += 1
@@ -333,7 +342,7 @@ class MainWindow():
     STATESAVER.table_to_state(self.table)
     self.number_active_jobs = self._get_active_jobs_number()
     self.window.progressBar.setValue(1)
-    self._continue_render()
+    self._continue_render(0)
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
