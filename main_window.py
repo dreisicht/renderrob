@@ -1,7 +1,8 @@
 """Main file to open RenderRob."""
 import os
 import sys
-import time
+import subprocess
+import platform
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
@@ -171,6 +172,8 @@ class MainWindow():
     table_utils.TABLE = self.table
     self.window.add_button.clicked.connect(table_utils.add_row_below)
     self.window.delete_button.clicked.connect(table_utils.remove_active_row)
+    self.window.play_button.clicked.connect(self.play_job)
+    self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(table_utils.move_row_up)
     self.window.down_button.clicked.connect(table_utils.move_row_down)
 
@@ -212,6 +215,30 @@ class MainWindow():
       if job.active:
         counter += 1
     return counter
+
+  def play_job(self) -> int:
+    """Open a job in image viewer or Blenderplayer."""
+    STATESAVER.table_to_state(self.table)
+    current_row = self.table.currentRow()
+    snb = shot_name_builder.ShotNameBuilder(
+        STATESAVER.state.render_jobs[current_row],
+        STATESAVER.state.settings.output_path)
+    if STATESAVER.state.render_jobs[current_row].start == "":
+      filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
+    else:
+      filepath = snb.frame_path.replace(
+          "####",
+          STATESAVER.state.render_jobs[current_row].start.zfill(4))
+    if platform.system() == 'Darwin':       # macOS
+      subprocess.call(('open', filepath))
+    elif platform.system() == 'Windows':    # Windows
+      print(filepath)
+      os.startfile(filepath)
+    else:                                   # linux variants
+      subprocess.call(('xdg-open', filepath))
+
+  def open_output_folder(self) -> None:
+    pass
 
   def render_job(self, job: state_pb2.render_job) -> None:
     """Render a job."""
