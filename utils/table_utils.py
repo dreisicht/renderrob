@@ -78,7 +78,7 @@ def post_process_row(table: QTableWidget, row: int) -> None:
        "Engine",
        "Device",
        "Motion\nBlur",
-       "New\nVersion",
+       "Overwrite",
        "High\nQuality",
        "Animation\nDenoise",
        "Denoise",
@@ -111,9 +111,7 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
       continue
     table.removeCellWidget(row, i)
     if i == 1:
-      item.setTextAlignment(Qt.AlignRight)
-      # TODO: Is vertical center needed?
-      # item.setTextAlignment(Qt.AlignRight)
+      item.setTextAlignment(Qt.AlignLeft)
     else:
       item.setTextAlignment(Qt.AlignCenter)
     table.setItem(row, i, item)

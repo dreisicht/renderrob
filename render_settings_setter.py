@@ -165,7 +165,7 @@ class RenderSettingsSetter:
     self.current_scene_data.use_nodes = False
     self.current_scene_data.cycles.use_animated_seed = True
 
-  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int) -> None:
+  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int, high_quality: bool) -> None:
     """Set the output settings."""
     if xres:
       self.current_scene_render.resolution_x = int(xres)
@@ -173,8 +173,10 @@ class RenderSettingsSetter:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
-    # TODO: Make use_overwrite dependent from render_job.new_version.
+    # TODO: Make Blender's use_overwrite dependent from render_job.overwrite -
+    # just as a safety measure.
     self.current_scene_render.use_overwrite = True
     self.current_scene_render.use_placeholder = False
 
     self.current_scene_data.frame_step = frame_step
+    self.current_scene_data.render.use_stamp = not high_quality

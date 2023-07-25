@@ -27,7 +27,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True
-    render_job.new_version = True
+    render_job.overwrite = True
     render_job.high_quality = True
     render_job.animation_denoise = True
     render_job.denoise = True
@@ -53,7 +53,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True
-    render_job.new_version = True
+    render_job.overwrite = True
     render_job.high_quality = True
     render_job.animation_denoise = True
     render_job.denoise = True
@@ -80,7 +80,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True
-    render_job.new_version = True
+    render_job.overwrite = True
     render_job.high_quality = True
     render_job.animation_denoise = True
     render_job.denoise = True
@@ -107,7 +107,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True
-    render_job.new_version = True
+    render_job.overwrite = True
     render_job.high_quality = True
     render_job.animation_denoise = True
     render_job.denoise = True

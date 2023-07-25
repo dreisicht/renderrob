@@ -77,34 +77,34 @@ icon-size: 25px;</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="play_button">
+               <widget class="QPushButton" name="add_button">
                 <property name="styleSheet">
                  <string notr="true">min-height: 30px;
 min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>Play</string>
+                 <string>     Add</string>
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>icons/play.svg</normaloff>icons/play.svg</iconset>
+                  <normaloff>icons/play-list-add.svg</normaloff>icons/play-list-add.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="open_button">
+               <widget class="QPushButton" name="delete_button">
                 <property name="styleSheet">
                  <string notr="true">min-height: 30px;
 min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>Open</string>
+                 <string>Delete</string>
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>icons/folder.svg</normaloff>icons/folder.svg</iconset>
+                  <normaloff>icons/play-list-remove.svg</normaloff>icons/play-list-remove.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -167,34 +167,34 @@ icon-size: 25px;</string>
                </spacer>
               </item>
               <item>
-               <widget class="QPushButton" name="add_button">
+               <widget class="QPushButton" name="play_button">
                 <property name="styleSheet">
                  <string notr="true">min-height: 30px;
 min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>     Add</string>
+                 <string>Play</string>
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>icons/play-list-add.svg</normaloff>icons/play-list-add.svg</iconset>
+                  <normaloff>icons/play.svg</normaloff>icons/play.svg</iconset>
                 </property>
                </widget>
               </item>
               <item>
-               <widget class="QPushButton" name="delete_button">
+               <widget class="QPushButton" name="open_button">
                 <property name="styleSheet">
                  <string notr="true">min-height: 30px;
 min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>Remove</string>
+                 <string>Open</string>
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>icons/play-list-remove.svg</normaloff>icons/play-list-remove.svg</iconset>
+                  <normaloff>icons/folder.svg</normaloff>icons/folder.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -282,7 +282,7 @@ icon-size: 25px;</string>
               </column>
               <column>
                <property name="text">
-                <string>New version</string>
+                <string>Overwrite</string>
                </property>
               </column>
               <column>

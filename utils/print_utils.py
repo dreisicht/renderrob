@@ -37,11 +37,19 @@ def print_error(ipt_str):
   """Print an error message to the console and exit the program."""
   ipt_str = str(ipt_str)
   print(BACK_RED, FORE_WHITE, end="")
-  print("[ERROR] " + ipt_str + " Exiting in 3 seconds.")
+  print("[ERROR] " + ipt_str)
   print(RESET_ALL, end="")
   write_cache("[ERROR]" + ipt_str)
-  # time.sleep(3)
   sys.exit()
+
+
+def print_error_no_exit(ipt_str):
+  """Print an error message to the console and exit the program."""
+  ipt_str = str(ipt_str)
+  print(BACK_RED, FORE_WHITE, end="")
+  print("[ERROR] " + ipt_str)
+  print(RESET_ALL, end="")
+  write_cache("[ERROR]" + ipt_str)
 
 
 def print_warning(ipt_str):

@@ -38,10 +38,7 @@ class StateSaver:
       table.insertRow(i)
 
       table_utils.post_process_row(table, i)
-      # TODO: Restore.
-      item = QTableWidgetItem(render_job.file)
-      item.setTextAlignment(Qt.AlignRight)
-      table.setItem(i, 1, item)
+      table.setItem(i, 1, QTableWidgetItem(render_job.file))
       table.setItem(i, 2, QTableWidgetItem(render_job.camera))
       table.setItem(i, 3, QTableWidgetItem(str(render_job.start)))
       table.setItem(i, 4, QTableWidgetItem(str(render_job.end)))
@@ -50,7 +47,7 @@ class StateSaver:
       table.setItem(i, 7, QTableWidgetItem(str(render_job.samples)))
       ui_utils.set_checkbox_values(table, i, [render_job.active,
                                               render_job.motion_blur,
-                                              render_job.new_version,
+                                              render_job.overwrite,
                                               render_job.high_quality,
                                               render_job.animation_denoise,
                                               render_job.denoise])
@@ -90,7 +87,7 @@ class StateSaver:
           table.cellWidget(i, 10), widget="dropdown")
       render_job.motion_blur = get_text(
           table.cellWidget(i, 11), widget="checkbox")
-      render_job.new_version = get_text(
+      render_job.overwrite = get_text(
           table.cellWidget(i, 12), widget="checkbox")
       render_job.high_quality = get_text(
           table.cellWidget(i, 13), widget="checkbox")

@@ -36,7 +36,7 @@ def render_job_to_render_settings_setter(render_job: state_pb2.render_job, setti
                     f"rss.set_camera(\'{render_job.camera}\')",
                     f"rss.set_render_settings(render_device=\'{render_job.device}\', border={not render_job.high_quality}, samples={samples}, motion_blur={render_job.motion_blur}, engine=\'{ui_utils.RENDER_ENGINES[render_job.engine]}\')",
                     f"rss.set_denoising_settings(an_denoise={render_job.animation_denoise}, denoise={render_job.denoise})",
-                    f"rss.set_output_settings(frame_step={frame_step}, xres={x_res}, yres={y_res}, percres={resolution})",
+                    f"rss.set_output_settings(frame_step={frame_step}, xres={x_res}, yres={y_res}, percres={resolution}, high_quality={render_job.high_quality})",
                     f"print(\'I finished setting the render settings.\')",
                     f"import bpy",
                     f"print(bpy.context.scene.cycles.samples)",

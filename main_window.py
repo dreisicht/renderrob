@@ -6,8 +6,9 @@ import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
 
+import dialogs
 import settings_window
 import shot_name_builder
 import utils.table_utils as table_utils
@@ -15,6 +16,7 @@ import utils.ui_utils as ui_utils
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from state_saver import STATESAVER
+from utils import print_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -28,6 +30,7 @@ class MainWindow():
     self.window = None
     self.table = None
     self.number_active_jobs = 0
+    self.current_job_index = 0
     self.cache = cache_pb2.RenderRobCache()
     self.main()
 
@@ -187,7 +190,7 @@ class MainWindow():
     self.window.actionQuit.triggered.connect(self.quit)
 
   def _handle_output(self):
-    """Output the subprocess output to the QTextEdit widget."""
+    """Output the subprocess output to the textbrowser widget."""
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
@@ -218,11 +221,13 @@ class MainWindow():
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blenderplayer."""
+    # TODO: Add support for the play of animations.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
         STATESAVER.state.render_jobs[current_row],
-        STATESAVER.state.settings.output_path)
+        STATESAVER.state.settings.output_path,
+        is_replay_mode=True)
     if STATESAVER.state.render_jobs[current_row].start == "":
       filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
     else:
@@ -232,14 +237,46 @@ class MainWindow():
     if platform.system() == 'Darwin':       # macOS
       subprocess.call(('open', filepath))
     elif platform.system() == 'Windows':    # Windows
-      print(filepath)
       os.startfile(filepath)
     else:                                   # linux variants
       subprocess.call(('xdg-open', filepath))
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
-    pass
+    STATESAVER.table_to_state(self.table)
+    current_row = self.table.currentRow()
+    snb = shot_name_builder.ShotNameBuilder(
+        STATESAVER.state.render_jobs[current_row],
+        STATESAVER.state.settings.output_path,
+        is_replay_mode=True)
+    if STATESAVER.state.render_jobs[current_row].start == "":
+      filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
+    else:
+      filepath = snb.frame_path.replace(
+          "####",
+          STATESAVER.state.render_jobs[current_row].start.zfill(4))
+
+    if platform.system() == 'Darwin':       # macOS
+      folder_path = os.path.dirname(filepath)
+      subprocess.call(('open', folder_path))
+    elif platform.system() == 'Windows':    # Windows
+      folder_path = os.path.dirname(filepath)
+      os.startfile(folder_path)
+    else:                                   # linux variants
+      folder_path = os.path.dirname(filepath)
+      subprocess.call(('xdg-open', folder_path))
+
+  def color_row_background(self, row_index, color):
+    """Color the background of a row."""
+    for column_index in range(self.table.columnCount()):
+      item = self.table.item(row_index, column_index)
+      if item is not None:
+        item.setBackground(color)
+
+  def reset_all_backgruond_colors(self):
+    """Reset the background colors of all rows."""
+    for row_index in range(self.table.rowCount()):
+      self.color_row_background(row_index, QColor(Qt.white))
 
   def render_job(self, job: state_pb2.render_job) -> None:
     """Render a job."""
@@ -258,6 +295,10 @@ class MainWindow():
       raise ValueError("Invalid start and end frame values.")
 
     self.process = QProcess()
+    if not STATESAVER.state.settings.blender_path:
+      error_message = "The Blender path is not set."
+      print_utils.print_error_no_exit(error_message)
+      dialogs.ErrorDialog(error_message)
     self.process.setProgram(STATESAVER.state.settings.blender_path)
     self.process.finished.connect(self._continue_render)
 
@@ -270,28 +311,38 @@ class MainWindow():
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
     self.process.readyReadStandardOutput.connect(self._handle_output)
-    print("Starting Render process.")
     self.process.start()
 
   def _continue_render(self) -> None:
     # Ignoring exit_code and QProcess.ExitStatus for now.
+    print_utils.print_info("Continuing render.")
+    self.color_row_background(self.current_job_index, QColor(Qt.green))
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
         self._continue_render()
       else:
+        print_utils.print_info(f"Starting render of {job.file}")
+        self.current_job_index += 1
         self.render_job(job)
+    else:
+      print_utils.print_info("No more render jobs left.")
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
     STATESAVER.table_to_state(self.table)
     self.number_active_jobs = self._get_active_jobs_number()
+    self.window.progressBar.setValue(1)
     self._continue_render()
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
     self.process.kill()
+    del STATESAVER.state.render_jobs[:]
     self.window.progressBar.setValue(0)
+    # TODO: Also output the print statements to the textbrowser widget.
+    self.reset_all_backgruond_colors()
+    print_utils.print_info("Render stopped.")
 
 
 if __name__ == "__main__":

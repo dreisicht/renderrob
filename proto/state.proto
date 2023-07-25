@@ -45,7 +45,7 @@ message render_job {
     render_engine engine = 10;
     device device = 11;
     bool motion_blur = 12;
-    bool new_version = 13;
+    bool overwrite = 13;
     bool high_quality = 14;
     bool animation_denoise = 15;
     bool denoise = 16;

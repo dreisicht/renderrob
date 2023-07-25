@@ -16,9 +16,17 @@ def still_or_animation(start: str, end: str) -> str:
 class ShotNameBuilder:
   """Class to build a shot name from the render job."""
 
-  def __init__(self, render_job: state_pb2.render_job(), output_path) -> None:
-    """Initialize the shot name builder."""
+  def __init__(self, render_job: state_pb2.render_job(), output_path: str, is_replay_mode: bool = False) -> None:
+    """Initialize the shot name builder.
+
+    Args:
+      render_job: The render job to build the shot name from.
+      output_path: The path to the output folder.
+      is_replay_mode: Whether the path is used for showing the result. If so, the version number
+        is not increased.
+    """
     self.render_job = render_job
+    self.replay_mode = is_replay_mode
     self.shotname = self.get_shotname()
     self.frame_path = self.get_full_frame_path(output_path, self.shotname)
 
@@ -66,13 +74,14 @@ class ShotNameBuilder:
         start_frame = str(1).zfill(4)
       else:
         start_frame = self.render_job.start.zfill(4)
-    print(start_frame)
 
     while os.path.exists(full_frame_path.replace(
             "v$$", "v" + str(shot_iter_num).zfill(2)).replace("####", start_frame)):
       shot_iter_num = shot_iter_num + 1
 
-    if not self.render_job.new_version and shot_iter_num > 1:
+    if self.replay_mode:
+      shot_iter_num = shot_iter_num - 1
+    elif self.render_job.overwrite and shot_iter_num > 1:
       shot_iter_num = shot_iter_num - 1
     # Update full_frame_path with iteration number.
     return full_frame_path.replace(
