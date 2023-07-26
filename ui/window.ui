@@ -84,7 +84,7 @@ min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>     Add</string>
+                 <string>    Add</string>
                 </property>
                 <property name="icon">
                  <iconset>

@@ -30,7 +30,8 @@ class MainWindow():
     self.window = None
     self.table = None
     self.number_active_jobs = 0
-    self.current_job_index = 0
+    self.job_row_index = 0
+    self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()
     self.main()
 
@@ -205,12 +206,6 @@ class MainWindow():
     self.window.textBrowser.setCurrentCharFormat(color_format)
     self.window.textBrowser.insertPlainText(output)
 
-    if "Blender quit" in output:
-      progress_value_current = self.window.progressBar.value()
-      progress_value = int(100 / self.number_active_jobs)
-      self.window.progressBar.setValue(
-          progress_value_current + progress_value)
-
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
     counter = 0
@@ -313,35 +308,49 @@ class MainWindow():
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
+  def set_background_colors(self, exit_code: int) -> None:
+    """Set the background colors of the rows."""
+    if self.job_row_index == 0:
+      self.color_row_background(self.job_row_index, QColor(128, 128, 128))
+    else:
+      if exit_code == 0:
+        self.color_row_background(self.job_row_index - 1, QColor(Qt.green))
+      elif exit_code == 664:
+        self.color_row_background(self.job_row_index - 1, QColor(Qt.white))
+      else:
+        self.color_row_background(self.job_row_index - 1, QColor(Qt.yellow))
+      self.color_row_background(self.job_row_index, QColor(128, 128, 128))
+
+  def _refresh_progress_bar(self):
+    progress_value = int(100 / self.number_active_jobs) * self.current_job
+    self.window.progressBar.setValue(progress_value)
+
   def _continue_render(self, exit_code: int) -> None:
     # Ignoring exit_code and QProcess.ExitStatus for now.
     print_utils.print_info("Continuing render.")
-    if self.current_job_index == 0:
-      self.color_row_background(self.current_job_index, QColor(128, 128, 128))
-    else:
-      if exit_code == 0:
-        self.color_row_background(self.current_job_index - 1, QColor(Qt.green))
-      elif exit_code == 664:
-        self.color_row_background(self.current_job_index - 1, QColor(Qt.white))
-      else:
-        self.color_row_background(self.current_job_index - 1, QColor(Qt.yellow))
-      self.color_row_background(self.current_job_index, QColor(128, 128, 128))
+    self.set_background_colors(exit_code)
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
         self._continue_render(664)
+        self.job_row_index += 1
       else:
         print_utils.print_info(f"Starting render of {job.file}")
-        self.current_job_index += 1
+        self.job_row_index += 1
+        self.current_job += 1
         self.render_job(job)
     else:
       print_utils.print_info("No more render jobs left.")
+      self.window.progressBar.setValue(100)
+    self._refresh_progress_bar()
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
     STATESAVER.table_to_state(self.table)
+    self.job_row_index = 0
+    self.current_job = 0
+    self.reset_all_backgruond_colors()
     self.number_active_jobs = self._get_active_jobs_number()
-    self.window.progressBar.setValue(1)
     self._continue_render(0)
 
   def stop_render(self) -> None:

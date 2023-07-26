@@ -29,6 +29,7 @@ def render_job_to_render_settings_setter(render_job: state_pb2.render_job, setti
   samples = samples if samples else '\"\"'
 
   python_command = ['import sys',
+                    # 'sys.exit(43)', # For testing of the error handling.
                     f"sys.path.append(\'{cwd}\')",
                     "import render_settings_setter",
                     f"rss = render_settings_setter.RenderSettingsSetter(\'{render_job.scene}\', {render_job.view_layers})",
