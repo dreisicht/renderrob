@@ -159,6 +159,16 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Playback FPS</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBox_4"/>
+     </item>
     </layout>
    </item>
    <item>

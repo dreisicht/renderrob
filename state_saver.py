@@ -3,13 +3,14 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
-from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
-from PySide6.QtCore import Qt
 import os
-from proto import state_pb2
-from utils import ui_utils
-from utils import table_utils
+
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
+
+import dialogs
+from proto import state_pb2
+from utils import table_utils, ui_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -69,6 +70,12 @@ class StateSaver:
       # TODO: Do the file post-processing when the user enters a path.
       render_job.file = get_text(table.item(i, 1)).replace(
           '"', "").replace("\\", "/")
+      if "/" not in render_job.file:
+        render_job.file = os.path.join(self.state.settings.blender_files_path,
+                                       render_job.file)
+      if not os.path.exists(render_job.file):
+        dialogs.ErrorDialog(
+            f"The file path {render_job.file} does not exist.")
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the

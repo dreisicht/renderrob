@@ -180,3 +180,4 @@ class RenderSettingsSetter:
 
     self.current_scene_data.frame_step = frame_step
     self.current_scene_data.render.use_stamp = not high_quality
+    print_utils.print_info("Finished setting the rendering settings!")

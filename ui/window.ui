@@ -13,6 +13,9 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
@@ -36,14 +39,14 @@
                 <property name="styleSheet">
                  <string notr="true">min-height: 30px;
 min-width: 80px;
-icon-size: 25px;</string>
+icon-size: 20px;</string>
                 </property>
                 <property name="text">
                  <string>Render</string>
                 </property>
                 <property name="icon">
                  <iconset>
-                  <normaloff>icons/camera.svg</normaloff>icons/camera.svg</iconset>
+                  <normaloff>icons/camera_rr.svg</normaloff>icons/camera_rr.svg</iconset>
                 </property>
                </widget>
               </item>
@@ -84,7 +87,7 @@ min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>    Add</string>
+                 <string>   Add</string>
                 </property>
                 <property name="icon">
                  <iconset>
@@ -174,7 +177,7 @@ min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>Play</string>
+                 <string>   Play</string>
                 </property>
                 <property name="icon">
                  <iconset>
@@ -190,7 +193,7 @@ min-width: 40px;
 icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>Open</string>
+                 <string> Open</string>
                 </property>
                 <property name="icon">
                  <iconset>
@@ -202,6 +205,10 @@ icon-size: 25px;</string>
             </item>
             <item>
              <widget class="QTableWidget" name="tableWidget">
+              <property name="styleSheet">
+               <string notr="true">QTableWidget {
+background: #ebebeb}</string>
+              </property>
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
@@ -490,11 +497,21 @@ icon-size: 25px;</string>
          <widget class="QTextBrowser" name="textBrowser">
           <property name="font">
            <font>
-            <family>Ebrima</family>
+            <family>Fira Code</family>
+            <pointsize>9</pointsize>
+            <italic>false</italic>
+            <bold>false</bold>
            </font>
           </property>
           <property name="styleSheet">
-           <string notr="true"/>
+           <string notr="true">QTextEdit, QListView {
+font: 9pt &quot;Fira Code&quot;;
+color: rgb(255, 255, 255);
+background-color: rgb(52, 80, 100);
+}
+
+
+</string>
           </property>
          </widget>
         </item>
@@ -504,8 +521,24 @@ icon-size: 25px;</string>
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
+      <property name="styleSheet">
+       <string notr="true"> QProgressBar::chunk {
+     background-color: #78909c;
+     width: 20px;
+	 text-align: center;
+ }
+QProgressBar {
+text-align: center;
+}</string>
+      </property>
       <property name="value">
        <number>24</number>
+      </property>
+      <property name="textVisible">
+       <bool>true</bool>
+      </property>
+      <property name="textDirection">
+       <enum>QProgressBar::TopToBottom</enum>
       </property>
      </widget>
     </item>

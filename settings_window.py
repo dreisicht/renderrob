@@ -35,6 +35,8 @@ class SettingsWindow():
         int(STATESAVER.state.settings.preview.frame_step))
     self.window.spinBox.setValue(
         int(STATESAVER.state.settings.preview.resolution))
+    self.window.spinBox_4.setValue(
+        int(STATESAVER.state.settings.fps))
 
     self.window.lineEdit_4.setText(
         ";".join(STATESAVER.state.settings.addons))
@@ -58,12 +60,18 @@ class SettingsWindow():
     # Check if the values are empty, if so, set them to 0.
     samples = self.window.spinBox_3.cleanText()
     STATESAVER.state.settings.preview.samples = int(samples) if samples else 0
+
     frame_step = self.window.spinBox_2.cleanText()
     STATESAVER.state.settings.preview.frame_step = int(
         frame_step) if frame_step else 0
+
     resolution = self.window.spinBox.cleanText()
     STATESAVER.state.settings.preview.resolution = int(
         resolution) if resolution else 0
+
+    fps = self.window.spinBox_4.cleanText()
+    STATESAVER.state.settings.fps = int(
+        fps) if resolution else 0
 
     del STATESAVER.state.settings.addons[:]
     addons_str = self.window.lineEdit_4.text()

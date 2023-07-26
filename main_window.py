@@ -6,7 +6,7 @@ import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox
+from PySide6.QtWidgets import QApplication, QFileDialog, QStyledItemDelegate
 
 import dialogs
 import settings_window
@@ -19,6 +19,36 @@ from state_saver import STATESAVER
 from utils import print_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
+
+COLORS = {
+    "red": 0x980030,
+    "yellow": 0xffd966,
+    "green": 0x9fd3b6,
+    "blue": 0x57a3b4,
+    "blue_grey": 0x4f7997,
+    "blue_grey_lighter": 0x6397bd,
+    "blue_grey_darker": 0x345064,
+    "neutral_grey": 0x999999,
+    "black_dark": 0x242a2d,
+    "black_light": 0x22282b
+}
+
+
+# class RowDelegate(QStyledItemDelegate):
+#   def __init__(self, parent=None, row_index, color):
+#     super().__init__(parent)
+#     self.row_index = row_index
+#     self.color = color
+
+#   def paint(self, painter, option, index):
+#     # Apply the custom stylesheet here based on the row index or other criteria
+#     if index.row() == self.row_index:  # Change '1' to the desired row number
+#       # Change the background color here
+#       option.palette.setColor(option.palette.Base, self.color)
+#       # Change the text color here
+#       # option.palette.setColor(option.palette.Text, Qt.white)
+
+#     super().paint(painter, option, index, self.color, self.row_index)
 
 
 class MainWindow():
@@ -169,6 +199,8 @@ class MainWindow():
     STATESAVER.state_to_table(self.table)
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
+    self.cache.recent_files.remove(file_name)
+    self.cache.recent_files.insert(0, file_name)
     self.refresh_recent_files_menu()
 
   def make_main_window_connections(self) -> None:
@@ -195,16 +227,42 @@ class MainWindow():
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
-    if '\u001b[46m' in output:
-      color_format.setForeground(QColor(Qt.white))
-      color_format.setBackground(QColor(Qt.blue))
-    elif '\u001b[30m' in output:
-      color_format.setForeground(QColor(Qt.black))
-      color_format.setBackground(QColor(Qt.white))
+    if '\u001b' in output:
+      for line in output.splitlines():
+        bc = print_utils.BASH_COLORS
+        info = bc["BACK_CYAN"] + " " + bc["FORE_BLACK"]
+        warning = bc["BACK_YELLOW"] + " " + bc["FORE_BLACK"]
+        error = bc["BACK_RED"] + " " + bc["FORE_WHITE"]
+        reset = bc["RESET_ALL"]
+        if line.startswith(info):
+          line = line.replace(info, '')
+          color_format.setBackground(QColor(COLORS["blue_grey_lighter"]))
+          color_format.setForeground(QColor(Qt.black))
+        if line.startswith(warning):
+          line = line.replace(warning, '')
+          color_format.setBackground(QColor(COLORS["yellow"]))
+          color_format.setForeground(QColor(Qt.black))
+        if line.startswith(error):
+          line = line.replace(error, '')
+          color_format.setBackground(QColor(COLORS["red"]))
+          color_format.setForeground(QColor(Qt.white))
 
-    self.window.textBrowser.moveCursor(QTextCursor.End)
-    self.window.textBrowser.setCurrentCharFormat(color_format)
-    self.window.textBrowser.insertPlainText(output)
+        self.window.textBrowser.moveCursor(QTextCursor.End)
+        self.window.textBrowser.setCurrentCharFormat(color_format)
+        self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
+
+        if line.endswith(reset):
+          line = line.replace(reset, '')
+          color_format.setBackground(QColor(52, 80, 100))
+          color_format.setForeground(QColor(Qt.white))
+    else:
+      self.window.textBrowser.moveCursor(QTextCursor.End)
+      self.window.textBrowser.setCurrentCharFormat(color_format)
+      self.window.textBrowser.insertPlainText(output)
+
+    # TODO: Find a more elegant way to do this.
+    if "Blender quit" in output:
+      self._refresh_progress_bar()
 
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
@@ -229,12 +287,26 @@ class MainWindow():
       filepath = snb.frame_path.replace(
           "####",
           STATESAVER.state.render_jobs[current_row].start.zfill(4))
-    if platform.system() == 'Darwin':       # macOS
-      subprocess.call(('open', filepath))
-    elif platform.system() == 'Windows':    # Windows
-      os.startfile(filepath)
-    else:                                   # linux variants
-      subprocess.call(('xdg-open', filepath))
+    if "STILL" == shot_name_builder.still_or_animation(STATESAVER.state.render_jobs[current_row].start,
+                                                       STATESAVER.state.render_jobs[current_row].end):
+      if not os.path.exists(filepath):
+        dialogs.ErrorDialog("The output does not yet exist.")
+      if platform.system() == 'Darwin':       # macOS
+        subprocess.call(('open', filepath))
+      elif platform.system() == 'Windows':    # Windows
+        os.startfile(filepath)
+      else:                                   # linux variants
+        subprocess.call(('xdg-open', filepath))
+    else:
+      if not os.path.exists(filepath):
+        dialogs.ErrorDialog("The output does not yet exist.")
+      if STATESAVER.state.settings.preview.frame_step_use:
+        frame_step = STATESAVER.state.settings.preview.frame_step
+      else:
+        frame_step = 1
+        # TODO: The call might not take fps and frame step into account.
+      blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f {STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
+      subprocess.call(blenderplayer_call)
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
@@ -251,6 +323,8 @@ class MainWindow():
           "####",
           STATESAVER.state.render_jobs[current_row].start.zfill(4))
 
+    if not os.path.exists(filepath):
+      dialogs.ErrorDialog("The output folder does not yet exist.")
     if platform.system() == 'Darwin':       # macOS
       folder_path = os.path.dirname(filepath)
       subprocess.call(('open', folder_path))
@@ -311,15 +385,21 @@ class MainWindow():
   def set_background_colors(self, exit_code: int) -> None:
     """Set the background colors of the rows."""
     if self.job_row_index == 0:
-      self.color_row_background(self.job_row_index, QColor(128, 128, 128))
+      # delegate = RowDelegate(self.table)
+      # self.table.setItemDelegateForRow(0, delegate)
+      self.color_row_background(
+          self.job_row_index, QColor(COLORS["blue_grey"]))
     else:
       if exit_code == 0:
-        self.color_row_background(self.job_row_index - 1, QColor(Qt.green))
+        self.color_row_background(
+            self.job_row_index - 1, QColor(COLORS["green"]))
       elif exit_code == 664:
         self.color_row_background(self.job_row_index - 1, QColor(Qt.white))
       else:
-        self.color_row_background(self.job_row_index - 1, QColor(Qt.yellow))
-      self.color_row_background(self.job_row_index, QColor(128, 128, 128))
+        self.color_row_background(
+            self.job_row_index - 1, QColor(COLORS["red"]))
+      self.color_row_background(
+          self.job_row_index, QColor(COLORS["blue_grey"]))
 
   def _refresh_progress_bar(self):
     progress_value = int(100 / self.number_active_jobs) * self.current_job
@@ -342,7 +422,6 @@ class MainWindow():
     else:
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
-    self._refresh_progress_bar()
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""

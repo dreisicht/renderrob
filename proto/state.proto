@@ -17,6 +17,7 @@ message settings {
     string blender_files_path = 3;
     preview_settings preview = 4;
     repeated string addons = 5;
+    int32 fps = 6;
 }
 enum file_format{
     png = 0;

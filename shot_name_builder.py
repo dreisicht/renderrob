@@ -74,6 +74,8 @@ class ShotNameBuilder:
         start_frame = str(1).zfill(4)
       else:
         start_frame = self.render_job.start.zfill(4)
+    else:
+      start_frame = self.render_job.start.zfill(4)
 
     while os.path.exists(full_frame_path.replace(
             "v$$", "v" + str(shot_iter_num).zfill(2)).replace("####", start_frame)):

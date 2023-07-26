@@ -111,7 +111,7 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
       continue
     table.removeCellWidget(row, i)
     if i == 1:
-      item.setTextAlignment(Qt.AlignLeft)
+      item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     else:
       item.setTextAlignment(Qt.AlignCenter)
     table.setItem(row, i, item)
