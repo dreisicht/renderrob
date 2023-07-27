@@ -29,26 +29,9 @@ COLORS = {
     "blue_grey_lighter": 0x6397bd,
     "blue_grey_darker": 0x345064,
     "neutral_grey": 0x999999,
-    "black_dark": 0x242a2d,
-    "black_light": 0x22282b
+    "black_light": 0x22282b,
+    "black_dark": 0x242a2d
 }
-
-
-# class RowDelegate(QStyledItemDelegate):
-#   def __init__(self, parent=None, row_index, color):
-#     super().__init__(parent)
-#     self.row_index = row_index
-#     self.color = color
-
-#   def paint(self, painter, option, index):
-#     # Apply the custom stylesheet here based on the row index or other criteria
-#     if index.row() == self.row_index:  # Change '1' to the desired row number
-#       # Change the background color here
-#       option.palette.setColor(option.palette.Base, self.color)
-#       # Change the text color here
-#       # option.palette.setColor(option.palette.Text, Qt.white)
-
-#     super().paint(painter, option, index, self.color, self.row_index)
 
 
 class MainWindow():
@@ -341,6 +324,10 @@ class MainWindow():
       item = self.table.item(row_index, column_index)
       if item is not None:
         item.setBackground(color)
+    ui_utils.set_checkbox_background_color(
+        self.table, row_index, color)
+    # Note: Combobox coloring didn't work properly.
+    # set_combobox_background_color is still existing though.
 
   def reset_all_backgruond_colors(self):
     """Reset the background colors of all rows."""
@@ -385,8 +372,6 @@ class MainWindow():
   def set_background_colors(self, exit_code: int) -> None:
     """Set the background colors of the rows."""
     if self.job_row_index == 0:
-      # delegate = RowDelegate(self.table)
-      # self.table.setItemDelegateForRow(0, delegate)
       self.color_row_background(
           self.job_row_index, QColor(COLORS["blue_grey"]))
     else:
@@ -406,7 +391,6 @@ class MainWindow():
     self.window.progressBar.setValue(progress_value)
 
   def _continue_render(self, exit_code: int) -> None:
-    # Ignoring exit_code and QProcess.ExitStatus for now.
     print_utils.print_info("Continuing render.")
     self.set_background_colors(exit_code)
     if STATESAVER.state.render_jobs:

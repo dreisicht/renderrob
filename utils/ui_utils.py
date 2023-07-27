@@ -1,11 +1,13 @@
 """Util functions for helping build the render rob UI."""
 
 import sys
-
+from typing import Tuple
 from PySide6.QtCore import QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
-                               QWidget, QPushButton)
+                               QWidget)
+from PySide6.QtGui import QColor
+
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
@@ -56,6 +58,23 @@ def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> No
     widget = table.cellWidget(row, i)
     checkbox_item = widget.findChild(QCheckBox)
     checkbox_item.setChecked(values[j])
+
+
+def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
+  """Set color of comboboxes."""
+  for j, i in enumerate(COMBOBOX_COLUMNS):
+    widget = table.cellWidget(row, i)
+    if widget:
+      widget.setStyleSheet(
+          f"QComboBox:drop-down {{background-color: {color.name()};}}")
+
+
+def set_checkbox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
+  """Set color of checkboxes."""
+  for j, i in enumerate(CHECKBOX_COLUMNS):
+    widget = table.cellWidget(row, i)
+    if widget:
+      widget.setStyleSheet(f"background-color: {color.name()};")
 
 
 def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
