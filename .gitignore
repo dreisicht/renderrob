@@ -1,23 +1,3 @@
-﻿/Blender
-/.vs/BlenderPython2/v16
 *.pyc
-/sketch
-/build/build
-/build/dist
-*.spec
-/key/*.json
-*__pycache__*
-*.pyc
-# *.afpub
-/design/archive
-# *.afdesign
-*.xlsx*
-*.whl
-*.exr
-/src/util/ERRORCACHE*
-*.pdf
-*.zip
-*.pickle
-*sheetcache
-*errorcache
-/cache/*
+*__pycache__/
+rrp_files/*

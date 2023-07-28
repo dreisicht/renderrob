@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package render_rob_state;
+
+message preview_settings {
+    int32 samples = 1;
+    bool samples_use = 2;
+    int32 frame_step = 3;
+    bool frame_step_use = 4;
+    int32 resolution = 5;
+    bool resolution_use = 6;
+}
+
+message settings {
+    string blender_path = 1;
+    string output_path = 2;
+    string blender_files_path = 3;
+    preview_settings preview = 4;
+    repeated string addons = 5;
+    int32 fps = 6;
+}
+enum file_format{
+    png = 0;
+    tiff = 1;
+    exr = 2;
+    jpg = 3;
+}
+enum render_engine{
+    cycles = 0;
+    eevee = 1;
+}
+enum device{
+    gpu = 0;
+    cpu = 1;
+}
+message render_job {
+    bool active = 1;
+    string file = 2;
+    string camera = 3;
+    string start = 4;
+    string end = 5;
+    string x_res = 6;
+    string y_res = 7;
+    string samples = 8;
+    file_format file_format = 9;
+    render_engine engine = 10;
+    device device = 11;
+    bool motion_blur = 12;
+    bool overwrite = 13;
+    bool high_quality = 14;
+    bool animation_denoise = 15;
+    bool denoise = 16;
+    string scene = 17;
+    repeated string view_layers = 18;
+    string comments = 19;
+}
+
+message render_rob_state {
+    settings settings = 1;
+    repeated render_job render_jobs = 2;
+}
