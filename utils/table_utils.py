@@ -1,12 +1,48 @@
 """Utility functions for table operations."""
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem
-
+from PySide6.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QStyledItemDelegate, QComboBox, QCheckBox, QWidget
 import utils.ui_utils as ui_utils
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is
 # only the function. Therefore arguments to the function cannot be passed.
+
+
+def make_editable(table_widget):
+  print("make_editable")
+  table_widget.setEditTriggers(QTableWidget.AllEditTriggers)
+
+  for row in range(table_widget.rowCount()):
+    for col in ui_utils.COMBOBOX_COLUMNS:
+      combobox_item = table_widget.cellWidget(row, col)
+      if combobox_item and isinstance(combobox_item, QComboBox):
+        combobox_item.setEditable(True)
+        combobox_item.setDisabled(False)
+
+    for col in ui_utils.CHECKBOX_COLUMNS:
+      checkbox_item = table_widget.cellWidget(row, col)
+      if checkbox_item and isinstance(checkbox_item, QWidget):
+        QWidget.findChild(checkbox_item, QCheckBox).setCheckable(True)
+
+
+def make_read_only_selectable(table_widget):
+  class ReadOnlyDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+      # Prevent editing by returning None when an editor is requested
+      return None
+  delegate = ReadOnlyDelegate()
+  table_widget.setItemDelegate(delegate)
+  for row in range(table_widget.rowCount()):
+    for col in ui_utils.COMBOBOX_COLUMNS:
+      combobox_item = table_widget.cellWidget(row, col)
+      if combobox_item and isinstance(combobox_item, QComboBox):
+        combobox_item.setEditable(False)
+        combobox_item.setDisabled(True)
+
+    for col in ui_utils.CHECKBOX_COLUMNS:
+      checkbox_item = table_widget.cellWidget(row, col)
+      if checkbox_item and isinstance(checkbox_item, QWidget):
+        QWidget.findChild(checkbox_item, QCheckBox).setCheckable(False)
 
 
 def move_row_down() -> None:
@@ -56,6 +92,8 @@ def add_row_below() -> None:
 def remove_active_row() -> None:
   """Remove the currently selected row."""
   current_row = TABLE.currentRow()
+  if current_row == -1:
+    current_row = TABLE.rowCount() - 1
   TABLE.removeRow(current_row)
 
 

@@ -320,6 +320,7 @@ class MainWindow():
 
   def color_row_background(self, row_index, color):
     """Color the background of a row."""
+    # TODO: Move to separate file.
     for column_index in range(self.table.columnCount()):
       item = self.table.item(row_index, column_index)
       if item is not None:
@@ -331,6 +332,7 @@ class MainWindow():
 
   def reset_all_backgruond_colors(self):
     """Reset the background colors of all rows."""
+    # TODO: Move to separate file.
     for row_index in range(self.table.rowCount()):
       self.color_row_background(row_index, QColor(Qt.white))
 
@@ -369,22 +371,35 @@ class MainWindow():
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def set_background_colors(self, exit_code: int) -> None:
+  def set_background_colors(self, exit_code: int, row_index: int) -> None:
     """Set the background colors of the rows."""
-    if self.job_row_index == 0:
+    # TODO: Move to separate file.
+    if row_index == 0:
       self.color_row_background(
-          self.job_row_index, QColor(COLORS["blue_grey"]))
+          row_index, QColor(COLORS["blue_grey"]))
     else:
       if exit_code == 0:
         self.color_row_background(
-            self.job_row_index - 1, QColor(COLORS["green"]))
+            row_index - 1, QColor(COLORS["green"]))
       elif exit_code == 664:
-        self.color_row_background(self.job_row_index - 1, QColor(Qt.white))
+        self.color_row_background(row_index - 1, QColor(Qt.white))
       else:
         self.color_row_background(
-            self.job_row_index - 1, QColor(COLORS["red"]))
+            row_index - 1, QColor(COLORS["red"]))
       self.color_row_background(
-          self.job_row_index, QColor(COLORS["blue_grey"]))
+          row_index, QColor(COLORS["blue_grey"]))
+
+  def disable_interactions(self) -> None:
+    # rows = self.tableName.rowCount()
+    # columns = self.tableName.columnCount()
+    # for row in range(rows):
+    #   for col in range(columns):
+    #     item = self.cell("text")
+    #     widget = self.table.cellWidget(row, col)
+    #     # execute the line below to every item you need locked
+    #     widget.setFlags(Qt.ItemIsEnabled)
+    #     self.ui.tableName.setItem(i, j, item)
+    self.table.setEnabled(False)
 
   def _refresh_progress_bar(self):
     progress_value = int(100 / self.number_active_jobs) * self.current_job
@@ -392,7 +407,7 @@ class MainWindow():
 
   def _continue_render(self, exit_code: int) -> None:
     print_utils.print_info("Continuing render.")
-    self.set_background_colors(exit_code)
+    self.set_background_colors(exit_code, self.job_row_index)
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
@@ -409,6 +424,9 @@ class MainWindow():
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
+    # self.disable_interactions()
+    # table_utils.make_read_only_selectable(self.table)
+    # table_utils.make_editable(self.table)
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
