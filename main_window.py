@@ -247,6 +247,9 @@ class MainWindow():
     if "Blender quit" in output:
       self._refresh_progress_bar()
 
+    # TODO #5 color a job containing a warning from the render settings setter
+    # yellow and a job containing an error red.
+
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
     counter = 0
@@ -257,7 +260,7 @@ class MainWindow():
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blenderplayer."""
-    # TODO: Add support for the play of animations.
+    # TODO: #6 Add support for the play of animations.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -287,12 +290,13 @@ class MainWindow():
         frame_step = STATESAVER.state.settings.preview.frame_step
       else:
         frame_step = 1
-        # TODO: The call might not take fps and frame step into account.
+        # TODO: #7 The call might not take fps and frame step into account.
       blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f {STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
       subprocess.call(blenderplayer_call)
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
+    # TODO: #8 Add keyboard shortcuts.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -320,10 +324,15 @@ class MainWindow():
 
   def color_row_background(self, row_index, color):
     """Color the background of a row."""
-    # TODO: Move to separate file.
+    # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+    # but exr selected, high quality and animation but no animation denoising,
+    # single frame rendering but animation denoising,
+    # single frame rendering in high quality but no denoising.)
+    # FIXME: Move to separate file.
     for column_index in range(self.table.columnCount()):
       item = self.table.item(row_index, column_index)
       if item is not None:
+        # FIXME: check if set style sheet is better with selections.
         item.setBackground(color)
     ui_utils.set_checkbox_background_color(
         self.table, row_index, color)
@@ -332,7 +341,7 @@ class MainWindow():
 
   def reset_all_backgruond_colors(self):
     """Reset the background colors of all rows."""
-    # TODO: Move to separate file.
+    # FIXME: Move to separate file.
     for row_index in range(self.table.rowCount()):
       self.color_row_background(row_index, QColor(Qt.white))
 
@@ -373,7 +382,7 @@ class MainWindow():
 
   def set_background_colors(self, exit_code: int, row_index: int) -> None:
     """Set the background colors of the rows."""
-    # TODO: Move to separate file.
+    # FIXME: Move to separate file.
     if row_index == 0:
       self.color_row_background(
           row_index, QColor(COLORS["blue_grey"]))
@@ -388,18 +397,6 @@ class MainWindow():
             row_index - 1, QColor(COLORS["red"]))
       self.color_row_background(
           row_index, QColor(COLORS["blue_grey"]))
-
-  def disable_interactions(self) -> None:
-    # rows = self.tableName.rowCount()
-    # columns = self.tableName.columnCount()
-    # for row in range(rows):
-    #   for col in range(columns):
-    #     item = self.cell("text")
-    #     widget = self.table.cellWidget(row, col)
-    #     # execute the line below to every item you need locked
-    #     widget.setFlags(Qt.ItemIsEnabled)
-    #     self.ui.tableName.setItem(i, j, item)
-    self.table.setEnabled(False)
 
   def _refresh_progress_bar(self):
     progress_value = int(100 / self.number_active_jobs) * self.current_job
@@ -421,12 +418,11 @@ class MainWindow():
     else:
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
+      table_utils.make_editable(self.table)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
-    # self.disable_interactions()
-    # table_utils.make_read_only_selectable(self.table)
-    # table_utils.make_editable(self.table)
+    table_utils.make_read_only_selectable(self.table)
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
@@ -439,8 +435,9 @@ class MainWindow():
     self.process.kill()
     del STATESAVER.state.render_jobs[:]
     self.window.progressBar.setValue(0)
-    # TODO: Also output the print statements to the textbrowser widget.
+    # TODO: #13 Also output the print statements to the textbrowser widget.
     self.reset_all_backgruond_colors()
+    table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
 
 

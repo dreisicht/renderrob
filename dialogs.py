@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon, QPixmap
 
 class ErrorDialog(QDialog):
   def __init__(self, message, parent=None):
-    # TODO: Build a custom error dialog with Qt Designer.
+    # TODO: #4 Build a custom error dialog with Qt Designer.
     super(ErrorDialog, self).__init__(parent)
     self.setWindowTitle("Error")
     # Replace with your icon file path

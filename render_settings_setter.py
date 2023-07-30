@@ -173,7 +173,7 @@ class RenderSettingsSetter:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
-    # TODO: Make Blender's use_overwrite dependent from render_job.overwrite -
+    # TODO: #14 Make Blender's use_overwrite dependent from render_job.overwrite -
     # just as a safety measure.
     self.current_scene_render.use_overwrite = True
     self.current_scene_render.use_placeholder = False
