@@ -229,7 +229,6 @@ class MainWindow():
           color_format.setBackground(QColor(COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
           has_warning = True
-          # TODO: #15 Set the background color of the row to yellow if log contains warning.
           self.color_row_background(
               self.job_row_index - 1, QColor(COLORS["yellow"]))
         if line.startswith(error):
@@ -257,9 +256,6 @@ class MainWindow():
       self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
-    # TODO #5 color a job containing a warning from the render settings setter
-    # yellow and a job containing an error red.
-
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
     counter = 0
@@ -270,7 +266,6 @@ class MainWindow():
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blenderplayer."""
-    # TODO: #6 Add support for the play of animations.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -300,7 +295,9 @@ class MainWindow():
         frame_step = STATESAVER.state.settings.preview.frame_step
       else:
         frame_step = 1
-        # TODO: #7 The call might not take fps and frame step into account.
+
+      # The call does not take frame step and fps into account.
+      # Investigated and turns out problem on Blender's side.
       blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f {STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
       subprocess.call(blenderplayer_call)
 
@@ -461,7 +458,6 @@ class MainWindow():
     self.process.kill()
     del STATESAVER.state.render_jobs[:]
     self.window.progressBar.setValue(0)
-    # TODO: #13 Also output the print statements to the textbrowser widget.
     self.reset_all_backgruond_colors()
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
