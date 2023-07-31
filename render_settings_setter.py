@@ -22,7 +22,7 @@ class RenderSettingsSetter:
     self.current_scene_data = None
     self.view_layer_data = None
     self.current_scene_render = None
-    if scene not in bpy.data.scenes:
+    if scene and scene not in bpy.data.scenes:
       print_utils.print_warning(
           "I couldn't find the scene you specified. I'm rendering the last used scene.")
     self.set_scene(scene)
@@ -168,7 +168,7 @@ class RenderSettingsSetter:
     self.current_scene_data.use_nodes = False
     self.current_scene_data.cycles.use_animated_seed = True
 
-  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int, high_quality: bool) -> None:
+  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:
     """Set the output settings."""
     if xres:
       self.current_scene_render.resolution_x = int(xres)
@@ -176,9 +176,7 @@ class RenderSettingsSetter:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
-    # TODO: #14 Make Blender's use_overwrite dependent from render_job.overwrite -
-    # just as a safety measure.
-    self.current_scene_render.use_overwrite = True
+    self.current_scene_render.use_overwrite = overwrite
     self.current_scene_render.use_placeholder = False
 
     self.current_scene_data.frame_step = frame_step

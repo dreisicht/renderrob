@@ -25,10 +25,11 @@ COLORS = {
     "yellow": 0xffd966,
     "green": 0x9fd3b6,
     "blue": 0x57a3b4,
-    "blue_grey": 0x4f7997,
     "blue_grey_lighter": 0x6397bd,
+    "blue_grey": 0x4f7997,
     "blue_grey_darker": 0x345064,
-    "neutral_grey": 0x999999,
+    "grey_light": 0xebebeb,
+    "grey_neutral": 0x999999,
     "black_light": 0x22282b,
     "black_dark": 0x242a2d
 }
@@ -230,11 +231,11 @@ class MainWindow():
           has_warning = True
           # TODO: #15 Set the background color of the row to yellow if log contains warning.
           self.color_row_background(
-              self.job_row_index, QColor(COLORS["yellow"]))
+              self.job_row_index - 1, QColor(COLORS["yellow"]))
         if line.startswith(error):
           line = line.replace(error, '')
           color_format.setBackground(QColor(COLORS["red"]))
-          color_format.setForeground(QColor(Qt.white))
+          color_format.setForeground(QColor(COLORS["grey_light"]))
           has_error = True
 
         self.window.textBrowser.moveCursor(QTextCursor.End)
@@ -244,7 +245,7 @@ class MainWindow():
         if line.endswith(reset):
           line = line.replace(reset, '')
           color_format.setBackground(QColor(52, 80, 100))
-          color_format.setForeground(QColor(Qt.white))
+          color_format.setForeground(QColor(COLORS["grey_light"]))
     else:
       self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -340,18 +341,25 @@ class MainWindow():
     # FIXME: Move to separate file.
     for column_index in range(self.table.columnCount()):
       item = self.table.item(row_index, column_index)
-      if item is not None:
-        item.setBackground(color)
-    ui_utils.set_checkbox_background_color(
-        self.table, row_index, color)
-    # Note: Combobox coloring didn't work properly.
-    # set_combobox_background_color is still existing though.
+      if item is None:
+        continue
+      if color == QColor(COLORS["green"]):
+        # If the background is already yellow or read means that there was a
+        # warning or an error in the render job and therefore not coloring it
+        # green.
+        if item.background() == QColor(COLORS["yellow"]):
+          continue
+        if item.background() == QColor(COLORS["red"]):
+          continue
+      item.setBackground(color)
+      ui_utils.set_checkbox_background_color(
+          self.table, row_index, color)
 
   def reset_all_backgruond_colors(self) -> None:
     """Reset the background colors of all rows."""
     # FIXME: Move to separate file.
     for row_index in range(self.table.rowCount()):
-      self.color_row_background(row_index, QColor(Qt.white))
+      self.color_row_background(row_index, QColor(COLORS["grey_light"]))
 
   def render_job(self, job: state_pb2.render_job) -> None:
     """Render a job."""
@@ -407,7 +415,8 @@ class MainWindow():
       self.color_row_background(
           row_index - previous_job, QColor(COLORS["green"]))
     elif exit_code == 664:
-      self.color_row_background(row_index - previous_job, QColor(Qt.white))
+      self.color_row_background(
+          row_index - previous_job, QColor(COLORS["grey_light"]))
     else:
       self.color_row_background(
           row_index - previous_job, QColor(COLORS["red"]))
@@ -425,20 +434,20 @@ class MainWindow():
         self.job_row_index += 1
         self._continue_render(664)
       else:
-        print("D1", exit_code, self.job_row_index)
         print_utils.print_info(f"Starting render of {job.file}")
         self.job_row_index += 1
         self.current_job += 1
         self.render_job(job)
     else:
-      print("D2", exit_code, self.job_row_index)
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
       table_utils.make_editable(self.table)
+      self.window.render_button.setEnabled(True)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
     self.window.progressBar.setValue(0)
+    self.window.render_button.setEnabled(False)
     table_utils.make_read_only_selectable(self.table)
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
@@ -456,6 +465,7 @@ class MainWindow():
     self.reset_all_backgruond_colors()
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
+    self.window.render_button.setEnabled(True)
 
 
 if __name__ == "__main__":

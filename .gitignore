@@ -1,3 +1,4 @@
 *.pyc
 *__pycache__/
 rrp_files/*
+ERRORCACHE
