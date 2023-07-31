@@ -210,6 +210,8 @@ class MainWindow():
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
+    has_warning = False
+    has_error = False
     if '\u001b' in output:
       for line in output.splitlines():
         bc = print_utils.BASH_COLORS
@@ -225,10 +227,15 @@ class MainWindow():
           line = line.replace(warning, '')
           color_format.setBackground(QColor(COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
+          has_warning = True
+          # TODO: #15 Set the background color of the row to yellow if log contains warning.
+          self.color_row_background(
+              self.job_row_index, QColor(COLORS["yellow"]))
         if line.startswith(error):
           line = line.replace(error, '')
           color_format.setBackground(QColor(COLORS["red"]))
           color_format.setForeground(QColor(Qt.white))
+          has_error = True
 
         self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -246,6 +253,8 @@ class MainWindow():
     # TODO: Find a more elegant way to do this.
     if "Blender quit" in output:
       self._refresh_progress_bar()
+      self.window.textBrowser.insertPlainText("\n")
+      self.window.textBrowser.moveCursor(QTextCursor.End)
 
     # TODO #5 color a job containing a warning from the render settings setter
     # yellow and a job containing an error red.
@@ -322,7 +331,7 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def color_row_background(self, row_index, color):
+  def color_row_background(self, row_index: int, color: QColor) -> None:
     """Color the background of a row."""
     # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
     # but exr selected, high quality and animation but no animation denoising,
@@ -332,14 +341,13 @@ class MainWindow():
     for column_index in range(self.table.columnCount()):
       item = self.table.item(row_index, column_index)
       if item is not None:
-        # FIXME: check if set style sheet is better with selections.
         item.setBackground(color)
     ui_utils.set_checkbox_background_color(
         self.table, row_index, color)
     # Note: Combobox coloring didn't work properly.
     # set_combobox_background_color is still existing though.
 
-  def reset_all_backgruond_colors(self):
+  def reset_all_backgruond_colors(self) -> None:
     """Reset the background colors of all rows."""
     # FIXME: Move to separate file.
     for row_index in range(self.table.rowCount()):
@@ -380,25 +388,31 @@ class MainWindow():
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def set_background_colors(self, exit_code: int, row_index: int) -> None:
-    """Set the background colors of the rows."""
-    # FIXME: Move to separate file.
-    if row_index == 0:
-      self.color_row_background(
-          row_index, QColor(COLORS["blue_grey"]))
-    else:
-      if exit_code == 0:
-        self.color_row_background(
-            row_index - 1, QColor(COLORS["green"]))
-      elif exit_code == 664:
-        self.color_row_background(row_index - 1, QColor(Qt.white))
-      else:
-        self.color_row_background(
-            row_index - 1, QColor(COLORS["red"]))
-      self.color_row_background(
-          row_index, QColor(COLORS["blue_grey"]))
+  def set_background_colors(self, exit_code: int, row_index: int, previous_job: int = 1) -> None:
+    """Set the background colors of the rows.
 
-  def _refresh_progress_bar(self):
+    Args:
+      exit_code: The exit code of the previous job. 0 means success, 664 means
+        job was skipped, other values mean error.
+      row_index: The row index of the current job.
+      previous_job: The row index of the previous job. Needed because jobs can
+        inactive and therefore skipped.
+    Returns:
+      None
+    """
+    # FIXME: Move to separate file.
+    self.color_row_background(
+        row_index, QColor(COLORS["blue_grey_lighter"]))
+    if exit_code == 0:
+      self.color_row_background(
+          row_index - previous_job, QColor(COLORS["green"]))
+    elif exit_code == 664:
+      self.color_row_background(row_index - previous_job, QColor(Qt.white))
+    else:
+      self.color_row_background(
+          row_index - previous_job, QColor(COLORS["red"]))
+
+  def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job
     self.window.progressBar.setValue(progress_value)
 
@@ -408,20 +422,23 @@ class MainWindow():
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
-        self._continue_render(664)
         self.job_row_index += 1
+        self._continue_render(664)
       else:
+        print("D1", exit_code, self.job_row_index)
         print_utils.print_info(f"Starting render of {job.file}")
         self.job_row_index += 1
         self.current_job += 1
         self.render_job(job)
     else:
+      print("D2", exit_code, self.job_row_index)
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
       table_utils.make_editable(self.table)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
+    self.window.progressBar.setValue(0)
     table_utils.make_read_only_selectable(self.table)
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0

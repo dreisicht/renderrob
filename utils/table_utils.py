@@ -21,17 +21,13 @@ def make_editable(table_widget: QTableWidget) -> None:
       widget = table_widget.cellWidget(row, col)
       if widget and isinstance(widget, QComboBox):
         widget.setDisabled(False)
-      # FIXME: Restore previous value of dropdown menu.
 
     for col in ui_utils.CHECKBOX_COLUMNS:
       widget = table_widget.cellWidget(row, col)
       checkbox_item = widget.findChild(QCheckBox)
       checked = checkbox_item.isChecked()
       if widget and isinstance(widget, QWidget):
-        # checkbox_item.setCheckable(True)
         checkbox_item.setDisabled(False)
-
-        # checkbox_item.setChecked(checked)
 
 
 def make_read_only_selectable(table_widget):

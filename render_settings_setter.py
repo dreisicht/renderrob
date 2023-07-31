@@ -22,6 +22,9 @@ class RenderSettingsSetter:
     self.current_scene_data = None
     self.view_layer_data = None
     self.current_scene_render = None
+    if scene not in bpy.data.scenes:
+      print_utils.print_warning(
+          "I couldn't find the scene you specified. I'm rendering the last used scene.")
     self.set_scene(scene)
     self.set_view_layers(view_layers)
 
