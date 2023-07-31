@@ -8,24 +8,31 @@ TABLE = None
 # only the function. Therefore arguments to the function cannot be passed.
 
 
-def make_editable(table_widget):
-  print("make_editable")
-  table_widget.setEditTriggers(QTableWidget.AllEditTriggers)
-
+def make_editable(table_widget: QTableWidget) -> None:
+  """Undo the make QTableWidget only selectable."""
+  class EditableDelegate(QStyledItemDelegate):
+    def createEditor(self, parent, option, index):
+      # Allow editing by returning the default editor
+      return QStyledItemDelegate.createEditor(self, parent, option, index)
+  delegate = EditableDelegate()
+  table_widget.setItemDelegate(delegate)
   for row in range(table_widget.rowCount()):
     for col in ui_utils.COMBOBOX_COLUMNS:
-      combobox_item = table_widget.cellWidget(row, col)
-      if combobox_item and isinstance(combobox_item, QComboBox):
-        combobox_item.setEditable(True)
-        combobox_item.setDisabled(False)
+      widget = table_widget.cellWidget(row, col)
+      if widget and isinstance(widget, QComboBox):
+        widget.setDisabled(False)
 
     for col in ui_utils.CHECKBOX_COLUMNS:
-      checkbox_item = table_widget.cellWidget(row, col)
-      if checkbox_item and isinstance(checkbox_item, QWidget):
-        QWidget.findChild(checkbox_item, QCheckBox).setCheckable(True)
+      widget = table_widget.cellWidget(row, col)
+      checkbox_item = widget.findChild(QCheckBox)
+      checked = checkbox_item.isChecked()
+      if widget and isinstance(widget, QWidget):
+        checkbox_item.setDisabled(False)
 
 
 def make_read_only_selectable(table_widget):
+  """Make QTableWidget only selectable."""
+  # TODO: #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
       # Prevent editing by returning None when an editor is requested
@@ -40,9 +47,13 @@ def make_read_only_selectable(table_widget):
         combobox_item.setDisabled(True)
 
     for col in ui_utils.CHECKBOX_COLUMNS:
-      checkbox_item = table_widget.cellWidget(row, col)
-      if checkbox_item and isinstance(checkbox_item, QWidget):
-        QWidget.findChild(checkbox_item, QCheckBox).setCheckable(False)
+      widget = table_widget.cellWidget(row, col)
+      checkbox_item = widget.findChild(QCheckBox)
+      checked = checkbox_item.isChecked()
+      if widget and isinstance(widget, QWidget):
+        # checkbox_item.setCheckable(False)
+        checkbox_item.setDisabled(True)
+        checkbox_item.setChecked(checked)
 
 
 def move_row_down() -> None:
@@ -91,6 +102,7 @@ def add_row_below() -> None:
 
 def remove_active_row() -> None:
   """Remove the currently selected row."""
+  # TODO: #11 Add undo functionality.
   current_row = TABLE.currentRow()
   if current_row == -1:
     current_row = TABLE.rowCount() - 1

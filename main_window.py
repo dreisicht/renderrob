@@ -25,10 +25,11 @@ COLORS = {
     "yellow": 0xffd966,
     "green": 0x9fd3b6,
     "blue": 0x57a3b4,
-    "blue_grey": 0x4f7997,
     "blue_grey_lighter": 0x6397bd,
+    "blue_grey": 0x4f7997,
     "blue_grey_darker": 0x345064,
-    "neutral_grey": 0x999999,
+    "grey_light": 0xebebeb,
+    "grey_neutral": 0x999999,
     "black_light": 0x22282b,
     "black_dark": 0x242a2d
 }
@@ -210,6 +211,8 @@ class MainWindow():
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
+    has_warning = False
+    has_error = False
     if '\u001b' in output:
       for line in output.splitlines():
         bc = print_utils.BASH_COLORS
@@ -225,10 +228,14 @@ class MainWindow():
           line = line.replace(warning, '')
           color_format.setBackground(QColor(COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
+          has_warning = True
+          self.color_row_background(
+              self.job_row_index - 1, QColor(COLORS["yellow"]))
         if line.startswith(error):
           line = line.replace(error, '')
           color_format.setBackground(QColor(COLORS["red"]))
-          color_format.setForeground(QColor(Qt.white))
+          color_format.setForeground(QColor(COLORS["grey_light"]))
+          has_error = True
 
         self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -237,7 +244,7 @@ class MainWindow():
         if line.endswith(reset):
           line = line.replace(reset, '')
           color_format.setBackground(QColor(52, 80, 100))
-          color_format.setForeground(QColor(Qt.white))
+          color_format.setForeground(QColor(COLORS["grey_light"]))
     else:
       self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -246,6 +253,8 @@ class MainWindow():
     # TODO: Find a more elegant way to do this.
     if "Blender quit" in output:
       self._refresh_progress_bar()
+      self.window.textBrowser.insertPlainText("\n")
+      self.window.textBrowser.moveCursor(QTextCursor.End)
 
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
@@ -257,7 +266,6 @@ class MainWindow():
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blenderplayer."""
-    # TODO: Add support for the play of animations.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -287,12 +295,15 @@ class MainWindow():
         frame_step = STATESAVER.state.settings.preview.frame_step
       else:
         frame_step = 1
-        # TODO: The call might not take fps and frame step into account.
+
+      # The call does not take frame step and fps into account.
+      # Investigated and turns out problem on Blender's side.
       blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f {STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
       subprocess.call(blenderplayer_call)
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
+    # TODO: #8 Add keyboard shortcuts.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -318,23 +329,34 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def color_row_background(self, row_index, color):
+  def color_row_background(self, row_index: int, color: QColor) -> None:
     """Color the background of a row."""
-    # TODO: Move to separate file.
+    # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+    # but exr selected, high quality and animation but no animation denoising,
+    # single frame rendering but animation denoising,
+    # single frame rendering in high quality but no denoising.)
+    # FIXME: Move to separate file.
     for column_index in range(self.table.columnCount()):
       item = self.table.item(row_index, column_index)
-      if item is not None:
-        item.setBackground(color)
-    ui_utils.set_checkbox_background_color(
-        self.table, row_index, color)
-    # Note: Combobox coloring didn't work properly.
-    # set_combobox_background_color is still existing though.
+      if item is None:
+        continue
+      if color == QColor(COLORS["green"]):
+        # If the background is already yellow or read means that there was a
+        # warning or an error in the render job and therefore not coloring it
+        # green.
+        if item.background() == QColor(COLORS["yellow"]):
+          continue
+        if item.background() == QColor(COLORS["red"]):
+          continue
+      item.setBackground(color)
+      ui_utils.set_checkbox_background_color(
+          self.table, row_index, color)
 
-  def reset_all_backgruond_colors(self):
+  def reset_all_backgruond_colors(self) -> None:
     """Reset the background colors of all rows."""
-    # TODO: Move to separate file.
+    # FIXME: Move to separate file.
     for row_index in range(self.table.rowCount()):
-      self.color_row_background(row_index, QColor(Qt.white))
+      self.color_row_background(row_index, QColor(COLORS["grey_light"]))
 
   def render_job(self, job: state_pb2.render_job) -> None:
     """Render a job."""
@@ -371,37 +393,32 @@ class MainWindow():
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def set_background_colors(self, exit_code: int, row_index: int) -> None:
-    """Set the background colors of the rows."""
-    # TODO: Move to separate file.
-    if row_index == 0:
+  def set_background_colors(self, exit_code: int, row_index: int, previous_job: int = 1) -> None:
+    """Set the background colors of the rows.
+
+    Args:
+      exit_code: The exit code of the previous job. 0 means success, 664 means
+        job was skipped, other values mean error.
+      row_index: The row index of the current job.
+      previous_job: The row index of the previous job. Needed because jobs can
+        inactive and therefore skipped.
+    Returns:
+      None
+    """
+    # FIXME: Move to separate file.
+    self.color_row_background(
+        row_index, QColor(COLORS["blue_grey_lighter"]))
+    if exit_code == 0:
       self.color_row_background(
-          row_index, QColor(COLORS["blue_grey"]))
+          row_index - previous_job, QColor(COLORS["green"]))
+    elif exit_code == 664:
+      self.color_row_background(
+          row_index - previous_job, QColor(COLORS["grey_light"]))
     else:
-      if exit_code == 0:
-        self.color_row_background(
-            row_index - 1, QColor(COLORS["green"]))
-      elif exit_code == 664:
-        self.color_row_background(row_index - 1, QColor(Qt.white))
-      else:
-        self.color_row_background(
-            row_index - 1, QColor(COLORS["red"]))
       self.color_row_background(
-          row_index, QColor(COLORS["blue_grey"]))
+          row_index - previous_job, QColor(COLORS["red"]))
 
-  def disable_interactions(self) -> None:
-    # rows = self.tableName.rowCount()
-    # columns = self.tableName.columnCount()
-    # for row in range(rows):
-    #   for col in range(columns):
-    #     item = self.cell("text")
-    #     widget = self.table.cellWidget(row, col)
-    #     # execute the line below to every item you need locked
-    #     widget.setFlags(Qt.ItemIsEnabled)
-    #     self.ui.tableName.setItem(i, j, item)
-    self.table.setEnabled(False)
-
-  def _refresh_progress_bar(self):
+  def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job
     self.window.progressBar.setValue(progress_value)
 
@@ -411,8 +428,8 @@ class MainWindow():
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
-        self._continue_render(664)
         self.job_row_index += 1
+        self._continue_render(664)
       else:
         print_utils.print_info(f"Starting render of {job.file}")
         self.job_row_index += 1
@@ -421,12 +438,14 @@ class MainWindow():
     else:
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
+      table_utils.make_editable(self.table)
+      self.window.render_button.setEnabled(True)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
-    # self.disable_interactions()
-    # table_utils.make_read_only_selectable(self.table)
-    # table_utils.make_editable(self.table)
+    self.window.progressBar.setValue(0)
+    self.window.render_button.setEnabled(False)
+    table_utils.make_read_only_selectable(self.table)
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
@@ -439,9 +458,10 @@ class MainWindow():
     self.process.kill()
     del STATESAVER.state.render_jobs[:]
     self.window.progressBar.setValue(0)
-    # TODO: Also output the print statements to the textbrowser widget.
     self.reset_all_backgruond_colors()
+    table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
+    self.window.render_button.setEnabled(True)
 
 
 if __name__ == "__main__":

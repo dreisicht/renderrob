@@ -67,7 +67,7 @@ class StateSaver:
       render_job = state_pb2.render_job()
       render_job.active = get_text(
           table.cellWidget(i, 0), widget="checkbox")
-      # TODO: Do the file post-processing when the user enters a path.
+      # TODO: #9 Do the file post-processing when the user enters a path.
       render_job.file = get_text(table.item(i, 1)).replace(
           '"', "").replace("\\", "/")
       if "/" not in render_job.file:
