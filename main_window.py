@@ -235,7 +235,6 @@ class MainWindow():
           line = line.replace(error, '')
           color_format.setBackground(QColor(COLORS["red"]))
           color_format.setForeground(QColor(COLORS["grey_light"]))
-          has_error = True
 
         self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -423,7 +422,11 @@ class MainWindow():
     self.window.progressBar.setValue(progress_value)
 
   def _continue_render(self, exit_code: int) -> None:
+    # 62097 is the exit code for an interrupted process -> cancelled render.
+    if exit_code == 62097:
+      return
     print_utils.print_info("Continuing render.")
+    print("Exit code:", exit_code)
     self.set_background_colors(exit_code, self.job_row_index)
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
@@ -458,7 +461,6 @@ class MainWindow():
     self.process.kill()
     del STATESAVER.state.render_jobs[:]
     self.window.progressBar.setValue(0)
-    self.reset_all_backgruond_colors()
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
     self.window.render_button.setEnabled(True)
