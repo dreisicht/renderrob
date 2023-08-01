@@ -2,3 +2,6 @@
 *__pycache__/
 rrp_files/*
 ERRORCACHE
+/venv/*
+*.exe
+*.spec
