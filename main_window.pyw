@@ -5,8 +5,8 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog, QStyledItemDelegate
+from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor, QIcon
+from PySide6.QtWidgets import QApplication, QFileDialog
 
 import dialogs
 import settings_window
@@ -54,9 +54,11 @@ class MainWindow():
     app = QApplication(sys.argv)
     if os.path.exists(".rr_cache"):
       self.load_cache()
-
     main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
+    self.window.setWindowIcon(QIcon("icons/renderrob_icon.ico"))
+    app.setWindowIcon(QIcon("icons/renderrob_icon.ico"))
+    self.window.setWindowTitle("RenderRob")
     self.table = main_window.tableWidget
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
@@ -426,7 +428,6 @@ class MainWindow():
     if exit_code == 62097:
       return
     print_utils.print_info("Continuing render.")
-    print("Exit code:", exit_code)
     self.set_background_colors(exit_code, self.job_row_index)
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)

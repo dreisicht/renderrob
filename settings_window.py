@@ -3,6 +3,8 @@ import os
 
 from PySide6.QtCore import Qt
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtGui import QIcon
+
 
 import utils.ui_utils as ui_utils
 from state_saver import STATESAVER
@@ -15,6 +17,8 @@ class SettingsWindow():
     """Open the settings dialog."""
     self.discover_blender_path()
     self.window = ui_utils.load_ui_from_file("ui/settings.ui")
+    self.window.setWindowTitle("RenderRob Settings")
+    self.window.setWindowIcon(QIcon("icons/renderrob_icon.ico"))
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
 

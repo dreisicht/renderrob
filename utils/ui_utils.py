@@ -1,7 +1,6 @@
 """Util functions for helping build the render rob UI."""
 
 import sys
-from typing import Tuple
 from PySide6.QtCore import QFile, QIODevice, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
