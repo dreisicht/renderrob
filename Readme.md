@@ -92,5 +92,6 @@ magick.exe convert icon-16.png icon-20.png icon-24.png icon-32.png icon-40.png i
 Deploy
 
 ```
-pyside6-deploy .\main_window.pyw --name RenderRob
+.\venv\Scripts\activate
+pyside6-deploy -c .\pysidedeploy.spec
 ```
