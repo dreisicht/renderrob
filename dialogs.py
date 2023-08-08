@@ -9,7 +9,7 @@ class ErrorDialog(QDialog):
     super(ErrorDialog, self).__init__(parent)
     self.setWindowTitle("Error")
     # Replace with your icon file path
-    self.setWindowIcon(QIcon('path_to_your_icon.png'))
+    self.setWindowIcon(QIcon('icons/icon.ico'))
     self.setStyleSheet("background-color: #f2f2f2;")
 
     layout = QVBoxLayout(self)

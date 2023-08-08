@@ -4,3 +4,4 @@ rrp_files/*
 ERRORCACHE
 /venv/*
 *.exe
+deployment/*

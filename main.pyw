@@ -56,8 +56,8 @@ class MainWindow():
       self.load_cache()
     main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
-    self.window.setWindowIcon(QIcon("icons/renderrob_icon.ico"))
-    app.setWindowIcon(QIcon("icons/renderrob_icon.ico"))
+    self.window.setWindowIcon(QIcon("icons/icon.ico"))
+    app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
     self.table = main_window.tableWidget
     self.refresh_recent_files_menu()
@@ -207,6 +207,7 @@ class MainWindow():
     self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
+    # TODO: #20 Add open blender button
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
