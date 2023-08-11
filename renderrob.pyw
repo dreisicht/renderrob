@@ -214,8 +214,6 @@ class MainWindow():
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
-    has_warning = False
-    has_error = False
     if '\u001b' in output:
       for line in output.splitlines():
         bc = print_utils.BASH_COLORS
@@ -231,7 +229,6 @@ class MainWindow():
           line = line.replace(warning, '')
           color_format.setBackground(QColor(COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
-          has_warning = True
           self.color_row_background(
               self.job_row_index - 1, QColor(COLORS["yellow"]))
         if line.startswith(error):
@@ -331,29 +328,6 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def color_row_background(self, row_index: int, color: QColor) -> None:
-    """Color the background of a row."""
-    # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
-    # but exr selected, high quality and animation but no animation denoising,
-    # single frame rendering but animation denoising,
-    # single frame rendering in high quality but no denoising.)
-    # FIXME: Move to separate file.
-    for column_index in range(self.table.columnCount()):
-      item = self.table.item(row_index, column_index)
-      if item is None:
-        continue
-      if color == QColor(COLORS["green"]):
-        # If the background is already yellow or read means that there was a
-        # warning or an error in the render job and therefore not coloring it
-        # green.
-        if item.background() == QColor(COLORS["yellow"]):
-          continue
-        if item.background() == QColor(COLORS["red"]):
-          continue
-      item.setBackground(color)
-      ui_utils.set_checkbox_background_color(
-          self.table, row_index, color)
-
   def reset_all_backgruond_colors(self) -> None:
     """Reset the background colors of all rows."""
     # FIXME: Move to separate file.
@@ -394,31 +368,6 @@ class MainWindow():
     self.process.setArguments(args)
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
-
-  def set_background_colors(self, exit_code: int, row_index: int, previous_job: int = 1) -> None:
-    """Set the background colors of the rows.
-
-    Args:
-      exit_code: The exit code of the previous job. 0 means success, 664 means
-        job was skipped, other values mean error.
-      row_index: The row index of the current job.
-      previous_job: The row index of the previous job. Needed because jobs can
-        inactive and therefore skipped.
-    Returns:
-      None
-    """
-    # FIXME: Move to separate file.
-    self.color_row_background(
-        row_index, QColor(COLORS["blue_grey_lighter"]))
-    if exit_code == 0:
-      self.color_row_background(
-          row_index - previous_job, QColor(COLORS["green"]))
-    elif exit_code == 664:
-      self.color_row_background(
-          row_index - previous_job, QColor(COLORS["grey_light"]))
-    else:
-      self.color_row_background(
-          row_index - previous_job, QColor(COLORS["red"]))
 
   def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job

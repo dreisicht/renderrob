@@ -5,7 +5,7 @@ title = RenderRob
 # of input_file
 project_dir = .
 # source file path
-input_file = main.pyw
+input_file = renderrob.pyw
 # directory where exec is stored
 exec_directory = .
 # path to .pyproject project file

@@ -165,3 +165,53 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
     else:
       item.setTextAlignment(Qt.AlignCenter)
     table.setItem(row, i, item)
+
+
+def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> None:
+  """Color the background of a row."""
+  # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+  # but exr selected, high quality and animation but no animation denoising,
+  # single frame rendering but animation denoising,
+  # single frame rendering in high quality but no denoising.)
+  # FIXME: Move to separate file.
+  for column_index in range(table.columnCount()):
+    item = table.item(row_index, column_index)
+    if item is None:
+      continue
+    if color == QColor(COLORS["green"]):
+      # If the background is already yellow or read means that there was a
+      # warning or an error in the render job and therefore not coloring it
+      # green.
+      if item.background() == QColor(COLORS["yellow"]):
+        continue
+      if item.background() == QColor(COLORS["red"]):
+        continue
+    item.setBackground(color)
+    ui_utils.set_checkbox_background_color(
+        table, row_index, color)
+
+
+def set_background_colors(exit_code: int, row_index: int, previous_job: int = 1) -> None:
+  """Set the background colors of the rows.
+
+  Args:
+    exit_code: The exit code of the previous job. 0 means success, 664 means
+      job was skipped, other values mean error.
+    row_index: The row index of the current job.
+    previous_job: The row index of the previous job. Needed because jobs can
+      inactive and therefore skipped.
+  Returns:
+    None
+  """
+  # FIXME: Move to separate file.
+  color_row_background(
+      row_index, QColor(COLORS["blue_grey_lighter"]))
+  if exit_code == 0:
+    color_row_background(
+        row_index - previous_job, QColor(COLORS["green"]))
+  elif exit_code == 664:
+    color_row_background(
+        row_index - previous_job, QColor(COLORS["grey_light"]))
+  else:
+    color_row_background(
+        row_index - previous_job, QColor(COLORS["red"]))
