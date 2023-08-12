@@ -2,10 +2,25 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QStyledItemDelegate, QComboBox, QCheckBox, QWidget
 import utils.ui_utils as ui_utils
+from PySide6.QtGui import QColor
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is
 # only the function. Therefore arguments to the function cannot be passed.
+
+COLORS = {
+    "red": 0x980030,
+    "yellow": 0xffd966,
+    "green": 0x9fd3b6,
+    "blue": 0x57a3b4,
+    "blue_grey_lighter": 0x6397bd,
+    "blue_grey": 0x4f7997,
+    "blue_grey_darker": 0x345064,
+    "grey_light": 0xebebeb,
+    "grey_neutral": 0x999999,
+    "black_light": 0x22282b,
+    "black_dark": 0x242a2d
+}
 
 
 def make_editable(table_widget: QTableWidget) -> None:
@@ -191,7 +206,7 @@ def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> 
         table, row_index, color)
 
 
-def set_background_colors(exit_code: int, row_index: int, previous_job: int = 1) -> None:
+def set_background_colors(table: QTableWidget, exit_code: int, row_index: int, previous_job: int = 1) -> None:
   """Set the background colors of the rows.
 
   Args:
@@ -204,14 +219,26 @@ def set_background_colors(exit_code: int, row_index: int, previous_job: int = 1)
     None
   """
   # FIXME: Move to separate file.
-  color_row_background(
-      row_index, QColor(COLORS["blue_grey_lighter"]))
+  color_row_background(table,
+                       row_index,
+                       QColor(COLORS["blue_grey_lighter"]))
   if exit_code == 0:
-    color_row_background(
-        row_index - previous_job, QColor(COLORS["green"]))
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["green"]))
   elif exit_code == 664:
-    color_row_background(
-        row_index - previous_job, QColor(COLORS["grey_light"]))
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["grey_light"]))
   else:
-    color_row_background(
-        row_index - previous_job, QColor(COLORS["red"]))
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["red"]))
+
+
+def reset_all_backgruond_colors(table: QTableWidget) -> None:
+  """Reset the background colors of all rows."""
+  # FIXME: Move to separate file.
+  for row_index in range(table.rowCount()):
+    color_row_background(table,
+                         row_index, QColor(COLORS["grey_light"]))

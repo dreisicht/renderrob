@@ -20,20 +20,6 @@ from utils import print_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
-COLORS = {
-    "red": 0x980030,
-    "yellow": 0xffd966,
-    "green": 0x9fd3b6,
-    "blue": 0x57a3b4,
-    "blue_grey_lighter": 0x6397bd,
-    "blue_grey": 0x4f7997,
-    "blue_grey_darker": 0x345064,
-    "grey_light": 0xebebeb,
-    "grey_neutral": 0x999999,
-    "black_light": 0x22282b,
-    "black_dark": 0x242a2d
-}
-
 
 class MainWindow():
   """Main window for RenderRob."""
@@ -47,9 +33,8 @@ class MainWindow():
     self.job_row_index = 0
     self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()
-    self.main()
 
-  def main(self) -> None:
+  def setup(self) -> QApplication:
     """Provide main function."""
     app = QApplication(sys.argv)
     if os.path.exists(".rr_cache"):
@@ -65,11 +50,14 @@ class MainWindow():
     self.window.progressBar.setMinimum(0)
     self.window.progressBar.setMaximum(100)
     self.make_main_window_connections()
+    return app
+
+  def execute(self) -> None:
+    app = self.setup()
     self.new_file()
     self.window.show()
-
     self.save_cache()
-    sys.exit(app.exec())
+    app.exec()
 
   def save_cache(self) -> None:
     """Store the cache to a file."""
@@ -223,18 +211,19 @@ class MainWindow():
         reset = bc["RESET_ALL"]
         if line.startswith(info):
           line = line.replace(info, '')
-          color_format.setBackground(QColor(COLORS["blue_grey_lighter"]))
+          color_format.setBackground(
+              QColor(table_utils.COLORS["blue_grey_lighter"]))
           color_format.setForeground(QColor(Qt.black))
         if line.startswith(warning):
           line = line.replace(warning, '')
-          color_format.setBackground(QColor(COLORS["yellow"]))
+          color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
-          self.color_row_background(
-              self.job_row_index - 1, QColor(COLORS["yellow"]))
+          table_utils.color_row_background(self.table,
+                                           self.job_row_index - 1, QColor(table_utils.COLORS["yellow"]))
         if line.startswith(error):
           line = line.replace(error, '')
-          color_format.setBackground(QColor(COLORS["red"]))
-          color_format.setForeground(QColor(COLORS["grey_light"]))
+          color_format.setBackground(QColor(table_utils.COLORS["red"]))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
 
         self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -243,7 +232,7 @@ class MainWindow():
         if line.endswith(reset):
           line = line.replace(reset, '')
           color_format.setBackground(QColor(52, 80, 100))
-          color_format.setForeground(QColor(COLORS["grey_light"]))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
     else:
       self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
@@ -328,12 +317,6 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def reset_all_backgruond_colors(self) -> None:
-    """Reset the background colors of all rows."""
-    # FIXME: Move to separate file.
-    for row_index in range(self.table.rowCount()):
-      self.color_row_background(row_index, QColor(COLORS["grey_light"]))
-
   def render_job(self, job: state_pb2.render_job) -> None:
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
@@ -378,7 +361,7 @@ class MainWindow():
     if exit_code == 62097:
       return
     print_utils.print_info("Continuing render.")
-    self.set_background_colors(exit_code, self.job_row_index)
+    table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
@@ -403,7 +386,7 @@ class MainWindow():
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
-    self.reset_all_backgruond_colors()
+    table_utils.reset_all_backgruond_colors()
     self.number_active_jobs = self._get_active_jobs_number()
     self._continue_render(0)
 
@@ -418,4 +401,5 @@ class MainWindow():
 
 
 if __name__ == "__main__":
-  MainWindow()
+  main_window = MainWindow()
+  sys.exit(main_window.execute())
