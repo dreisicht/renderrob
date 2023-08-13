@@ -70,6 +70,8 @@ class StateSaver:
       render_job.file = get_text(table.item(i, 1)).replace('"', "").replace("\\", "/")
       if "/" not in render_job.file:
         render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
+      if not render_job.file:
+        dialogs.ErrorDialog("The file path cannot be empty.")
       if not os.path.exists(render_job.file):
         dialogs.ErrorDialog(f"The file path {render_job.file} does not exist.")
       render_job.camera = get_text(table.item(i, 2))

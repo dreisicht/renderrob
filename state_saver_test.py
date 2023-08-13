@@ -3,9 +3,9 @@ import unittest
 
 import renderrob  # type: ignore
 from PySide6.QtWidgets import QApplication
-from proto import state_pb2
 
 import state_saver
+from proto import state_pb2
 from utils import table_utils
 
 
