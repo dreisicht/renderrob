@@ -386,7 +386,7 @@ class MainWindow():
     STATESAVER.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
-    table_utils.reset_all_backgruond_colors()
+    table_utils.reset_all_backgruond_colors(self.table)
     self.number_active_jobs = self._get_active_jobs_number()
     self._continue_render(0)
 

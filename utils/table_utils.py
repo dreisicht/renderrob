@@ -50,6 +50,7 @@ def make_read_only_selectable(table_widget):
   # TODO: #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
+      del parent, option, index
       # Prevent editing by returning None when an editor is requested
       return None
   delegate = ReadOnlyDelegate()

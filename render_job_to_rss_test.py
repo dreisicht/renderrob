@@ -8,7 +8,7 @@ import render_job_to_rss
 class TestRenderJobToRss(unittest.TestCase):
   """Tests for the ShotNameBuilder class."""
 
-  def test_get_shotname(self) -> None:
+  def test_render_job_to_render_settings_setter(self) -> None:
     """Test that the shot name is built correctly."""
     render_job = state_pb2.render_job()
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"

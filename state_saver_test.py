@@ -3,6 +3,7 @@ import unittest
 
 import renderrob  # type: ignore
 from PySide6.QtWidgets import QApplication
+from proto import state_pb2
 
 import state_saver
 from utils import table_utils
@@ -38,7 +39,7 @@ class TestStateSaver(unittest.TestCase):
   def test_state_to_table(self):
     """Test the state_to_table method."""
     state_saver_instance = state_saver.StateSaver()
-    with open("test/input/basic_state.rrp", "rb") as f:
+    with open("test/basic_state.rrp", "rb") as f:
       state_saver_instance.state.ParseFromString(f.read())
 
     table = self.main_window.table
@@ -46,7 +47,7 @@ class TestStateSaver(unittest.TestCase):
     self.assertEqual(table.rowCount(), 1)
     self.assertEqual(table.columnCount(), 19)
     self.assertTrue(state_saver.get_text(table.cellWidget(0, 0), widget="checkbox"))
-    self.assertEqual(state_saver.get_text(table.item(0, 1)), "a")
+    self.assertEqual(state_saver.get_text(table.item(0, 1)), "test/cube.blend")
     self.assertEqual(state_saver.get_text(table.item(0, 2)), "b")
     self.assertEqual(state_saver.get_text(table.item(0, 3)), "1")
     self.assertEqual(state_saver.get_text(table.item(0, 4)), "2")
@@ -67,3 +68,10 @@ class TestStateSaver(unittest.TestCase):
 
   def test_table_to_state(self):
     """Test the table_to_state method."""
+    self.main_window.open_file("test/basic_state.rrp")
+    state_saver_instance = state_saver.StateSaver()
+    state_saver_instance.table_to_state(self.main_window.table)
+    reference_state = state_pb2.render_rob_state()
+    with open("test/basic_state.rrp", "rb") as f:
+      reference_state.ParseFromString(f.read())
+    self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)
