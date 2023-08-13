@@ -34,15 +34,15 @@ class MainWindow():
     self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()
 
-  def setup(self) -> QApplication:
+  def setup(self) -> None:
     """Provide main function."""
-    app = QApplication(sys.argv)
+    self.app = QApplication(sys.argv)
     if os.path.exists(".rr_cache"):
       self.load_cache()
     main_window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window = main_window
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
-    app.setWindowIcon(QIcon("icons/icon.ico"))
+    self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
     self.table = main_window.tableWidget
     self.refresh_recent_files_menu()
@@ -50,14 +50,13 @@ class MainWindow():
     self.window.progressBar.setMinimum(0)
     self.window.progressBar.setMaximum(100)
     self.make_main_window_connections()
-    return app
 
   def execute(self) -> None:
-    app = self.setup()
+    self.setup()
     self.new_file()
     self.window.show()
     self.save_cache()
-    app.exec()
+    self.app.exec()
 
   def save_cache(self) -> None:
     """Store the cache to a file."""
@@ -219,7 +218,8 @@ class MainWindow():
           color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
           table_utils.color_row_background(self.table,
-                                           self.job_row_index - 1, QColor(table_utils.COLORS["yellow"]))
+                                           self.job_row_index - 1,
+                                           QColor(table_utils.COLORS["yellow"]))
         if line.startswith(error):
           line = line.replace(error, '')
           color_format.setBackground(QColor(table_utils.COLORS["red"]))
@@ -253,7 +253,7 @@ class MainWindow():
     return counter
 
   def play_job(self) -> int:
-    """Open a job in image viewer or Blenderplayer."""
+    """Open a job in image viewer or Blender Player."""
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -274,7 +274,7 @@ class MainWindow():
         subprocess.call(('open', filepath))
       elif platform.system() == 'Windows':    # Windows
         os.startfile(filepath)
-      else:                                   # linux variants
+      else:                                   # Linux variants
         subprocess.call(('xdg-open', filepath))
     else:
       if not os.path.exists(filepath):
@@ -313,7 +313,7 @@ class MainWindow():
     elif platform.system() == 'Windows':    # Windows
       folder_path = os.path.dirname(filepath)
       os.startfile(folder_path)
-    else:                                   # linux variants
+    else:                                   # Linux variants
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 

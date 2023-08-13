@@ -1,30 +1,69 @@
 """Test the state_saver module."""
-import state_saver
-
 import unittest
+
 import renderrob  # type: ignore
+from PySide6.QtWidgets import QApplication
+
+import state_saver
 from utils import table_utils
-# TODO: Where do I get a QTableWidget from?
 
 
 class TestStateSaver(unittest.TestCase):
+  """Test the state_saver module."""
+
   def setUp(self) -> None:
     """Set up the unit tests."""
     self.main_window = renderrob.MainWindow()
-    self.app = self.main_window.setup()
+    self.main_window.setup()
     table_utils.add_row_below()
     return super().setUp()
 
+  def tearDown(self) -> None:
+    """Tear down the unit tests."""
+    app_instance = QApplication.instance()
+    app_instance.shutdown()
+    del app_instance
+    del self.main_window.app
+    del self.main_window
+    return super().tearDown()
+
   def test_get_text(self):
-    self.assertEqual(state_saver.get_text(
-        self.main_window.table.cellWidget(0, 2)), "")
+    """Test the get_text method."""
+    self.assertEqual(state_saver.get_text(self.main_window.table.cellWidget(0, 2)), "")
     self.assertTrue(state_saver.get_text(
         self.main_window.table.cellWidget(0, 0), widget="checkbox"))
     self.assertEqual(state_saver.get_text(
         self.main_window.table.cellWidget(0, 8), widget="dropdown"), "png")
 
   def test_state_to_table(self):
-    pass
+    """Test the state_to_table method."""
+    state_saver_instance = state_saver.StateSaver()
+    with open("test/input/basic_state.rrp", "rb") as f:
+      state_saver_instance.state.ParseFromString(f.read())
+
+    table = self.main_window.table
+    state_saver_instance.state_to_table(table)
+    self.assertEqual(table.rowCount(), 1)
+    self.assertEqual(table.columnCount(), 19)
+    self.assertTrue(state_saver.get_text(table.cellWidget(0, 0), widget="checkbox"))
+    self.assertEqual(state_saver.get_text(table.item(0, 1)), "a")
+    self.assertEqual(state_saver.get_text(table.item(0, 2)), "b")
+    self.assertEqual(state_saver.get_text(table.item(0, 3)), "1")
+    self.assertEqual(state_saver.get_text(table.item(0, 4)), "2")
+    self.assertEqual(state_saver.get_text(table.item(0, 5)), "3")
+    self.assertEqual(state_saver.get_text(table.item(0, 6)), "4")
+    self.assertEqual(state_saver.get_text(table.item(0, 7)), "5")
+    self.assertEqual(state_saver.get_text(table.cellWidget(0, 8), widget="dropdown"), "png")
+    self.assertEqual(state_saver.get_text(table.cellWidget(0, 9), widget="dropdown"), "cycles")
+    self.assertEqual(state_saver.get_text(table.cellWidget(0, 10), widget="dropdown"), "gpu")
+    self.assertTrue(state_saver.get_text(table.cellWidget(0, 11), widget="checkbox"))
+    self.assertFalse(state_saver.get_text(table.cellWidget(0, 12), widget="checkbox"))
+    self.assertTrue(state_saver.get_text(table.cellWidget(0, 13), widget="checkbox"))
+    self.assertFalse(state_saver.get_text(table.cellWidget(0, 14), widget="checkbox"))
+    self.assertTrue(state_saver.get_text(table.cellWidget(0, 15), widget="checkbox"))
+    self.assertEqual(state_saver.get_text(table.item(0, 16)), "c")
+    self.assertEqual(state_saver.get_text(table.item(0, 17)).split(";"), ["d"])
+    self.assertEqual(state_saver.get_text(table.item(0, 18)), "e")
 
   def test_table_to_state(self):
-    pass
+    """Test the table_to_state method."""
