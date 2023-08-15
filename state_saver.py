@@ -65,17 +65,15 @@ class StateSaver:
     del self.state.render_jobs[:]
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()
-      render_job.active = get_text(
-          table.cellWidget(i, 0), widget="checkbox")
+      render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
       # TODO: #9 Do the file post-processing when the user enters a path.
-      render_job.file = get_text(table.item(i, 1)).replace(
-          '"', "").replace("\\", "/")
+      render_job.file = get_text(table.item(i, 1)).replace('"', "").replace("\\", "/")
       if "/" not in render_job.file:
-        render_job.file = os.path.join(self.state.settings.blender_files_path,
-                                       render_job.file)
+        render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
+      if not render_job.file:
+        dialogs.ErrorDialog("The file path cannot be empty.")
       if not os.path.exists(render_job.file):
-        dialogs.ErrorDialog(
-            f"The file path {render_job.file} does not exist.")
+        dialogs.ErrorDialog(f"The file path {render_job.file} does not exist.")
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the
@@ -86,22 +84,14 @@ class StateSaver:
       render_job.y_res = get_text(table.item(i, 6))
       render_job.samples = get_text(table.item(i, 7))
 
-      render_job.file_format = get_text(
-          table.cellWidget(i, 8), widget="dropdown")
-      render_job.engine = get_text(
-          table.cellWidget(i, 9), widget="dropdown")
-      render_job.device = get_text(
-          table.cellWidget(i, 10), widget="dropdown")
-      render_job.motion_blur = get_text(
-          table.cellWidget(i, 11), widget="checkbox")
-      render_job.overwrite = get_text(
-          table.cellWidget(i, 12), widget="checkbox")
-      render_job.high_quality = get_text(
-          table.cellWidget(i, 13), widget="checkbox")
-      render_job.animation_denoise = get_text(
-          table.cellWidget(i, 14), widget="checkbox")
-      render_job.denoise = get_text(
-          table.cellWidget(i, 15), widget="checkbox")
+      render_job.file_format = get_text(table.cellWidget(i, 8), widget="dropdown")
+      render_job.engine = get_text(table.cellWidget(i, 9), widget="dropdown")
+      render_job.device = get_text(table.cellWidget(i, 10), widget="dropdown")
+      render_job.motion_blur = get_text(table.cellWidget(i, 11), widget="checkbox")
+      render_job.overwrite = get_text(table.cellWidget(i, 12), widget="checkbox")
+      render_job.high_quality = get_text(table.cellWidget(i, 13), widget="checkbox")
+      render_job.animation_denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
+      render_job.denoise = get_text(table.cellWidget(i, 15), widget="checkbox")
       render_job.scene = get_text(table.item(i, 16))
       del render_job.view_layers[:]
       new_view_layer_list = get_text(table.item(i, 17)).split(";")

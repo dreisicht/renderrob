@@ -14,27 +14,6 @@ BASH_COLORS = {
 CACHEFILEPATH = "ERRORCACHE"
 
 
-def hex_to_rgb(hex_col):
-  """Convert hex color to RGB color."""
-  return tuple(int(hex_col[i:i + 2], 16) for i in (0, 2, 4))
-
-
-def to_bool(bool_val):
-  """Convert a string or int to a bool."""
-  if isinstance(bool_val, str):
-    if bool_val.upper() == "FALSE":
-      return False
-    if bool_val.upper() == "TRUE":
-      return True
-    raise ValueError("Could not convert value to bool.")
-  if isinstance(bool_val, int):
-    if bool_val == 0:
-      return False
-    if bool_val == 1:
-      return True
-  raise ValueError("The value is not a string or int.")
-
-
 def print_error(ipt_str):
   """Print an error message to the console and exit the program."""
   ipt_str = str(ipt_str)
@@ -89,7 +68,5 @@ def write_cache(ipt_str):
   except PermissionError:
     # time.sleep(0.1)
     f = open(CACHEFILEPATH, "a", encoding="utf-8")
-  # finally:
-  #   time.sleep(0.1)
   f.write(ipt_str + "\n")
   f.close()

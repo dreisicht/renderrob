@@ -2,10 +2,25 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QStyledItemDelegate, QComboBox, QCheckBox, QWidget
 import utils.ui_utils as ui_utils
+from PySide6.QtGui import QColor
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is
 # only the function. Therefore arguments to the function cannot be passed.
+
+COLORS = {
+    "red": 0x980030,
+    "yellow": 0xffd966,
+    "green": 0x9fd3b6,
+    "blue": 0x57a3b4,
+    "blue_grey_lighter": 0x6397bd,
+    "blue_grey": 0x4f7997,
+    "blue_grey_darker": 0x345064,
+    "grey_light": 0xebebeb,
+    "grey_neutral": 0x999999,
+    "black_light": 0x22282b,
+    "black_dark": 0x242a2d
+}
 
 
 def make_editable(table_widget: QTableWidget) -> None:
@@ -35,6 +50,7 @@ def make_read_only_selectable(table_widget):
   # TODO: #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
+      del parent, option, index
       # Prevent editing by returning None when an editor is requested
       return None
   delegate = ReadOnlyDelegate()
@@ -165,3 +181,65 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
     else:
       item.setTextAlignment(Qt.AlignCenter)
     table.setItem(row, i, item)
+
+
+def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> None:
+  """Color the background of a row."""
+  # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+  # but exr selected, high quality and animation but no animation denoising,
+  # single frame rendering but animation denoising,
+  # single frame rendering in high quality but no denoising.)
+  # FIXME: Move to separate file.
+  for column_index in range(table.columnCount()):
+    item = table.item(row_index, column_index)
+    if item is None:
+      continue
+    if color == QColor(COLORS["green"]):
+      # If the background is already yellow or read means that there was a
+      # warning or an error in the render job and therefore not coloring it
+      # green.
+      if item.background() == QColor(COLORS["yellow"]):
+        continue
+      if item.background() == QColor(COLORS["red"]):
+        continue
+    item.setBackground(color)
+    ui_utils.set_checkbox_background_color(
+        table, row_index, color)
+
+
+def set_background_colors(table: QTableWidget, exit_code: int, row_index: int, previous_job: int = 1) -> None:
+  """Set the background colors of the rows.
+
+  Args:
+    exit_code: The exit code of the previous job. 0 means success, 664 means
+      job was skipped, other values mean error.
+    row_index: The row index of the current job.
+    previous_job: The row index of the previous job. Needed because jobs can
+      inactive and therefore skipped.
+  Returns:
+    None
+  """
+  # FIXME: Move to separate file.
+  color_row_background(table,
+                       row_index,
+                       QColor(COLORS["blue_grey_lighter"]))
+  if exit_code == 0:
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["green"]))
+  elif exit_code == 664:
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["grey_light"]))
+  else:
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["red"]))
+
+
+def reset_all_backgruond_colors(table: QTableWidget) -> None:
+  """Reset the background colors of all rows."""
+  # FIXME: Move to separate file.
+  for row_index in range(table.rowCount()):
+    color_row_background(table,
+                         row_index, QColor(COLORS["grey_light"]))

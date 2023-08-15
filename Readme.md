@@ -82,3 +82,16 @@ Convert protos:
 protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
 protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 ```
+
+Create .ico file
+
+```
+magick.exe convert icon-16.png icon-20.png icon-24.png icon-32.png icon-40.png icon-48.png icon-64.png icon-256.png icon.ico 
+```
+
+Deploy
+
+```
+.\venv\Scripts\activate
+pyside6-deploy -c .\pysidedeploy.spec
+```

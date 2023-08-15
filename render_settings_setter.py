@@ -112,12 +112,12 @@ class RenderSettingsSetter:
     """Set the render settings."""
     self.current_scene_render.use_border = border
 
-    if engine == "eevee":
+    if engine.lower() == "eevee":
       if samples:
         self.current_scene_data.eevee.taa_render_samples = int(samples)
       self.current_scene_render.engine = 'BLENDER_EEVEE'
       self.current_scene_data.eevee.use_motion_blur = motion_blur
-    elif engine == "cycles":
+    elif engine.lower() == "cycles":
       self.current_scene_render.engine = 'CYCLES'
       if samples:
         self.current_scene_data.cycles.samples = int(samples)

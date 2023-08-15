@@ -9,6 +9,7 @@ class SettingsWindowTest(unittest.TestCase):
   """Tests for the settings window."""
 
   def setUp(self) -> None:
+    """Set up the unit tests."""
     self.app = QApplication(sys.argv)
     return super().setUp()
 
