@@ -10,7 +10,7 @@ class TestRenderJobToRss(unittest.TestCase):
 
   def test_render_job_to_render_settings_setter(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()
+    render_job = state_pb2.render_job()  # pylint: disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera"
@@ -30,8 +30,14 @@ class TestRenderJobToRss(unittest.TestCase):
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
     render_job.comments = "This is a comment."
-    settings = state_pb2.settings()
+    settings = state_pb2.settings()  # pylint: disable=no-member
     rss = render_job_to_rss.render_job_to_render_settings_setter(
         render_job, settings)
     self.assertEqual(
-        rss, "import sys ; sys.path.append('c:/Users/peter/Documents/repositories/RenderRob') ; import render_settings_setter ; rss = render_settings_setter.RenderSettingsSetter('Scene', ['View Layer']) ; rss.activate_addons([]) ; rss.set_camera('Camera') ; rss.set_render_settings(render_device='gpu', border=False, samples=128, motion_blur=True, engine='cycles') ; rss.set_denoising_settings(an_denoise=True, denoise=True) ; rss.set_output_settings(frame_step=1, xres=1920, yres=1080, percres=100, high_quality=True, overwrite=True)")
+        rss, ("import sys ; sys.path.append('c:/Users/peter/Documents/repositories/RenderRob') ; "
+              "import render_settings_setter ; rss = render_settings_setter.RenderSettingsSetter("
+              "'Scene', ['View Layer']) ; rss.activate_addons([]) ; rss.set_camera('Camera') ; rss"
+              ".set_render_settings(render_device='gpu', border=False, samples=128, motion_blur="
+              "True, engine='cycles') ; rss.set_denoising_settings(an_denoise=True, denoise=True) ;"
+              " rss.set_output_settings(frame_step=1, xres=1920, yres=1080, percres=100, "
+              "high_quality=True, overwrite=True)"))

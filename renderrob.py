@@ -54,7 +54,8 @@ class MainWindow():
   def execute(self) -> None:
     """Execute the main window.
 
-    NOTE: For unit testing, this function should not be called."""
+    NOTE: For unit testing, this function should not be called.
+    """
     self.setup()
     self.new_file()
     self.window.show()
@@ -206,11 +207,11 @@ class MainWindow():
     color_format = QTextCharFormat()
     if '\u001b' in output:
       for line in output.splitlines():
-        bc = print_utils.BASH_COLORS
-        info = bc["BACK_CYAN"] + " " + bc["FORE_BLACK"]
-        warning = bc["BACK_YELLOW"] + " " + bc["FORE_BLACK"]
-        error = bc["BACK_RED"] + " " + bc["FORE_WHITE"]
-        reset = bc["RESET_ALL"]
+        back_color = print_utils.BASH_COLORS
+        info = back_color["BACK_CYAN"] + " " + back_color["FORE_BLACK"]
+        warning = back_color["BACK_YELLOW"] + " " + back_color["FORE_BLACK"]
+        error = back_color["BACK_RED"] + " " + back_color["FORE_WHITE"]
+        reset = back_color["RESET_ALL"]
         if line.startswith(info):
           line = line.replace(info, '')
           color_format.setBackground(
@@ -290,8 +291,8 @@ class MainWindow():
 
       # The call does not take frame step and fps into account.
       # Investigated and turns out problem on Blender's side.
-      blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f"
-      f"{STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
+      blenderplayer_call = (f"{STATESAVER.state.settings.blender_path} -a {filepath} -f"
+                            f"{STATESAVER.state.settings.fps} -j {frame_step} -p 0 0")
       subprocess.call(blenderplayer_call)
 
   def open_output_folder(self) -> None:

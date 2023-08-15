@@ -6,7 +6,9 @@ from proto import state_pb2
 from utils import ui_utils
 
 
-def render_job_to_render_settings_setter(render_job: state_pb2.render_job, settings: state_pb2.settings) -> str:
+def render_job_to_render_settings_setter(
+        render_job: state_pb2.render_job,  # pylint: disable=no-member
+        settings: state_pb2.settings) -> str:  # pylint: disable=no-member
   """Build a Python command to execute the render_settings_setter."""
   if render_job.high_quality:
     resolution = 100
@@ -31,11 +33,11 @@ def render_job_to_render_settings_setter(render_job: state_pb2.render_job, setti
   python_command = ['import sys',
                     f"sys.path.append(\'{cwd}\')",
                     "import render_settings_setter",
-                    f"rss = render_settings_setter.RenderSettingsSetter(\'{render_job.scene}\', {render_job.view_layers})",
+                    f"rss = render_settings_setter.RenderSettingsSetter(\'{render_job.scene}\', {render_job.view_layers})",  # pylint: disable=line-too-long
                     f"rss.activate_addons({addons})",
                     f"rss.set_camera(\'{render_job.camera}\')",
-                    f"rss.set_render_settings(render_device=\'{ui_utils.DEVICES[render_job.device]}\', border={not render_job.high_quality}, samples={samples}, motion_blur={render_job.motion_blur}, engine=\'{ui_utils.RENDER_ENGINES[render_job.engine]}\')",
-                    f"rss.set_denoising_settings(an_denoise={render_job.animation_denoise}, denoise={render_job.denoise})",
-                    f"rss.set_output_settings(frame_step={frame_step}, xres={x_res}, yres={y_res}, percres={resolution}, high_quality={render_job.high_quality}, overwrite={render_job.overwrite})",
+                    f"rss.set_render_settings(render_device=\'{ui_utils.DEVICES[render_job.device]}\', border={not render_job.high_quality}, samples={samples}, motion_blur={render_job.motion_blur}, engine=\'{ui_utils.RENDER_ENGINES[render_job.engine]}\')",  # pylint: disable=line-too-long
+                    f"rss.set_denoising_settings(an_denoise={render_job.animation_denoise}, denoise={render_job.denoise})",  # pylint: disable=line-too-long
+                    f"rss.set_output_settings(frame_step={frame_step}, xres={x_res}, yres={y_res}, percres={resolution}, high_quality={render_job.high_quality}, overwrite={render_job.overwrite})",  # pylint: disable=line-too-long
                     ]
   return " ; ".join(python_command)

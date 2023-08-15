@@ -2,16 +2,20 @@
 import os
 
 from PySide6.QtCore import Qt
-from PySide6.QtUiTools import QUiLoader
 from PySide6.QtGui import QIcon
+from PySide6.QtUiTools import QUiLoader
 
-
-import utils.ui_utils as ui_utils
 from state_saver import STATESAVER
+from utils import ui_utils
 
 
 class SettingsWindow():
-  """Settings dialog for RenderRob."""
+  """Settings dialog for RenderRob.
+
+  This class represents a settings dialog for RenderRob. It allows the user to modify various
+  settings such as the path to Blender, output path, Blender files path, and more. The class also
+  provides methods to save the state from the settings dialog into the global state.
+  """
 
   def __init__(self) -> None:
     """Open the settings dialog."""

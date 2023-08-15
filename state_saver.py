@@ -5,7 +5,6 @@ is being handled in the settings window class.
 """
 import os
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 import dialogs

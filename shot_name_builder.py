@@ -1,8 +1,9 @@
 """Class to build a shot name from the render job."""
 
-from proto import state_pb2
 import os
 import pathlib
+
+from proto import state_pb2
 from utils import ui_utils
 
 
@@ -16,7 +17,8 @@ def still_or_animation(start: str, end: str) -> str:
 class ShotNameBuilder:
   """Class to build a shot name from the render job."""
 
-  def __init__(self, render_job: state_pb2.render_job(), output_path: str, is_replay_mode: bool = False) -> None:
+  def __init__(self, render_job: state_pb2.render_job(),  # pylint: disable=no-member
+               output_path: str, is_replay_mode: bool = False) -> None:
     """Initialize the shot name builder.
 
     Args:

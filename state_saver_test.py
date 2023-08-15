@@ -1,9 +1,9 @@
 """Test the state_saver module."""
 import unittest
 
-import renderrob  # type: ignore
 from PySide6.QtWidgets import QApplication
 
+import renderrob
 import state_saver
 from proto import state_pb2
 from utils import table_utils
@@ -71,7 +71,7 @@ class TestStateSaver(unittest.TestCase):
     self.main_window.open_file("test/basic_state.rrp")
     state_saver_instance = state_saver.StateSaver()
     state_saver_instance.table_to_state(self.main_window.table)
-    reference_state = state_pb2.render_rob_state()
+    reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
     with open("test/basic_state.rrp", "rb") as f:
       reference_state.ParseFromString(f.read())
     self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)
