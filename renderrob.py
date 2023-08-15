@@ -88,7 +88,8 @@ class MainWindow():
     file_name, _ = QFileDialog.getSaveFileName(
         self.window, "Save File", "", "RenderRob Files (*.rrp)")
     with open(file_name, "wb") as protobuf:
-      protobuf.write(STATESAVER.state.SerializeToString(protobuf))
+      protobuf.write(
+          STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
@@ -97,7 +98,8 @@ class MainWindow():
     """Save the state to a serialized proto file without a dialog."""
     STATESAVER.table_to_state(self.table)
     with open(self.cache.current_file, "wb") as protobuf:
-      protobuf.write(STATESAVER.state.SerializeToString(protobuf))
+      protobuf.write(
+          STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
 
   def new_file(self) -> None:
     """Create a new file."""

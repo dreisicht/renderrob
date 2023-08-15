@@ -32,7 +32,7 @@ def make_editable(table_widget: QTableWidget) -> None:
     """Allow editing of QTableWidget."""
 
     def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
-      # Allow editing by returning the default editor
+      """Allow editing by returning the default editor"""
       return QStyledItemDelegate.createEditor(self, parent, option, index)
   delegate = EditableDelegate()
   table_widget.setItemDelegate(delegate)
