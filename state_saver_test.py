@@ -72,6 +72,6 @@ class TestStateSaver(unittest.TestCase):
     state_saver_instance = state_saver.StateSaver()
     state_saver_instance.table_to_state(self.main_window.table)
     reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
-    with open("test/basic_state.rrp", "rb") as f:
-      reference_state.ParseFromString(f.read())
+    with open("test/basic_state.rrp", "rb") as rrp_file:
+      reference_state.ParseFromString(rrp_file.read())
     self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)
