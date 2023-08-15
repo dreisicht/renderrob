@@ -20,6 +20,11 @@ jobs:
           pip install -r requirements.txt
           pip install PySide6
           sudo apt install protobuf-compiler
+          sudo apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
       - name: Build proto bindings
+        run: |
+          protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
+          protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+      - name: Run unittests
         run: |
           python -m unittest discover -s . -p '*_test.py'
