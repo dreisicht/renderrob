@@ -61,7 +61,7 @@ def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> No
 
 def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
   """Set color of comboboxes."""
-  for j, i in enumerate(COMBOBOX_COLUMNS):
+  for i in COMBOBOX_COLUMNS:
     widget = table.cellWidget(row, i)
     if widget:
       widget.setStyleSheet(
@@ -70,7 +70,7 @@ def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) 
 
 def set_checkbox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
   """Set color of checkboxes."""
-  for j, i in enumerate(CHECKBOX_COLUMNS):
+  for i in CHECKBOX_COLUMNS:
     widget = table.cellWidget(row, i)
     if widget:
       widget.setStyleSheet(f"background-color: {color.name()};")

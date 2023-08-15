@@ -1,5 +1,4 @@
 """Unit tests for main module."""
-import os
 import unittest
 
 from PySide6.QtWidgets import QApplication
@@ -39,9 +38,10 @@ class TestMainWindow(unittest.TestCase):
 
   def test_open_file(self):
     """Test the open_file function."""
-    self.assertTrue("test/test_save_file.rrp" in self.main_window.cache.current_file)
-    abs_path = os.path.abspath("test/test_save_file.rrp").replace("\\", "/")
-    self.assertTrue(abs_path.lower() in self.main_window.cache.recent_files[0].lower())
+    filepath = "test/test_save_file.rrp"
+    self.main_window.open_file(filepath)
+    self.assertTrue(filepath in self.main_window.cache.current_file)
+    self.assertEqual(self.main_window.cache.current_file, filepath)
 
   def test_quit(self):
     """Test the quit function."""

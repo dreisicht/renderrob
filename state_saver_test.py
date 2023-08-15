@@ -39,8 +39,8 @@ class TestStateSaver(unittest.TestCase):
   def test_state_to_table(self):
     """Test the state_to_table method."""
     state_saver_instance = state_saver.StateSaver()
-    with open("test/basic_state.rrp", "rb") as f:
-      state_saver_instance.state.ParseFromString(f.read())
+    with open("test/basic_state.rrp", "rb") as rrp_file:
+      state_saver_instance.state.ParseFromString(rrp_file.read())
 
     table = self.main_window.table
     state_saver_instance.state_to_table(table)
