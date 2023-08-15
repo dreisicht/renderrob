@@ -3,7 +3,7 @@
 import unittest
 from unittest.mock import patch
 
-import bpy
+import bpy  # pylint: disable=import-error
 
 import render_settings_setter
 
@@ -40,7 +40,6 @@ class TestRenderSettingsSetter(unittest.TestCase):
     bpy.data.scenes.new("Scene2")
     with patch("builtins.print"):
       self.rss.set_scene("Scene2")
-    self.rss.current_scene_data.name
     self.assertEqual(self.rss.current_scene_data.name, "Scene2")
 
   def test_set_scene_nonexistent_scene_name(self):
@@ -50,8 +49,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
 
     with patch("utils.print_utils.print_error") as mock_print_error:
       self.rss.set_scene("NonexistentScene")
-    mock_print_error.assert_called_with(
-        f"Scene NonexistentScene not found!")
+    mock_print_error.assert_called_with("Scene NonexistentScene not found!")
     self.assertEqual(new_scene.name, "SceneAF")
 
   def test_set_view_layer_single_view_layer(self):
@@ -87,7 +85,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
     with patch("utils.print_utils.print_error") as mock_print_error:
       self.rss.set_view_layers(["NonexistentViewLayer"])
     mock_print_error.assert_called_with(
-        f"View Layer NonexistentViewLayer not found. Please check the name in the sheet!")
+        "View Layer NonexistentViewLayer not found. Please check the name in the sheet!")
 
   # def test_activate_addons(self):
   #   addon_name = "mesh_f2"
@@ -131,10 +129,11 @@ class TestRenderSettingsSetter(unittest.TestCase):
     self.assertEqual(scene.render.engine, "CYCLES")
     self.assertEqual(scene.cycles.samples, 128)
     self.assertEqual(scene.cycles.device, "GPU")
+    cycles_devices = bpy.context.preferences.addons["cycles"].preferences.devices
     self.assertTrue(any(
-        device.use for device in bpy.context.preferences.addons["cycles"].preferences.devices if "OPTIX" in str(device.type)))
+        device.use for device in cycles_devices if "OPTIX" in str(device.type)))
     self.assertFalse(any(
-        device.use for device in bpy.context.preferences.addons["cycles"].preferences.devices if "CPU" in str(device.type)))
+        device.use for device in cycles_devices if "CPU" in str(device.type)))
     self.assertFalse(scene.render.use_motion_blur)
 
   def test_set_denoising_settings_multiple_view_layers(self):

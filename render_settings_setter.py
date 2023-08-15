@@ -1,12 +1,10 @@
 """This module contains the functions to set the render settings in Blender."""
 
-from multiprocessing import cpu_count
 from typing import List
 
-import bpy
+import bpy  # pylint: disable=import-error
 
-import utils.print_utils as print_utils
-import utils.rr_c_image as rr_c_image
+from utils import print_utils, rr_c_image
 
 
 class RenderSettingsSetter:
@@ -108,7 +106,8 @@ class RenderSettingsSetter:
     except KeyError:
       print_utils.print_error(f"I didn't find the camera called {camera_name}.")
 
-  def set_render_settings(self, render_device: str, border: bool, samples: str, motion_blur: bool, engine: str) -> None:
+  def set_render_settings(self, render_device: str, border: bool,
+                          samples: str, motion_blur: bool, engine: str) -> None:
     """Set the render settings."""
     self.current_scene_render.use_border = border
 
@@ -129,7 +128,7 @@ class RenderSettingsSetter:
         except ValueError:
           print_utils.print_info(
               "Cycles didn't like me asking about the devices.")
-        # TODO: #1 Add support for multiple GPU types.
+        # #1 Add support for multiple GPU types.
         cycles_pref.compute_device_type = 'OPTIX'
 
         self.current_scene_data.cycles.device = 'GPU'
@@ -168,7 +167,8 @@ class RenderSettingsSetter:
     self.current_scene_data.use_nodes = False
     self.current_scene_data.cycles.use_animated_seed = True
 
-  def set_output_settings(self, frame_step: int, xres: int, yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:
+  def set_output_settings(self, frame_step: int, xres: int,
+                          yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:
     """Set the output settings."""
     if xres:
       self.current_scene_render.resolution_x = int(xres)

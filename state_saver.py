@@ -5,7 +5,6 @@ is being handled in the settings window class.
 """
 import os
 
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 import dialogs
@@ -29,7 +28,7 @@ class StateSaver:
 
   def __init__(self):
     """Initialize the state saver."""
-    self.state = state_pb2.render_rob_state()
+    self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
 
   def state_to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
@@ -64,9 +63,9 @@ class StateSaver:
     """Create a render job from a table row."""
     del self.state.render_jobs[:]
     for i in range(table.rowCount()):
-      render_job = state_pb2.render_job()
+      render_job = state_pb2.render_job()  # pylint: disable=no-member
       render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
-      # TODO: #9 Do the file post-processing when the user enters a path.
+      #  #9 Do the file post-processing when the user enters a path.
       render_job.file = get_text(table.item(i, 1)).replace('"', "").replace("\\", "/")
       if "/" not in render_job.file:
         render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)

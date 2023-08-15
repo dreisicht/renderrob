@@ -14,7 +14,7 @@ class TestShotNameBuilder(unittest.TestCase):
 
   def test_get_shotname(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()
+    render_job = state_pb2.render_job()  # pylint:disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera"
@@ -40,7 +40,7 @@ class TestShotNameBuilder(unittest.TestCase):
 
   def test_get_shotname_non_standard_names(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()
+    render_job = state_pb2.render_job()  # pylint:disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera.001"
@@ -67,7 +67,7 @@ class TestShotNameBuilder(unittest.TestCase):
 
   def test_get_frame_path(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()
+    render_job = state_pb2.render_job()  # pylint:disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera"
@@ -94,7 +94,7 @@ class TestShotNameBuilder(unittest.TestCase):
 
   def test_get_frame_path_no_output(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()
+    render_job = state_pb2.render_job()  # pylint:disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera"

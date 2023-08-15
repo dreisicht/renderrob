@@ -1,8 +1,11 @@
 """Utility functions for table operations."""
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QTableWidget, QHeaderView, QTableWidgetItem, QStyledItemDelegate, QComboBox, QCheckBox, QWidget
-import utils.ui_utils as ui_utils
 from PySide6.QtGui import QColor
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView,
+                               QStyledItemDelegate, QTableWidget,
+                               QTableWidgetItem, QWidget)
+
+import utils.ui_utils as ui_utils
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is
@@ -26,8 +29,10 @@ COLORS = {
 def make_editable(table_widget: QTableWidget) -> None:
   """Undo the make QTableWidget only selectable."""
   class EditableDelegate(QStyledItemDelegate):
-    def createEditor(self, parent, option, index):
-      # Allow editing by returning the default editor
+    """Allow editing of QTableWidget."""
+
+    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
+      """Allow editing by returning the default editor"""
       return QStyledItemDelegate.createEditor(self, parent, option, index)
   delegate = EditableDelegate()
   table_widget.setItemDelegate(delegate)
@@ -40,19 +45,19 @@ def make_editable(table_widget: QTableWidget) -> None:
     for col in ui_utils.CHECKBOX_COLUMNS:
       widget = table_widget.cellWidget(row, col)
       checkbox_item = widget.findChild(QCheckBox)
-      checked = checkbox_item.isChecked()
       if widget and isinstance(widget, QWidget):
         checkbox_item.setDisabled(False)
 
 
 def make_read_only_selectable(table_widget):
   """Make QTableWidget only selectable."""
-  # TODO: #10 Set the render button to disabled.
+  #  #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
-    def createEditor(self, parent, option, index):
+    """Prevent editing of QTableWidget."""
+
+    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
+      """Prevent editing of QTableWidget by returning None."""
       del parent, option, index
-      # Prevent editing by returning None when an editor is requested
-      return None
   delegate = ReadOnlyDelegate()
   table_widget.setItemDelegate(delegate)
   for row in range(table_widget.rowCount()):
@@ -118,7 +123,7 @@ def add_row_below() -> None:
 
 def remove_active_row() -> None:
   """Remove the currently selected row."""
-  # TODO: #11 Add undo functionality.
+  #  #11 Add undo functionality.
   current_row = TABLE.currentRow()
   if current_row == -1:
     current_row = TABLE.rowCount() - 1
@@ -185,11 +190,10 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
 
 def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> None:
   """Color the background of a row."""
-  # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+  #  #3 Add coloring for upfront warnings (double jobs, animation denoising,
   # but exr selected, high quality and animation but no animation denoising,
   # single frame rendering but animation denoising,
   # single frame rendering in high quality but no denoising.)
-  # FIXME: Move to separate file.
   for column_index in range(table.columnCount()):
     item = table.item(row_index, column_index)
     if item is None:
@@ -207,7 +211,8 @@ def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> 
         table, row_index, color)
 
 
-def set_background_colors(table: QTableWidget, exit_code: int, row_index: int, previous_job: int = 1) -> None:
+def set_background_colors(table: QTableWidget, exit_code: int,
+                          row_index: int, previous_job: int = 1) -> None:
   """Set the background colors of the rows.
 
   Args:
@@ -219,7 +224,6 @@ def set_background_colors(table: QTableWidget, exit_code: int, row_index: int, p
   Returns:
     None
   """
-  # FIXME: Move to separate file.
   color_row_background(table,
                        row_index,
                        QColor(COLORS["blue_grey_lighter"]))
@@ -239,7 +243,6 @@ def set_background_colors(table: QTableWidget, exit_code: int, row_index: int, p
 
 def reset_all_backgruond_colors(table: QTableWidget) -> None:
   """Reset the background colors of all rows."""
-  # FIXME: Move to separate file.
   for row_index in range(table.rowCount()):
     color_row_background(table,
                          row_index, QColor(COLORS["grey_light"]))

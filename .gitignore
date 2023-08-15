@@ -5,3 +5,4 @@ ERRORCACHE
 /venv/*
 *.exe
 deployment/*
+*_pb2.py

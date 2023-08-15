@@ -1,7 +1,6 @@
 """Utility functions for printing to the console."""
 import os
 import sys
-import time
 
 BASH_COLORS = {
     "RESET_ALL": '\u001b[0m',
@@ -61,12 +60,13 @@ def print_info(ipt_str):
 def write_cache(ipt_str):
   """Write an error message to the error cache."""
   if not os.path.exists(CACHEFILEPATH):
-    with open(CACHEFILEPATH, "w", encoding="utf-8") as f:
-      f.write("")
+    with open(CACHEFILEPATH, "w", encoding="utf-8") as error_cache_file:
+      error_cache_file.write("")
   try:
-    f = open(CACHEFILEPATH, "a", encoding="utf-8")
+    with open(CACHEFILEPATH, "a", encoding="utf-8") as error_cache_file:
+      error_cache_file.write(ipt_str + "\n")
+      error_cache_file.close()
   except PermissionError:
-    # time.sleep(0.1)
-    f = open(CACHEFILEPATH, "a", encoding="utf-8")
-  f.write(ipt_str + "\n")
-  f.close()
+    with open(CACHEFILEPATH, "a", encoding="utf-8") as error_cache_file:
+      error_cache_file.write(ipt_str + "\n")
+      error_cache_file.close()
