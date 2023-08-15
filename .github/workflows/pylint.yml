@@ -20,4 +20,4 @@ jobs:
           pip install -r requirements.txt
       - name: Analysing the code with pylint
         run: |
-          pylint $(git ls-files '*.py') --generate-members --extension-pkg-whitelist=PySide6 --indent-string='  '
+          pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  '
