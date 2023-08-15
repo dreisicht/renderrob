@@ -10,7 +10,7 @@ class TestRenderJobToRss(unittest.TestCase):
 
   def test_render_job_to_render_settings_setter(self) -> None:
     """Test that the shot name is built correctly."""
-    render_job = state_pb2.render_job()  # pylint: disable=no-member
+    render_job = state_pb2.render_job()  #
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
     render_job.camera = "Camera"
@@ -30,7 +30,7 @@ class TestRenderJobToRss(unittest.TestCase):
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
     render_job.comments = "This is a comment."
-    settings = state_pb2.settings()  # pylint: disable=no-member
+    settings = state_pb2.settings()  #
     rss = render_job_to_rss.render_job_to_render_settings_setter(
         render_job, settings)
     self.assertEqual(

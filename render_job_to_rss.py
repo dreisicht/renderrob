@@ -7,8 +7,8 @@ from utils import ui_utils
 
 
 def render_job_to_render_settings_setter(
-        render_job: state_pb2.render_job,  # pylint: disable=no-member
-        settings: state_pb2.settings) -> str:  # pylint: disable=no-member
+        render_job: state_pb2.render_job,  #
+        settings: state_pb2.settings) -> str:  #
   """Build a Python command to execute the render_settings_setter."""
   if render_job.high_quality:
     resolution = 100

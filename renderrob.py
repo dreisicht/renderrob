@@ -30,7 +30,7 @@ class MainWindow():
     self.number_active_jobs = 0
     self.job_row_index = 0
     self.current_job = 0
-    self.cache = cache_pb2.RenderRobCache()  # pylint: disable=no-member
+    self.cache = cache_pb2.RenderRobCache()  #
     self.app = None
     self.recent_file_actions = None
     self.process = None
@@ -323,7 +323,7 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
+  def render_job(self, job: state_pb2.render_job) -> None:  #
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
         job, STATESAVER.state.settings.output_path)
