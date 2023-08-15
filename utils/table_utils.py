@@ -31,7 +31,7 @@ def make_editable(table_widget: QTableWidget) -> None:
   class EditableDelegate(QStyledItemDelegate):
     """Allow editing of QTableWidget."""
 
-    def createEditor(self, parent, option, index):
+    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
       # Allow editing by returning the default editor
       return QStyledItemDelegate.createEditor(self, parent, option, index)
   delegate = EditableDelegate()
@@ -55,7 +55,7 @@ def make_read_only_selectable(table_widget):
   class ReadOnlyDelegate(QStyledItemDelegate):
     """Prevent editing of QTableWidget."""
 
-    def createEditor(self, parent, option, index):
+    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
       """Prevent editing of QTableWidget by returning None."""
       del parent, option, index
   delegate = ReadOnlyDelegate()
