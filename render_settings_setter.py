@@ -129,7 +129,7 @@ class RenderSettingsSetter:
         except ValueError:
           print_utils.print_info(
               "Cycles didn't like me asking about the devices.")
-        # TODO: #1 Add support for multiple GPU types.
+        #  #1 Add support for multiple GPU types.
         cycles_pref.compute_device_type = 'OPTIX'
 
         self.current_scene_data.cycles.device = 'GPU'

@@ -47,7 +47,7 @@ def make_editable(table_widget: QTableWidget) -> None:
 
 def make_read_only_selectable(table_widget):
   """Make QTableWidget only selectable."""
-  # TODO: #10 Set the render button to disabled.
+  #  #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
       del parent, option, index
@@ -118,7 +118,7 @@ def add_row_below() -> None:
 
 def remove_active_row() -> None:
   """Remove the currently selected row."""
-  # TODO: #11 Add undo functionality.
+  #  #11 Add undo functionality.
   current_row = TABLE.currentRow()
   if current_row == -1:
     current_row = TABLE.rowCount() - 1
@@ -185,7 +185,7 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
 
 def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> None:
   """Color the background of a row."""
-  # TODO: #3 Add coloring for upfront warnings (double jobs, animation denoising,
+  #  #3 Add coloring for upfront warnings (double jobs, animation denoising,
   # but exr selected, high quality and animation but no animation denoising,
   # single frame rendering but animation denoising,
   # single frame rendering in high quality but no denoising.)

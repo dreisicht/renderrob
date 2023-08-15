@@ -5,18 +5,16 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QTextCharFormat, QTextCursor, QIcon
+from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import QApplication, QFileDialog
 
 import dialogs
 import settings_window
 import shot_name_builder
-import utils.table_utils as table_utils
-import utils.ui_utils as ui_utils
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from state_saver import STATESAVER
-from utils import print_utils
+from utils import print_utils, table_utils, ui_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -32,19 +30,21 @@ class MainWindow():
     self.number_active_jobs = 0
     self.job_row_index = 0
     self.current_job = 0
-    self.cache = cache_pb2.RenderRobCache()
+    self.cache = cache_pb2.RenderRobCache()  # pylint: disable=no-member
+    self.app = None
+    self.recent_file_actions = None
+    self.process = None
 
   def setup(self) -> None:
     """Provide main function."""
     self.app = QApplication(sys.argv)
     if os.path.exists(".rr_cache"):
       self.load_cache()
-    main_window = ui_utils.load_ui_from_file("ui/window.ui")
-    self.window = main_window
+    self.window = ui_utils.load_ui_from_file("ui/window.ui")
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
-    self.table = main_window.tableWidget
+    self.table = self.window.tableWidget
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -52,6 +52,9 @@ class MainWindow():
     self.make_main_window_connections()
 
   def execute(self) -> None:
+    """Execute the main window.
+
+    NOTE: For unit testing, this function should not be called."""
     self.setup()
     self.new_file()
     self.window.show()
@@ -194,7 +197,7 @@ class MainWindow():
     self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
-    # TODO: #20 Add open blender button
+    #  #20 Add open blender button
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
@@ -238,7 +241,7 @@ class MainWindow():
       self.window.textBrowser.setCurrentCharFormat(color_format)
       self.window.textBrowser.insertPlainText(output)
 
-    # TODO: Find a more elegant way to do this.
+    #  Find a more elegant way to do this.
     if "Blender quit" in output:
       self._refresh_progress_bar()
       self.window.textBrowser.insertPlainText("\n")
@@ -266,8 +269,9 @@ class MainWindow():
       filepath = snb.frame_path.replace(
           "####",
           STATESAVER.state.render_jobs[current_row].start.zfill(4))
-    if "STILL" == shot_name_builder.still_or_animation(STATESAVER.state.render_jobs[current_row].start,
-                                                       STATESAVER.state.render_jobs[current_row].end):
+    if "STILL" == shot_name_builder.still_or_animation(
+            STATESAVER.state.render_jobs[current_row].start,
+            STATESAVER.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
         dialogs.ErrorDialog("The output does not yet exist.")
       if platform.system() == 'Darwin':       # macOS
@@ -286,12 +290,13 @@ class MainWindow():
 
       # The call does not take frame step and fps into account.
       # Investigated and turns out problem on Blender's side.
-      blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f {STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
+      blenderplayer_call = f"{STATESAVER.state.settings.blender_path} -a {filepath} -f"
+      f"{STATESAVER.state.settings.fps} -j {frame_step} -p 0 0"
       subprocess.call(blenderplayer_call)
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
-    # TODO: #8 Add keyboard shortcuts.
+    # #8 Add keyboard shortcuts.
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -317,7 +322,7 @@ class MainWindow():
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
-  def render_job(self, job: state_pb2.render_job) -> None:
+  def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
         job, STATESAVER.state.settings.output_path)

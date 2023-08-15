@@ -8,7 +8,7 @@ class ErrorDialog(QDialog):
 
   def __init__(self, message, parent=None):
     """Initialize the error dialog."""
-    # TODO: #4 Build a custom error dialog with Qt Designer.
+    #  #4 Build a custom error dialog with Qt Designer.
     super(ErrorDialog, self).__init__(parent)
     self.setWindowTitle("Error")
     self.setWindowIcon(QIcon('icons/icon.ico'))
