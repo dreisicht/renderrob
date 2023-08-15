@@ -27,3 +27,6 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module"
+      - name: Run unittests
+        run: |
+          python -m unittest discover -s . -p '*_test.py'
