@@ -1,11 +1,21 @@
 """Tests for render_settings_setter.py."""
 
 import unittest
+import subprocess
 from unittest.mock import patch
 
-import bpy  # pylint: disable=import-error
+import bpy
 
 import render_settings_setter
+
+
+def check_gpu():
+  """Check if GPU rendering is available."""
+  try:
+    result = subprocess.run(["nvidia-smi", "-L"], stdout=subprocess.PIPE, check=False)
+  except FileNotFoundError:
+    return False
+  return bool(result.stdout)
 
 
 class TestRenderSettingsSetter(unittest.TestCase):
@@ -119,6 +129,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
     self.assertEqual(scene.cycles.device, "CPU")
     self.assertFalse(scene.eevee.use_motion_blur)
 
+  @unittest.skipIf(not check_gpu(), "GPU is not supported on this machine.")
   def test_set_render_settings_gpu_engine(self):
     """Test the set_render_settings function with the GPU engine."""
     scene = bpy.context.scene
