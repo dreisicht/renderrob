@@ -21,11 +21,16 @@ jobs:
         with:
           path: |
             ~/.cache/pip
-            /var/cache/apt/archives
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
           restore-keys: |
+            ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libgl1-mesa-dev
+          # version: 1.0
 
       - name: Install dependencies
         run: |
