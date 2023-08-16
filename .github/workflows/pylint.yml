@@ -20,8 +20,6 @@ jobs:
           key: ${{ runner.os }}-pip-
           restore-keys: |
             ${{ runner.os }}-pip-
-            ${{ runner.os }}-apt-
-            ${{ runner.os }}-
       - name: Install dependencies
         run: |
           sudo apt update
@@ -30,12 +28,9 @@ jobs:
           pip install -r requirements.txt
       - name: Build proto bindings
         run: |
-          # wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protobuf-24.0.tar.gz
-          # ./configure
-          # make
-          # make check
-          # sudo make install
-          # sudo ldconfig # refresh shared library cache.
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protoc-24.0-linux-x86_64.zip
+          tar -xvf protoc-24.0-linux-x86_64.zip
+          sudo cp bin/protoc /usr/local/bin/protoc
           protoc --version
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
