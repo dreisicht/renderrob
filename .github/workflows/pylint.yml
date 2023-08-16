@@ -3,7 +3,7 @@ name: Pylint
 on: [push]
 
 jobs:
-  build:
+  setup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -13,7 +13,7 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Cache dependencies
+      - name: Cache Python dependencies
         uses: actions/cache@v3
         env:
           cache-name: cache-pip
@@ -26,11 +26,10 @@ jobs:
             ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
             ${{ runner.os }}-pip-
             ${{ runner.os }}-
-
-      - uses: awalsh128/cache-apt-pkgs-action@latest
+      - name: Cache apt dependencies
+        uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: libgl1-mesa-dev
-          # version: 1.0
 
       - name: Install dependencies
         run: |
@@ -38,7 +37,7 @@ jobs:
           sudo apt install -y libgl1-mesa-dev
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          python -c 'import bpy'
+          python -c 'import bpy;print(bpy.app.version_string)'
 
       - name: Build proto bindings
         run: |
@@ -49,6 +48,10 @@ jobs:
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
+  test:
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
