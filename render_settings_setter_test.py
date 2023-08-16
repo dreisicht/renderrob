@@ -11,7 +11,10 @@ import render_settings_setter
 
 def check_gpu():
   """Check if GPU rendering is available."""
-  result = subprocess.run(["nvidia-smi", "-L"], stdout=subprocess.PIPE, check=False)
+  try:
+    result = subprocess.run(["nvidia-smi", "-L"], stdout=subprocess.PIPE, check=False)
+  except FileNotFoundError:
+    return False
   return bool(result.stdout)
 
 
