@@ -38,7 +38,7 @@ jobs:
           sudo apt install -y libgl1-mesa-dev
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          # python -c 'import bpy'
+          python -c 'import bpy'
 
       - name: Build proto bindings
         run: |
@@ -53,6 +53,6 @@ jobs:
         run: |
           pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
 
-      # - name: Run unittests
-      #   run: |
-      #     python -m unittest discover -s . -p '*_test.py'
+      - name: Run unittests
+        run: |
+          python -m unittest discover -s . -p '*_test.py'
