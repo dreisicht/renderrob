@@ -25,14 +25,17 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y protobuf-compiler libgl1
-          sudo apt install protobuf-compiler
-          sudo apt install libgl1
-          sudo apt install libgl1-mesa-glx
+          sudo apt install -y libgl1-mesa-dev
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Build proto bindings
         run: |
+          # wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protobuf-24.0.tar.gz
+          # ./configure
+          # make
+          # make check
+          # sudo make install
+          # sudo ldconfig # refresh shared library cache.
           protoc --version
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
