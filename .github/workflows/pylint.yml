@@ -35,7 +35,7 @@ jobs:
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
       - name: Analysing the code with pylint
         run: |
-          pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members
+          pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members=*
       - name: Run unittests
         run: |
           python -m unittest discover -s . -p '*_test.py'
