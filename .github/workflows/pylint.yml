@@ -7,10 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up Python 3.10
         uses: actions/setup-python@v3
         with:
           python-version: "3.10"
+
       - name: Install dependencies
         run: |
           sudo apt update
@@ -18,7 +20,12 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           # python -c 'import bpy'
-      - uses: actions/cache@v3
+
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pip
+        id: cache-pip
         with:
           path: |
             ~/.cache/pip
@@ -36,9 +43,11 @@ jobs:
           protoc --version
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
+
       - name: Run unittests
         run: |
           python -m unittest discover -s . -p '*_test.py'
