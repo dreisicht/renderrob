@@ -2,7 +2,7 @@
 
 from typing import List
 
-import bpy  # pylint: disable=import-error
+import bpy
 
 from utils import print_utils, rr_c_image
 
