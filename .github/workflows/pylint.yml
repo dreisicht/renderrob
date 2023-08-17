@@ -1,9 +1,9 @@
-name: Pylint
+name: RenderRobActions
 
 on: [push]
 
 jobs:
-  setup:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -48,10 +48,6 @@ jobs:
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
-  test:
-    runs-on: ubuntu-latest
-    needs: setup
-    steps:
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
