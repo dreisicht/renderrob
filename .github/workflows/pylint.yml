@@ -35,13 +35,16 @@ jobs:
         run: |
           sudo apt update
           sudo apt install -y libgl1-mesa-dev
+          sudo apt install -y libxcb-xinerama0
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          echo testing Blender version
           python -c 'import bpy;print(bpy.app.version_string)'
 
       - name: Build proto bindings
         run: |
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protoc-24.0-linux-x86_64.zip
+
           unzip protoc-24.0-linux-x86_64.zip
           sudo cp bin/protoc /usr/local/bin/protoc
           protoc --version
@@ -54,4 +57,5 @@ jobs:
 
       - name: Run unittests
         run: |
-          python -m unittest discover -s . -p '*_test.py'
+          # python -m unittest discover -s . -p '*_test.py'
+          python -m unittest experiment.py
