@@ -1,9 +1,11 @@
 """Experiment with the Blender API."""
 
-import bpy
-from proto import state_pb2
-from PySide6.QtWidgets import QApplication
 import unittest
+
+import bpy
+from PySide6.QtWidgets import QApplication
+
+from proto import state_pb2
 
 
 class TestBasic(unittest.TestCase):
