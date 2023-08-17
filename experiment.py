@@ -1,3 +1,5 @@
+"""Experiment with the Blender API."""
+
 import bpy
 
 print(bpy.context.scene.name)
