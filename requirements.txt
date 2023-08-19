@@ -5,4 +5,3 @@ bpy
 shiboken6
 PySide6-Essentials
 PySide6-Addons
-PySide6-Tools
