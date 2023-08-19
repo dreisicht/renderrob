@@ -36,8 +36,22 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y libgl1-mesa-dev libxcb-randr0-dev libxcb-xtest0-dev libxcb-shape0-dev libxcb-xkb-dev libxcb-cursor0
-          sudo apt install -y 
+          # Undocumented Pyside6 system dependencies
+          sudo apt install -y \
+                      libfontconfig1-dev libfreetype6-dev \
+                      libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev \
+                      libxi-dev libxrender-dev \
+                      libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
+                      libopengl0 '^libxcb.*-dev'
+                      libgl1 \
+                      libegl1 \
+                      libdbus-glib-1-2
+
+          # Nuitka dependencies
+          sudo apt install -y \
+                      ccache \
+                      clang \
+                      patchelf
           sudo apt install -y --reinstall libxcb-xinerama0
           python -m pip install --upgrade pip
           pip install -r requirements.txt
