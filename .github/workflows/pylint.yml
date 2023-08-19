@@ -35,6 +35,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          export QT_QPA_PLATFORM=offscreen
           sudo apt update
           # Undocumented Pyside6 system dependencies
           sudo apt install -y \
