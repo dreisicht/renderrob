@@ -36,8 +36,8 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y libgl1-mesa-dev
-          sudo apt install -y libxcb-randr0-dev libxcb-xtest0-dev libxcb-shape0-dev libxcb-xkb-dev
+          sudo apt install -y libgl1-mesa-dev libxcb-randr0-dev libxcb-xtest0-dev libxcb-shape0-dev libxcb-xkb-dev libxcb-cursor0
+          sudo apt install -y 
           sudo apt install -y --reinstall libxcb-xinerama0
           python -m pip install --upgrade pip
           pip install -r requirements.txt
