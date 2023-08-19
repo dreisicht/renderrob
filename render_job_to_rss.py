@@ -9,11 +9,9 @@ from utils import ui_utils
 def normalize_drive_letter(path):
   """Normalize the drive letter to upper case."""
   path = os.path.normpath(path).replace("\\", "/")
-  drive, rest = os.path.splitdrive(path)
-  if len(drive) > 2:
-    return path
-  normalized_drive = drive.upper()
-  return os.path.join(normalized_drive, rest)
+  if path[1] == ":":
+    return path[0].upper() + path[1:]
+  return path
 
 
 def render_job_to_render_settings_setter(
