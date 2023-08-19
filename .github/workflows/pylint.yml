@@ -47,7 +47,7 @@ jobs:
                       libxi-dev libxrender-dev \
                       libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
                       libopengl0 '^libxcb.*-dev'
-                      libdbus-glib-1-2
+                      # libdbus-glib-1-2
 
           # Nuitka dependencies
           sudo apt install -y \
