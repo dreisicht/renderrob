@@ -61,7 +61,9 @@ jobs:
           echo testing Blender version
           python -c 'import bpy;print(bpy.__file__)'
           python -m site
+          # Remove the cv2 qt plugins, they are not compatible with pyside6
 
+          rm -r /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/cv2/qt/plugins
       - name: Build proto bindings
         run: |
           wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protoc-24.0-linux-x86_64.zip
@@ -79,7 +81,7 @@ jobs:
       - name: Run unittests
         run: |
           test_files=$(find . -name '*_test.py')
-          # for file in $test_files; do
-          #     echo "Running tests in $file"
-          #     python -m unittest "$file"
-          # done
+          for file in $test_files; do
+              echo "Running tests in $file"
+              python -m unittest "$file"
+          done
