@@ -57,5 +57,8 @@ jobs:
 
       - name: Run unittests
         run: |
-          # python -m unittest discover -s . -p '*_test.py'
-          python -m unittest experiment.py
+          test_files=$(find . -name '*_test.py')
+          for file in $test_files; do
+              echo "Running tests in $file"
+              python -m unittest "$file"
+          done
