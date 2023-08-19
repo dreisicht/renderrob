@@ -38,15 +38,15 @@ jobs:
           sudo apt update
           # Undocumented Pyside6 system dependencies
           sudo apt install -y \
-                      libgl1 \
-                      libegl1-mesa-dev\
                       libgl1-mesa-dev\
+                      libegl1-mesa-dev\
+                      libgl1 \
+                      libegl1 \
                       libfontconfig1-dev libfreetype6-dev \
                       libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev \
                       libxi-dev libxrender-dev \
                       libxkbcommon-dev libxkbcommon-x11-dev libatspi2.0-dev \
                       libopengl0 '^libxcb.*-dev'
-                      libegl1 \
                       libdbus-glib-1-2
 
           # Nuitka dependencies
