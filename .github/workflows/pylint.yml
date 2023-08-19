@@ -39,7 +39,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           echo testing Blender version
-          python -c 'import bpy;print(bpy.app.version_string)'
+          python -c 'import bpy;print(bpy.__file__)'
+          python -m site
 
       - name: Build proto bindings
         run: |

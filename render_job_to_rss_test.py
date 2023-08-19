@@ -11,18 +11,22 @@ class TestRenderJobToRss(unittest.TestCase):
 
   def test_normalize_drive_letter(self):
     """Test that the drive letter is normalized correctly."""
-    self.assertEqual(render_job_to_rss.normalize_drive_letter("c:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py"),
-                     "C:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py")
     self.assertEqual(render_job_to_rss.normalize_drive_letter(
-        "d:/test/file.txt"), "D:/test/file.txt")
+        "c:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py"),
+        "C:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py")
     self.assertEqual(render_job_to_rss.normalize_drive_letter(
-        "e:\\test\\file.txt"), "E:/test/file.txt")
+        "d:/test/file.txt"),
+        "D:/test/file.txt")
     self.assertEqual(render_job_to_rss.normalize_drive_letter(
-        "\\\\server\\share\\file.txt"), "//server/share/file.txt")
+        "e:\\test\\file.txt"),
+        "E:/test/file.txt")
+    self.assertEqual(render_job_to_rss.normalize_drive_letter(
+        "\\\\server\\share\\file.txt"),
+        "//server/share/file.txt")
 
   def test_render_job_to_render_settings_setter(self) -> None:
     """Test that the shot name is built correctly."""
-    self.maxDiff = None
+    self.maxDiff = None  # pylint: disable=invalid-name
     render_job = state_pb2.render_job()  # pylint: disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
