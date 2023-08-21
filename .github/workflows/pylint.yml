@@ -44,7 +44,6 @@ jobs:
           export DISPLAY=:0
           export QT_QPA_PLATFORM=offscreen
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-          xhost +local:*
       # - name: build "display"
       #   run: |
       #     /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
@@ -94,5 +93,5 @@ jobs:
           test_files=$(find . -name '*_test.py')
           for file in $test_files; do
               echo "Running tests in $file"
-              python -m unittest "$file"
+              xvfb-run python -m unittest "$file"
           done
