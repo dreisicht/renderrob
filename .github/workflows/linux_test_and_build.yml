@@ -1,4 +1,4 @@
-name: RenderRobActions
+name: LinuxTestAndBuild
 
 on: [push]
 
@@ -43,7 +43,7 @@ jobs:
           sudo apt install xvfb
           export DISPLAY=:0
           export QT_QPA_PLATFORM=offscreen
-          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+          # Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
       # - name: build "display"
       #   run: |
       #     /sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX
