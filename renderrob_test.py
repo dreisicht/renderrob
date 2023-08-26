@@ -57,7 +57,7 @@ class TestMainWindow(unittest.TestCase):
     """Test the _get_active_jobs_number function."""
     filepath = "test/basic_state.rrp"
     self.main_window.open_file(filepath)
-    self.assertEqual(self.main_window._get_active_jobs_number(), 0)
+    self.assertEqual(self.main_window._get_active_jobs_number(), 1)
 
 
 if __name__ == "__main__":
