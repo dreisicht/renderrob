@@ -6,3 +6,4 @@ ERRORCACHE
 *.exe
 deployment/*
 *_pb2.py
+.rr_cache
