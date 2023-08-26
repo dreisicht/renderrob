@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QApplication
 import renderrob  # type: ignore
 from utils import table_utils
 
+# pylint: disable=protected-access
+
 
 class TestMainWindow(unittest.TestCase):
   """Unit tests for MainWindow."""
