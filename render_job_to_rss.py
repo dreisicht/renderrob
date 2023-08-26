@@ -6,6 +6,14 @@ from proto import state_pb2
 from utils import ui_utils
 
 
+def normalize_drive_letter(path):
+  """Normalize the drive letter to upper case."""
+  path = os.path.normpath(path).replace("\\", "/")
+  if path[1] == ":":
+    return path[0].upper() + path[1:]
+  return path
+
+
 def render_job_to_render_settings_setter(
         render_job: state_pb2.render_job,  # pylint: disable=no-member
         settings: state_pb2.settings) -> str:  # pylint: disable=no-member
@@ -19,7 +27,7 @@ def render_job_to_render_settings_setter(
     frame_step = settings.preview.frame_step if settings.preview.frame_step_use else 1
     samples = settings.preview.samples if settings.preview.samples_use else render_job.samples
 
-  cwd = os.getcwd().replace("\\", "/")
+  cwd = normalize_drive_letter(os.getcwd())
   addons = []
   for addon in settings.addons:
     if addon:

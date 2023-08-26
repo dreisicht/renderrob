@@ -1,15 +1,32 @@
 """Unit tests for shot_name_builder.py."""
-
+import os
 import unittest
-from proto import state_pb2
+
 import render_job_to_rss
+from proto import state_pb2
 
 
 class TestRenderJobToRss(unittest.TestCase):
   """Tests for the ShotNameBuilder class."""
 
+  def test_normalize_drive_letter(self):
+    """Test that the drive letter is normalized correctly."""
+    self.assertEqual(render_job_to_rss.normalize_drive_letter(
+        "c:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py"),
+        "C:/Users/peter/Documents/repositories/RenderRob/render_job_to_rss.py")
+    self.assertEqual(render_job_to_rss.normalize_drive_letter(
+        "d:/test/file.txt"),
+        "D:/test/file.txt")
+    self.assertEqual(render_job_to_rss.normalize_drive_letter(
+        "e:\\test\\file.txt"),
+        "E:/test/file.txt")
+    self.assertEqual(render_job_to_rss.normalize_drive_letter(
+        "\\\\server\\share\\file.txt"),
+        "//server/share/file.txt")
+
   def test_render_job_to_render_settings_setter(self) -> None:
     """Test that the shot name is built correctly."""
+    self.maxDiff = None  # pylint: disable=invalid-name
     render_job = state_pb2.render_job()  # pylint: disable=no-member
     render_job.file = "/home/rob/Projects/RenderRob/rr_test.blend"
     render_job.active = True
@@ -33,8 +50,9 @@ class TestRenderJobToRss(unittest.TestCase):
     settings = state_pb2.settings()  # pylint: disable=no-member
     rss = render_job_to_rss.render_job_to_render_settings_setter(
         render_job, settings)
+    cwd = render_job_to_rss.normalize_drive_letter(os.getcwd())
     self.assertEqual(
-        rss, ("import sys ; sys.path.append('c:/Users/peter/Documents/repositories/RenderRob') ; "
+        rss, (f"import sys ; sys.path.append('{cwd}') ; "
               "import render_settings_setter ; rss = render_settings_setter.RenderSettingsSetter("
               "'Scene', ['View Layer']) ; rss.activate_addons([]) ; rss.set_camera('Camera') ; rss"
               ".set_render_settings(render_device='gpu', border=False, samples=128, motion_blur="

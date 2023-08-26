@@ -6,6 +6,8 @@ from PySide6.QtWidgets import QApplication
 import renderrob  # type: ignore
 from utils import table_utils
 
+# pylint: disable=protected-access
+
 
 class TestMainWindow(unittest.TestCase):
   """Unit tests for MainWindow."""
@@ -50,6 +52,12 @@ class TestMainWindow(unittest.TestCase):
   def test_open_recent_file(self):
     """Test the open_recent_file function."""
     self.main_window.open_recent_file0()
+
+  def test_get_active_jobs_number(self):
+    """Test the _get_active_jobs_number function."""
+    filepath = "test/basic_state.rrp"
+    self.main_window.open_file(filepath)
+    self.assertEqual(self.main_window._get_active_jobs_number(), 1)
 
 
 if __name__ == "__main__":
