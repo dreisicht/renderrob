@@ -89,15 +89,17 @@ jobs:
         run: |
           python -m venv venv
 
-      - name: Build
+      - name: Build Windows
+        if: matrix.os == 'windows-latest'
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # .\venv\Scripts\activate
-            pyside6-deploy -c .\pysidedeploy.spec
-          else
-            # source venv/bin/activate
-            ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
-          fi
+          # .\venv\Scripts\activate
+          pyside6-deploy -c .\pysidedeploy.spec
+
+      - name: Build Mac OS
+        if: matrix.os == 'macos-latest'
+        run: |
+          # source venv/bin/activate
+          ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
