@@ -76,14 +76,14 @@ jobs:
           .\bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
           .\bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
-      - name: Build proto bindings Mac OS
-        if: ${{ matrix.os }} == 'macos-latest'
-        run: |
-          wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-          unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-          sudo cp bin/protoc /usr/local/bin/protoc
-          bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
-          bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+      # - name: Build proto bindings Mac OS
+      #   if: ${{ matrix.os }} == 'macos-latest'
+      #   run: |
+      #     wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+      #     unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+      #     sudo cp bin/protoc /usr/local/bin/protoc
+      #     bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
+      #     bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
       - name: Create Python virtual environment
         run: |

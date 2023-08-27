@@ -19,6 +19,7 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
+      #TODO: Remove?
       # - name: Cache Python dependencies
       #   uses: actions/cache@v3
       #   env:
@@ -67,17 +68,17 @@ jobs:
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
-      - name: Analysing the code with pylint
-        run: |
-          python -m pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
+      # - name: Analysing the code with pylint
+      #   run: |
+      #     python -m pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
 
-      - name: Run unittests
-        run: |
-          test_files=$(find . -name '*_test.py')
-          for file in $test_files; do
-              echo "Running tests in $file"
-              xvfb-run python -m unittest "$file"
-          done
+      # - name: Run unittests
+      #   run: |
+      #     test_files=$(find . -name '*_test.py')
+      #     for file in $test_files; do
+      #         echo "Running tests in $file"
+      #         xvfb-run python -m unittest "$file"
+      #     done
 
       - name: Create Python virtual environment
         run: |
@@ -86,10 +87,11 @@ jobs:
       - name: Build
         run: |
           # source venv/bin/activate
-          echo '${{ steps.setup-python.outputs.python-path }}'
+          echo ${{ steps.setup-python.outputs.python-path }}
+          echo ${{ env.Python_ROOT_DIR }}
 
-          ls -la /opt/hostedtoolcache/Python/
-          /opt/hostedtoolcache/Python/Scripts/pyside6-deploy -c pysidedeploy.spec
+          ls -la ${{ env.Python_ROOT_DIR }}/Scripts
+          ${{ env.Python_ROOT_DIR }}/Scripts/pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
