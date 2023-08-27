@@ -69,7 +69,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Build proto bindings Windows
-        if: ${{ matrix.os }} == 'windows-latest'
+        if: matrix.os == 'windows-latest'
         run: |
           curl -L ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }} -o protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
           tar -xf protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
