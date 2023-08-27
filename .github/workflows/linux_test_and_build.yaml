@@ -90,7 +90,7 @@ jobs:
           echo ${{ steps.setup-python.outputs.python-path }}
           echo ${{ env.Python_ROOT_DIR }}
 
-          ls -la ${{ env.Python_ROOT_DIR }}/Scripts
+          ls -la ${{ env.Python_ROOT_DIR }}
           ${{ env.Python_ROOT_DIR }}/Scripts/pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
