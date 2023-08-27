@@ -1,0 +1,100 @@
+name: WindowsMacBuild
+
+on: [push]
+
+env:
+  PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/v24.1/
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+        include:
+          - os: windows-latest
+            pip_path: ~\AppData\Local\pip\Cache
+            protoc_zip: protoc-24.1-win64.zip
+          - os: macos-latest
+            pip_path: ~/Library/Caches/pip
+            protoc_zip: protoc-24.1-osx-x86_64.zip
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+
+      - name: Cache Python dependencies
+        uses: actions/cache@v3
+        env:
+          cache-name: cache-pip
+        id: cache-pip
+        with:
+          path: |
+            ${{ matrix.pip_path }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+            ${{ runner.os }}-pip-
+
+      # - name: Install qt dependencies
+      #   env:
+      #     QT_QPA_PLATFORM: offscreen
+      #   uses: tlambert03/setup-qt-libs@v1
+
+      # - name: Install Nuitka dependencies
+      #   run: |
+      #     sudo apt install -y \
+      #                 ccache \
+      #                 clang \
+      #                 patchelf
+      #     python -m pip install --upgrade pip
+      #     pip install -r requirements.txt
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.pip_path }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Build proto bindings
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            
+            curl -L ${{ env.PROTOC_URL }}${{ matrix.protoc_zip }} -o ${{ matrix.protoc_zip }}
+            tar -xf ${{ matrix.protoc_zip }}
+            bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
+            bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
+          else
+            wget ${{ env.PROTOC_URL }}${{ matrix.protoc_zip }}
+            unzip ${{ matrix.protoc_zip }}
+            sudo cp bin/protoc /usr/local/bin/protoc
+            protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
+            protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+          fi
+
+      - name: Create Python virtual environment
+        run: |
+          python -m venv venv
+
+      - name: Build
+        run: |
+          .\venv\Scripts\activate
+          pyside6-deploy -c .\pysidedeploy.spec
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: renderrob
+          path: |
+            icons/
+            ui/
+            renderrob.exe
