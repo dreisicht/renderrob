@@ -67,21 +67,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Build proto bindings
+      - name: Build proto bindings Windows
+        if: ${{ matrix.os }} == 'windows-latest'
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            
-            curl -L ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }} -o protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-            tar -xf protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-            bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
-            bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
-          else
-            wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-            unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-            sudo cp bin/protoc /usr/local/bin/protoc
-            protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
-            protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
-          fi
+          curl -L ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }} -o protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          tar -xf protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
+          bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
+
+      - name: Build proto bindings Mac OS
+        if: ${{ matrix.os }} == 'windows-latest'
+        run: |
+          wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          sudo cp bin/protoc /usr/local/bin/protoc
+          protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
+          protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
       - name: Create Python virtual environment
         run: |
@@ -94,7 +95,7 @@ jobs:
             pyside6-deploy -c .\pysidedeploy.spec
           else
             source venv/bin/activate
-            pyside6-deploy -c pysidedeploy.spec
+            ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
           fi
 
       - uses: actions/upload-artifact@v3
