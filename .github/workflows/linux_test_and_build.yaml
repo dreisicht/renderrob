@@ -83,8 +83,8 @@ jobs:
 
       - name: Build
         run: |
-          ./venv/Scripts/activate
-          pyside6-deploy -c .\pysidedeploy.spec
+          source venv/bin/activate
+          pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
