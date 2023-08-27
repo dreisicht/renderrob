@@ -87,7 +87,7 @@ jobs:
       - name: Build
         run: |
           source venv/bin/activate
-          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/
+          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/lib/
           ls -l /opt/hostedtoolcache/Python/3.10.12/x64/lib/site-packages/
           ls -l /opt/hostedtoolcache/Python/3.10.12/x64/lib/site-packages/PySide6/
           ls -l /opt/hostedtoolcache/Python/3.10.12/x64/lib/site-packages/PySide6/scripts/
