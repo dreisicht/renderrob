@@ -76,14 +76,14 @@ jobs:
           .\bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
           .\bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
-      # - name: Build proto bindings Mac OS
-      #   if: ${{ matrix.os }} == 'macos-latest'
-      #   run: |
-      #     wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-      #     unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
-      #     sudo cp bin/protoc /usr/local/bin/protoc
-      #     bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
-      #     bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+      - name: Build proto bindings Mac OS
+        if: ${{ matrix.os }} == 'macos-latest'
+        run: |
+          wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+          sudo cp bin/protoc /usr/local/bin/protoc
+          bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
+          bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
       - name: Create Python virtual environment
         run: |
@@ -96,11 +96,11 @@ jobs:
           # ${{env.pythonLocation}}
           (echo yes) | pyside6-deploy -c .\pysidedeploy.spec
 
-      # - name: Build Mac OS
-      #   if: matrix.os == 'macos-latest'
-      #   run: |
-      #     # source venv/bin/activate
-      #     ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
+      - name: Build Mac OS
+        if: matrix.os == 'macos-latest'
+        run: |
+          source venv/bin/activate
+          python -m ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
@@ -109,3 +109,5 @@ jobs:
             icons/
             ui/
             renderrob.exe
+            renderrob.bin
+            renderrob
