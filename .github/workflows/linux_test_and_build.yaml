@@ -87,8 +87,9 @@ jobs:
         run: |
           # source venv/bin/activate
           echo '${{ steps.setup-python.outputs.python-path }}'
-          ls -la ~/.local/bin
-          ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
+
+          ls -la /opt/hostedtoolcache/Python/
+          /opt/hostedtoolcache/Python/Scripts/pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
