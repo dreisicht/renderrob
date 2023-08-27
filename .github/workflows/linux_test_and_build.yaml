@@ -55,7 +55,7 @@ jobs:
 
       - name: Build proto bindings
         run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.1/protoc-24.0-linux-x86_64.zip
+          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.1/protoc-24.1-linux-x86_64.zip
 
           unzip protoc-24.0-linux-x86_64.zip
           sudo cp bin/protoc /usr/local/bin/protoc

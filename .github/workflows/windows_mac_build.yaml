@@ -88,7 +88,11 @@ jobs:
 
       - name: Build
         run: |
-          .\venv\Scripts\activate
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            source venv/bin/activate
+          else
+            .\venv\Scripts\activate
+          fi
           pyside6-deploy -c .\pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
