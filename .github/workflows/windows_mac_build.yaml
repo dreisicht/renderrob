@@ -92,7 +92,7 @@ jobs:
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             .\venv\Scripts\activate
             pyside6-deploy -c .\pysidedeploy.spec
-            else
+          else
             source venv/bin/activate
             pyside6-deploy -c pysidedeploy.spec
           fi
