@@ -87,6 +87,10 @@ jobs:
       - name: Build
         run: |
           source venv/bin/activate
+          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/
+          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/site-packages/
+          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/site-packages/PySide6/
+          ls -l /opt/hostedtoolcache/Python/3.10.12/x64/site-packages/PySide6/scripts/
           python ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy.py -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
