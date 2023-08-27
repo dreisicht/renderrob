@@ -2,6 +2,10 @@ name: LinuxTestAndBuild
 
 on: [push]
 
+env:
+  PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/
+  PROTOC_VERSION: 24.1
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -55,9 +59,8 @@ jobs:
 
       - name: Build proto bindings
         run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.1/protoc-24.1-linux-x86_64.zip
-
-          unzip protoc-24.0-linux-x86_64.zip
+          wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
+          unzip protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
           sudo cp bin/protoc /usr/local/bin/protoc
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto

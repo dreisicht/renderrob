@@ -3,7 +3,8 @@ name: WindowsMacBuild
 on: [push]
 
 env:
-  PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/v24.1/
+  PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/
+  PROTOC_VERSION: 24.1
 
 jobs:
   build:
@@ -13,10 +14,10 @@ jobs:
         include:
           - os: windows-latest
             pip_path: ~\AppData\Local\pip\Cache
-            protoc_zip: protoc-24.1-win64.zip
+            protoc_zip_ending: -win64.zip
           - os: macos-latest
             pip_path: ~/Library/Caches/pip
-            protoc_zip: protoc-24.1-osx-x86_64.zip
+            protoc_zip_ending: -osx-x86_64.zip
 
     runs-on: ${{ matrix.os }}
     steps:
@@ -70,13 +71,13 @@ jobs:
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
             
-            curl -L ${{ env.PROTOC_URL }}${{ matrix.protoc_zip }} -o ${{ matrix.protoc_zip }}
-            tar -xf ${{ matrix.protoc_zip }}
+            curl -L ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }} -o protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+            tar -xf protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
             bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
             bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/cache.proto
           else
-            wget ${{ env.PROTOC_URL }}${{ matrix.protoc_zip }}
-            unzip ${{ matrix.protoc_zip }}
+            wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
+            unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
             sudo cp bin/protoc /usr/local/bin/protoc
             protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
             protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
@@ -89,9 +90,9 @@ jobs:
       - name: Build
         run: |
           if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            source venv/bin/activate
-          else
             .\venv\Scripts\activate
+          else
+            source venv/bin/activate
           fi
           pyside6-deploy -c .\pysidedeploy.spec
 
