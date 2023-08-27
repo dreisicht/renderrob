@@ -93,8 +93,8 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           .\venv\Scripts\activate
-          # ${{env.python}}
-          pyside6-deploy -c .\pysidedeploy.spec
+          # ${{env.pythonLocation}}
+          (echo yes) | pyside6-deploy -c .\pysidedeploy.spec
 
       # - name: Build Mac OS
       #   if: matrix.os == 'macos-latest'

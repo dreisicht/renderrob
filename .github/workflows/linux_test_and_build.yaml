@@ -87,8 +87,7 @@ jobs:
       - name: Build
         run: |
           # source venv/bin/activate
-
-          python /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c pysidedeploy.spec
+          python -m /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
