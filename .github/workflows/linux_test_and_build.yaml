@@ -87,11 +87,7 @@ jobs:
       - name: Build
         run: |
           # source venv/bin/activate
-          ${{ steps.setup-python.outputs.python-path }} -c "from PySide6.scripts.pyside_tool import deploy"
-          ${{ steps.setup-python.outputs.python-path }} -c "from PySide6.scripts import pyside_tool; print(pyside_tool.__file__)"
-
-          ls -la ${{ env.Python_ROOT_DIR }}
-          ${{ env.Python_ROOT_DIR }}/Scripts/pyside6-deploy -c pysidedeploy.spec
+          ls /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10/site-packages/PySide6/scripts
 
       - uses: actions/upload-artifact@v3
         with:

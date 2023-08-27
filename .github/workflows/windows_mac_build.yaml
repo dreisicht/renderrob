@@ -95,11 +95,11 @@ jobs:
           # .\venv\Scripts\activate
           pyside6-deploy -c .\pysidedeploy.spec
 
-      - name: Build Mac OS
-        if: matrix.os == 'macos-latest'
-        run: |
-          # source venv/bin/activate
-          ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
+      # - name: Build Mac OS
+      #   if: matrix.os == 'macos-latest'
+      #   run: |
+      #     # source venv/bin/activate
+      #     ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
         with:
