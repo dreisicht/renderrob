@@ -70,6 +70,7 @@ jobs:
       - name: Build proto bindings Windows
         if: ${{ matrix.os }} == 'windows-latest'
         run: |
+          echo ${{ matrix.os }}
           curl -L ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }} -o protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
           tar -xf protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
           bin\protoc.exe --proto_path=proto/ --python_out=proto/ proto/state.proto
@@ -78,6 +79,7 @@ jobs:
       - name: Build proto bindings Mac OS
         if: ${{ matrix.os }} == 'windows-latest'
         run: |
+          echo ${{ matrix.os }}
           wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
           unzip protoc-${{ env.PROTOC_VERSION }}${{ matrix.protoc_zip_ending }}
           sudo cp bin/protoc /usr/local/bin/protoc
