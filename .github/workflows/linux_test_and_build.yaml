@@ -83,7 +83,7 @@ jobs:
 
       - name: Build
         run: |
-          source venv/bin/activate
+          # source venv/bin/activate
           ls -la ~/.local/bin
           ~/.local/bin/pyside6-deploy -c pysidedeploy.spec
 
