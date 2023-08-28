@@ -80,13 +80,13 @@ jobs:
       #         xvfb-run python -m unittest "$file"
       #     done
 
-      - name: Create Python virtual environment
-        run: |
-          python -m venv venv
+      # - name: Create Python virtual environment
+      #   run: |
+      #     python -m venv venv
 
       - name: Build
         run: |
-          source venv/bin/activate
+          # source venv/bin/activate
           yes | python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c pysidedeploy.spec
 
       - uses: actions/upload-artifact@v3
