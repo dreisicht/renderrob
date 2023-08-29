@@ -100,7 +100,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           source venv/bin/activate
-          python -m ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy -c build/pysidedeploy_mac.spec
+          # python -m ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy -c build/pysidedeploy_mac.spec
 
       - uses: actions/upload-artifact@v3
         with:
