@@ -94,20 +94,27 @@ jobs:
         run: |
           .\venv\Scripts\activate
           # ${{env.pythonLocation}}
-          (echo yes) | pyside6-deploy -c .\pysidedeploy.spec
+          (echo yes) | pyside6-deploy -c .\build\pysidedeploy_win.spec
 
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
-          source venv/bin/activate
-          python -m ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy -c pysidedeploy.spec
+          # source venv/bin/activate
+          python -m ${{env.pythonLocation}}/site-packages/PySide6/scripts/deploy -c build/pysidedeploy_mac.spec
 
       - uses: actions/upload-artifact@v3
         with:
-          name: renderrob
+          name: renderrob_win
           path: |
             icons/
             ui/
             renderrob.exe
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: renderrob_mac
+          path: |
+            icons/
+            ui/
             renderrob.bin
             renderrob

@@ -1,6 +1,6 @@
 *.pyc
 *__pycache__/
-rrp_files/*
+*/rrp_files/*
 ERRORCACHE
 /venv/*
 *.exe

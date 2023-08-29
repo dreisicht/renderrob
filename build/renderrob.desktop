@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=RenderRob
+Exec=renderrob.bin
+Icon=icons/icon.png
+Terminal=false
+Type=Application
+Categories=Graphics;3DGraphics;
