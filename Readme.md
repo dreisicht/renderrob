@@ -1,5 +1,8 @@
 # Render Rob
 
+[![LinuxTestAndBuild](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml)
+[![WindowsMacBuild](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml)
+
 ![ ](img/renderrob_deck_01.jpg)
 
 **Render Rob is a Google Spreadsheet based Render manager for Blender. It gives you the possibility to easily manage your render jobs and change the settings from the sheet itself for better overview. No need for command line fiddling anymore!**
