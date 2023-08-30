@@ -90,11 +90,6 @@ jobs:
         run: |
           python -m venv venv
 
-      - name: Install imageio
-        if: ${{ matrix.os == 'macos-latest' }}
-        run: |
-          pip install imageio
-
       - name: Build Windows
         if: matrix.os == 'windows-latest'
         run: |
@@ -106,6 +101,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           source venv/bin/activate
+          pip install imageio
           yes | python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec
 
       - uses: actions/upload-artifact@v3
