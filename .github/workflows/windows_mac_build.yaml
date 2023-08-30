@@ -5,6 +5,7 @@ on: [push]
 env:
   PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/
   PROTOC_VERSION: 24.1
+  pythonLocation: .
 
 jobs:
   build:
@@ -88,6 +89,11 @@ jobs:
       - name: Create Python virtual environment
         run: |
           python -m venv venv
+
+      - name: Install imageio
+        if: ${{ matrix.os == 'macos-latest' }}
+        run: |
+          pip install imageio
 
       - name: Build Windows
         if: matrix.os == 'windows-latest'

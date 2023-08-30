@@ -5,6 +5,7 @@ on: [push]
 env:
   PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/
   PROTOC_VERSION: 24.1
+  pythonLocation: .
 
 jobs:
   test:
