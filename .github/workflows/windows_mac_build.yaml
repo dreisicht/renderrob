@@ -101,7 +101,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           # source venv/bin/activate
-          # pip install imageio
+          pip install imageio
           # pip install -r requirements.txt
           yes | python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec
 
