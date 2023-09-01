@@ -103,7 +103,7 @@ jobs:
           # source venv/bin/activate
           pip install imageio
           # pip install -r requirements.txt
-          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec
+          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --yes
 
       - uses: actions/upload-artifact@v3
         with:
