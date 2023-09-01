@@ -100,6 +100,7 @@ jobs:
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
+          brew install ccache
           # source venv/bin/activate
           pip install imageio
           # pip install -r requirements.txt
