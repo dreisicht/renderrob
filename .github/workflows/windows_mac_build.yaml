@@ -11,8 +11,7 @@ jobs:
   build:
     strategy:
       matrix:
-        # os: [windows-latest, macos-latest]
-        os: [macos-latest]
+        os: [windows-latest, macos-latest]
         include:
           - os: windows-latest
             pip_path: ~\AppData\Local\pip\Cache
@@ -102,13 +101,14 @@ jobs:
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
+          # pip install -r requirements.txt
           # source venv/bin/activate
           pip install imageio
-          # pip install -r requirements.txt
-          # python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
-          yes | /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
+          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
+          # yes | /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
 
       - uses: actions/upload-artifact@v3
+        if: matrix.os == 'windows-latest'
         with:
           name: renderrob_win
           path: |
@@ -117,6 +117,7 @@ jobs:
             renderrob.exe
 
       - uses: actions/upload-artifact@v3
+        if: matrix.os == 'macos-latest'
         with:
           name: renderrob_mac
           path: |
