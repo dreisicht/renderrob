@@ -35,7 +35,7 @@ wheel_shiboken =
 [nuitka]
 # (str) specify any extra nuitka arguments
 # eg = extra_args = --show-modules --follow-stdlib
-extra_args = --quiet --noinclude-qt-translations=True --windows-icon-from-ico=icons/icon.ico --windows-disable-console  
+extra_args = --quiet --noinclude-qt-translations=True --windows-icon-from-ico=icons/icon.ico --windows-disable-console --disable-console
 
 [buildozer]
 # build mode
