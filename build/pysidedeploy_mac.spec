@@ -35,7 +35,7 @@ wheel_shiboken =
 [nuitka]
 # (str) specify any extra nuitka arguments
 # eg = extra_args = --show-modules --follow-stdlib
-extra_args = --macos-create-app-bundle --macos-app-icon=icons/icon.png
+extra_args = --disable-console --macos-create-app-bundle --macos-app-icon=icons/icon.png
 
 [buildozer]
 # build mode
