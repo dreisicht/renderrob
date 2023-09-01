@@ -104,7 +104,7 @@ jobs:
           pip install imageio
           # pip install -r requirements.txt
           # python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
-          yes | /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
+          /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
 
       - uses: actions/upload-artifact@v3
         with:
