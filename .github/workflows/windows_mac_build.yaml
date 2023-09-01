@@ -11,7 +11,8 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        # os: [windows-latest, macos-latest]
+        os: [macos-latest]
         include:
           - os: windows-latest
             pip_path: ~\AppData\Local\pip\Cache
@@ -85,6 +86,7 @@ jobs:
           sudo cp bin/protoc /usr/local/bin/protoc
           bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+          brew install ccache
 
       - name: Create Python virtual environment
         run: |
@@ -100,12 +102,11 @@ jobs:
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
-          brew install ccache
           # source venv/bin/activate
           pip install imageio
           # pip install -r requirements.txt
           # python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
-          /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
+          yes | /Users/runner/hostedtoolcache/Python/3.10.12/x64/bin/python -m nuitka /Users/runner/work/renderrob/renderrob/renderrob.py --follow-imports --onefile --enable-plugin=pyside6 --output-dir=/Users/runner/work/renderrob/renderrob/deployment --quiet --noinclude-qt-translations --macos-create-app-bundle --macos-app-icon=icons/icon.png
 
       - uses: actions/upload-artifact@v3
         with:
