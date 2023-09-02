@@ -105,7 +105,8 @@ jobs:
           # source venv/bin/activate
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
-          cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
+          sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
+          sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
           ls
 
       - uses: actions/upload-artifact@v3
@@ -126,5 +127,5 @@ jobs:
             ui/
             renderrob
             renderrob.bin
-            renderrob.app
+            renderrob.app/
             renderrob.app/Contents/MacOS/renderrob
