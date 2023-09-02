@@ -20,22 +20,6 @@ jobs:
           python-version: "3.10"
           cache: "pip"
 
-      #TODO: Remove?
-      # - name: Cache Python dependencies
-      #   uses: actions/cache@v3
-      #   env:
-      #     cache-name: cache-pip
-      #   id: cache-pip
-      #   with:
-      #     path: |
-      #       ~/.cache/pip
-      #       # How to handle incremental updates of Python versions?
-      #       /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10
-      #     key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-      #       ${{ runner.os }}-pip-
-
       - name: Cache apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -69,21 +53,21 @@ jobs:
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
-      # - name: Analysing the code with pylint
-      #   run: |
-      #     python -m pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
+      - name: Analysing the code with pylint
+        run: |
+          python -m pylint $(git ls-files '*.py') --extension-pkg-whitelist=PySide6 --indent-string='  ' --disable="R, no-member, import-error, no-name-in-module" --generated-members="proto*,bpy*"
 
-      # - name: Run unittests
-      #   run: |
-      #     test_files=$(find . -name '*_test.py')
-      #     for file in $test_files; do
-      #         echo "Running tests in $file"
-      #         xvfb-run python -m unittest "$file"
-      #     done
+      - name: Run unittests
+        run: |
+          test_files=$(find . -name '*_test.py')
+          for file in $test_files; do
+              echo "Running tests in $file"
+              xvfb-run python -m unittest "$file"
+          done
 
-      # - name: Create Python virtual environment
-      #   run: |
-      #     python -m venv venv
+      - name: Create Python virtual environment
+        run: |
+          python -m venv venv
 
       - name: Build
         run: |
@@ -97,7 +81,6 @@ jobs:
           path: |
             icons/
             ui/
-            renderrob.app
             renderrob.bin
             renderrob
             icon.png
