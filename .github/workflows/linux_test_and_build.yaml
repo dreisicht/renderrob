@@ -90,9 +90,6 @@ jobs:
           # source venv/bin/activate
           yes | python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_linux.spec
           cp icons/icon.png icon.png
-          ls
-          ls -l
-          ls -la
 
       - uses: actions/upload-artifact@v3
         with:
