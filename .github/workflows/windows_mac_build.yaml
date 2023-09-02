@@ -105,7 +105,8 @@ jobs:
           # source venv/bin/activate
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
-          cp -r /Users/runner/work/renderrob/renderrob/deployment/renderrob.app ./renderrob.app
+          cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
+          ls
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'
@@ -123,5 +124,7 @@ jobs:
           path: |
             icons/
             ui/
-            renderrob.bin
             renderrob
+            renderrob.bin
+            renderrob.app
+            renderrob.app/Contents/MacOS/renderrob
