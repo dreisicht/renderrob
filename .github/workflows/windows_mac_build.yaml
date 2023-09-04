@@ -101,12 +101,17 @@ jobs:
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
+          mkdir deployment
+          echo before
+          ls /Users/runner/work/renderrob/renderrob/deployment
           # pip install -r requirements.txt
           # source venv/bin/activate
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
+          echo after
+          ls /Users/runner/work/renderrob/renderrob/deployment
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'
