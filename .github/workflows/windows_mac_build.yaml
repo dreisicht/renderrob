@@ -103,7 +103,8 @@ jobs:
         run: |
           mkdir deployment
           echo before
-          ls /Users/runner/work/renderrob/renderrob/deployment
+          ls -la /Users/runner/work/renderrob/renderrob/
+          ls -la /Users/runner/work/renderrob/renderrob/deployment
           # pip install -r requirements.txt
           # source venv/bin/activate
           pip install imageio
@@ -111,7 +112,8 @@ jobs:
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
           echo after
-          ls /Users/runner/work/renderrob/renderrob/deployment
+          ls -la /Users/runner/work/renderrob/renderrob/
+          ls -la /Users/runner/work/renderrob/renderrob/deployment
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'
@@ -129,9 +131,4 @@ jobs:
           path: |
             icons/
             ui/
-            build/
-            bin/
-            renderrob
-            renderrob.bin
-            renderrob.app/
-            renderrob.app/Contents/MacOS/renderrob
+            deployment/
