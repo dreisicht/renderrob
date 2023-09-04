@@ -87,9 +87,9 @@ jobs:
           bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
           brew install ccache
 
-      - name: Create Python virtual environment
-        run: |
-          python -m venv venv
+      # - name: Create Python virtual environment
+      #   run: |
+      #     python -m venv venv
 
       - name: Build Windows
         if: matrix.os == 'windows-latest'
@@ -108,7 +108,7 @@ jobs:
           # pip install -r requirements.txt
           # source venv/bin/activate
           pip install imageio
-          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
+          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose -keep-deployment-files
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
           echo after
