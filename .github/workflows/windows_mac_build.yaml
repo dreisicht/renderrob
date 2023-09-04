@@ -105,9 +105,18 @@ jobs:
           # source venv/bin/activate
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose
+          echo -1
+          ls /Users/runner/work/renderrob/
+          echo 0
+          ls /Users/runner/work/renderrob/renderrob/
+          echo 1
+          ls /Users/runner/work/renderrob/renderrob/deployment
+          echo 2
+          ls /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/
+          echo 3
+          ls /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/
           sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
           # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
-          ls
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'
