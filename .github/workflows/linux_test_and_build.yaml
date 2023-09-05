@@ -2,6 +2,11 @@ name: LinuxTestAndBuild
 
 on: [push]
 
+env:
+  PROTOC_URL: https://github.com/protocolbuffers/protobuf/releases/download/
+  PROTOC_VERSION: 24.1
+  pythonLocation: .
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -9,58 +14,42 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
+        id: setup-python
         with:
           python-version: "3.10"
+          cache: "pip"
 
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        env:
-          cache-name: cache-pip
-        id: cache-pip
-        with:
-          path: |
-            ~/.cache/pip
-            # How to handle incremental updates of Python versions?
-            /opt/hostedtoolcache/Python/3.10.12/x64/lib/python3.10
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-            ${{ runner.os }}-pip-
-            ${{ runner.os }}-
       - name: Cache apt dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: libgl1-mesa-dev
 
-      - name: Install virtual screen
+      - name: Install qt dependencies
         env:
           QT_QPA_PLATFORM: offscreen
         uses: tlambert03/setup-qt-libs@v1
+
       - name: Run virtual screen
         run: |
           sudo apt install xvfb
           export DISPLAY=:0
           export QT_QPA_PLATFORM=offscreen
-          # Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
-      - name: Install dependencies
+
+      - name: Install Nuitka and Python dependencies
         run: |
-          # Nuitka dependencies
           sudo apt install -y \
                       ccache \
                       clang \
                       patchelf
-          # sudo apt install -y --reinstall libxcb-xinerama0
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
       - name: Build proto bindings
         run: |
-          wget https://github.com/protocolbuffers/protobuf/releases/download/v24.0/protoc-24.0-linux-x86_64.zip
-
-          unzip protoc-24.0-linux-x86_64.zip
+          wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
+          unzip protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
           sudo cp bin/protoc /usr/local/bin/protoc
-          protoc --version
           protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
 
@@ -75,3 +64,22 @@ jobs:
               echo "Running tests in $file"
               xvfb-run python -m unittest "$file"
           done
+
+      - name: Create Python virtual environment
+        run: |
+          python -m venv venv
+
+      - name: Build
+        run: |
+          python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_linux.spec --force
+          cp icons/icon.png icon.png
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: renderrob
+          path: |
+            icons/
+            ui/
+            renderrob.bin
+            renderrob
+            icon.png

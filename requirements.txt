@@ -1,7 +1,8 @@
+shiboken6
 pylint
 pyside6
 protobuf
-bpy
-shiboken6
 PySide6-Essentials
 PySide6-Addons
+bpy
+nuitka
