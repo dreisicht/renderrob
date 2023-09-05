@@ -43,20 +43,6 @@ jobs:
             ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
             ${{ runner.os }}-pip-
 
-      # - name: Install qt dependencies
-      #   env:
-      #     QT_QPA_PLATFORM: offscreen
-      #   uses: tlambert03/setup-qt-libs@v1
-
-      # - name: Install Nuitka dependencies
-      #   run: |
-      #     sudo apt install -y \
-      #                 ccache \
-      #                 clang \
-      #                 patchelf
-      #     python -m pip install --upgrade pip
-      #     pip install -r requirements.txt
-
       - uses: actions/cache@v3
         with:
           path: ${{ matrix.pip_path }}
@@ -96,25 +82,13 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           .\venv\Scripts\activate
-          # ${{env.pythonLocation}}
           (echo yes) | pyside6-deploy -c .\build\pysidedeploy_win.spec
 
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
-          mkdir deployment
-          echo before
-          ls -la /Users/runner/work/renderrob/renderrob/
-          ls -la /Users/runner/work/renderrob/renderrob/deployment
-          # pip install -r requirements.txt
-          # source venv/bin/activate
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose --keep-deployment-files
-          # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app/Contents/MacOS/renderrob .
-          # sudo cp -R /Users/runner/work/renderrob/renderrob/deployment/renderrob.app .
-          echo after
-          ls -la /Users/runner/work/renderrob/renderrob/
-          ls -la /Users/runner/work/renderrob/renderrob/deployment
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'windows-latest'

@@ -71,7 +71,6 @@ jobs:
 
       - name: Build
         run: |
-          # source venv/bin/activate
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_linux.spec --force
           cp icons/icon.png icon.png
 
