@@ -3,7 +3,7 @@
 [![LinuxTestAndBuild](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml)
 [![WindowsMacBuild](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml)
 
-![ ](img/renderrob_deck_01.jpg)
+![ ](img/renderrob_deck.jpg)
 
 **Render Rob is a standalone Render Manager built with the goal to make rendering multiple Blender files as easy as possible. No need for command line fiddling anymore!**
 
@@ -24,7 +24,7 @@ Individuals and small teams.
 - Automatic organizing of render output folder.
 - Cross plattform compatible.
 
-![Screenshot](img/screenshot.jpg)
+![Screenshot](img/marketing/screenshot.png)
 
 ## Support
 
