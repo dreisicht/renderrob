@@ -226,6 +226,8 @@ class MainWindow():
           table_utils.color_row_background(self.table,
                                            self.job_row_index - 1,
                                            QColor(table_utils.COLORS["yellow"]))
+          table_utils.set_background_colors(self.table, 987, self.job_row_index)
+
         if line.startswith(error):
           line = line.replace(error, '')
           color_format.setBackground(QColor(table_utils.COLORS["red"]))
@@ -366,10 +368,8 @@ class MainWindow():
 
   def _continue_render(self, exit_code: int) -> None:
     # 62097 is the exit code for an interrupted process -> cancelled render.
-    if exit_code == 62097:
-      return
-    print_utils.print_info("Continuing render.")
     table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
+    print_utils.print_info("Continuing render.")
     if STATESAVER.state.render_jobs:
       job = STATESAVER.state.render_jobs.pop(0)
       if not job.active:
