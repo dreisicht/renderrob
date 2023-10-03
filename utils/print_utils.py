@@ -20,7 +20,8 @@ def print_error(ipt_str):
   print("[ERROR] " + ipt_str)
   print(BASH_COLORS["RESET_ALL"], end="")
   write_cache("[ERROR]" + ipt_str)
-  sys.exit()
+  print_info("Blender quit")
+  sys.exit(62097)
 
 
 def print_error_no_exit(ipt_str):
@@ -39,7 +40,6 @@ def print_warning(ipt_str):
   print("[WARNING] " + ipt_str)
   print(BASH_COLORS["RESET_ALL"], end="")
   write_cache("[WARNING]" + ipt_str)
-  # time.sleep(1)
 
 
 def print_info_input(ipt_str):

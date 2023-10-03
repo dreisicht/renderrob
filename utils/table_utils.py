@@ -235,6 +235,10 @@ def set_background_colors(table: QTableWidget, exit_code: int,
     color_row_background(table,
                          row_index - previous_job,
                          QColor(COLORS["grey_light"]))
+  elif exit_code == 987:
+    color_row_background(table,
+                         row_index - previous_job,
+                         QColor(COLORS["yellow"]))
   else:
     color_row_background(table,
                          row_index - previous_job,
