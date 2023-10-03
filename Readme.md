@@ -88,3 +88,9 @@ Deploy
 .\venv\Scripts\activate
 pyside6-deploy -c .\pysidedeploy.spec
 ```
+
+Remove stale origin branches
+
+```
+git remote prune origin  
+```
