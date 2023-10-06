@@ -80,6 +80,9 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   """Add a checkbox to the given table at the given row and column."""
   widget = QWidget()
   check_box = QCheckBox()
+  # Warning: Setting the size way bigger here, so that the click area is bigger. If other styles
+  # are used, this might need to be adjusted. See in renderrob.py: self.app.setStye("Breeze")
+  check_box.setStyleSheet("QCheckBox::indicator { width: 50px; height: 50px;}")
   layout = QHBoxLayout(widget)
   layout.addWidget(check_box)
   layout.setAlignment(Qt.AlignCenter)
