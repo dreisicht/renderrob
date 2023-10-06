@@ -38,6 +38,7 @@ class MainWindow():
   def setup(self) -> None:
     """Provide main function."""
     self.app = QApplication(sys.argv)
+    self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
     self.window = ui_utils.load_ui_from_file("ui/window.ui")
