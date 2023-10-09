@@ -1,21 +1,41 @@
-"""Experiment with the Blender API."""
+import sys
 
-import unittest
-
-import bpy
-from PySide6.QtWidgets import QApplication
-
-from proto import state_pb2
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QMessageBox, QMainWindow, QVBoxLayout
+from PySide6.QtCore import QMetaObject, Slot, QEvent
+from utils import print_utils, table_utils, ui_utils
 
 
-class TestBasic(unittest.TestCase):
-  """Test the basic functionality of the Blender API."""
+class ExampleWindow(QWidget):
+  def __init__(self):
+    super().__init__()
 
-  def test_basic(self):
-    """Test the basic functionality of the Blender API."""
-    print(bpy.context.scene.name)
-    bpy.data.scenes.new("Scene")
-    print(bpy.context.scene.name)
-    print(state_pb2)
-    print(QApplication)
-    print("Everything is fine.")
+    self.setup()
+
+  def setup(self):
+    layout = QVBoxLayout()
+    layout.addWidget(ui_utils.load_ui_from_file("ui/window.ui"))
+    self.setLayout(layout)
+    self.show()
+
+  def closeEvent(self, event):
+    """Handle the close event."""
+    print("DEBUG")
+    reply = QMessageBox.question(self, 'Message', 'Unsaved state. Quit?',
+                                 QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Close | QMessageBox.StandardButton.Cancel)
+
+    if reply == QMessageBox.Close:
+      event.accept()
+    else:
+      event.ignore()
+
+
+def run():
+  app = QApplication(sys.argv)
+
+  exw = ExampleWindow()
+
+  sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+  run()

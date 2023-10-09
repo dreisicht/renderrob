@@ -5,8 +5,8 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog
+from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor, QCloseEvent
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget, QMainWindow, QVBoxLayout, QStackedLayout, QGridLayout
 
 import dialogs
 import settings_window
@@ -19,29 +19,32 @@ from utils import print_utils, table_utils, ui_utils
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 
-class MainWindow():
+class MainWindow(QWidget):
   """Main window for RenderRob."""
 
   def __init__(self) -> None:
     """Initialize the main window."""
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
+    self.app = QApplication(sys.argv)
+    super().__init__()
     self.window = None
     self.table = None
     self.number_active_jobs = 0
     self.job_row_index = 0
     self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()  # pylint: disable=no-member
-    self.app = None
     self.recent_file_actions = None
     self.process = None
+    self.is_saved = True
 
   def setup(self) -> None:
     """Provide main function."""
-    self.app = QApplication(sys.argv)
     self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
     self.window = ui_utils.load_ui_from_file("ui/window.ui")
+
+    self.resize(1400, self.app.primaryScreen().size().height() - 100)
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
@@ -51,6 +54,22 @@ class MainWindow():
     self.window.progressBar.setMinimum(0)
     self.window.progressBar.setMaximum(100)
     self.make_main_window_connections()
+    layout = QStackedLayout()
+    layout.addWidget(self.window)
+    self.setLayout(layout)
+
+  def closeEvent(self, event):
+    """Handle the close event."""
+    if self.is_saved:
+      event.accept()
+      return
+    reply = QMessageBox.question(self, 'Message', 'Are you sure you want to quit?',
+                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+    if reply == QMessageBox.Yes:
+      event.accept()
+    else:
+      event.ignore()
 
   def execute(self) -> None:
     """Execute the main window.
@@ -59,7 +78,7 @@ class MainWindow():
     """
     self.setup()
     self.new_file()
-    self.window.show()
+    self.show()
     self.save_cache()
     self.app.exec()
 
@@ -94,6 +113,7 @@ class MainWindow():
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
+    self.is_saved = True
 
   def save_file(self) -> None:
     """Save the state to a serialized proto file without a dialog."""
@@ -101,6 +121,7 @@ class MainWindow():
     with open(self.cache.current_file, "wb") as protobuf:
       protobuf.write(
           STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
+    self.is_saved = True
 
   def new_file(self) -> None:
     """Create a new file."""
@@ -183,6 +204,11 @@ class MainWindow():
     self.cache.recent_files.insert(0, file_name)
     self.refresh_recent_files_menu()
 
+  def open_settings_window(self) -> None:
+    """Open the settings window."""
+    self.is_saved = False
+    settings_window.SettingsWindow()
+
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
     table_utils.TABLE = self.table
@@ -198,7 +224,7 @@ class MainWindow():
     self.window.actionOpen.triggered.connect(self.open_file_dialog)
     self.window.actionSave.triggered.connect(self.save_file)
     self.window.actionSave_As.triggered.connect(self.save_as_file)
-    self.window.actionSettings.triggered.connect(settings_window.SettingsWindow)
+    self.window.actionSettings.triggered.connect(self.open_settings_window)
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
     #  #20 Add open blender button
