@@ -5,10 +5,9 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor, QCloseEvent
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget, QMainWindow, QVBoxLayout, QStackedLayout, QGridLayout
+from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget, QStackedLayout
 
-import dialogs
 import settings_window
 import shot_name_builder
 from proto import cache_pb2, state_pb2
@@ -129,6 +128,7 @@ class MainWindow(QWidget):
       self.table.removeRow(0)
     self.cache.current_file = ""
     STATESAVER.state.FromString(b"")
+    STATESAVER.parent_widget = self
     table_utils.post_process_row(self.table, 0)
     table_utils.add_row_below()
 
@@ -305,7 +305,7 @@ class MainWindow(QWidget):
             STATESAVER.state.render_jobs[current_row].start,
             STATESAVER.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
-        dialogs.ErrorDialog("The output does not yet exist.")
+        QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
       if platform.system() == 'Darwin':       # macOS
         subprocess.call(('open', filepath))
       elif platform.system() == 'Windows':    # Windows
@@ -314,7 +314,7 @@ class MainWindow(QWidget):
         subprocess.call(('xdg-open', filepath))
     else:
       if not os.path.exists(filepath):
-        dialogs.ErrorDialog("The output does not yet exist.")
+        QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
       if STATESAVER.state.settings.preview.frame_step_use:
         frame_step = STATESAVER.state.settings.preview.frame_step
       else:
@@ -343,7 +343,7 @@ class MainWindow(QWidget):
           STATESAVER.state.render_jobs[current_row].start.zfill(4))
 
     if not os.path.exists(filepath):
-      dialogs.ErrorDialog("The output folder does not yet exist.")
+      QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
     if platform.system() == 'Darwin':       # macOS
       folder_path = os.path.dirname(filepath)
       subprocess.call(('open', folder_path))
@@ -374,7 +374,7 @@ class MainWindow(QWidget):
     if not STATESAVER.state.settings.blender_path:
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
-      dialogs.ErrorDialog(error_message)
+      QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
     self.process.setProgram(STATESAVER.state.settings.blender_path)
     self.process.finished.connect(self._continue_render)
 

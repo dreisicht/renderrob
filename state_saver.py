@@ -5,9 +5,8 @@ is being handled in the settings window class.
 """
 import os
 
-from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem, QMessageBox
 
-import dialogs
 from proto import state_pb2
 from utils import table_utils, ui_utils
 
@@ -29,6 +28,7 @@ class StateSaver:
   def __init__(self):
     """Initialize the state saver."""
     self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
+    self.parent_widget = None
 
   def state_to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
@@ -62,6 +62,7 @@ class StateSaver:
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
     del self.state.render_jobs[:]
+    assert self.parent_widget
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member
       render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
@@ -70,9 +71,11 @@ class StateSaver:
       if "/" not in render_job.file:
         render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
       if not render_job.file:
-        dialogs.ErrorDialog("The file path cannot be empty.")
+        QMessageBox.warning(self.parent_widget, "Warning",
+                            "The file path cannot be empty.", QMessageBox.Ok)
       if not os.path.exists(render_job.file):
-        dialogs.ErrorDialog(f"The file path {render_job.file} does not exist.")
+        QMessageBox.warning(
+            self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.", QMessageBox.Ok)
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the
