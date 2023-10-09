@@ -1,18 +1,29 @@
 """Util functions for helping build the render rob UI."""
 
 import sys
-from PySide6.QtCore import QFile, QIODevice, Qt
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
-                               QWidget)
-from PySide6.QtGui import QColor
 
+from PySide6.QtCore import QFile, QIODevice, QMetaObject, Qt
+from PySide6.QtGui import QColor
+from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget, QMessageBox
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
 FILE_FORMATS = ["png", "tiff", "exr", "jpg"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
+
+
+def closeEvent(self, event):
+  """Handle the close event."""
+  print("DEBUG")
+  reply = QMessageBox.question(self, 'Message', 'Unsaved state. Quit?',
+                               QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Close | QMessageBox.StandardButton.Cancel)
+
+  if reply == QMessageBox.Yes:
+    event.accept()
+  else:
+    event.ignore()
 
 
 def load_ui_from_file(ui_file_name: str) -> QUiLoader:
@@ -28,6 +39,8 @@ def load_ui_from_file(ui_file_name: str) -> QUiLoader:
   if not window:
     print(loader.errorString())
     sys.exit(-1)
+  window.closeEvent = closeEvent
+  QMetaObject.connectSlotsByName(window)
   return window
 
 
