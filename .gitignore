@@ -7,3 +7,4 @@ ERRORCACHE
 deployment/*
 *_pb2.py
 .rr_cache
+experiment.py
