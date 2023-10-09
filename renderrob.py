@@ -194,6 +194,7 @@ class MainWindow(QWidget):
 
   def open_file(self, file_name: str) -> None:
     """Open a RenderRob file."""
+    STATESAVER.parent_widget = self
     with open(file_name, "rb") as pb_file:
       pb_str = pb_file.read()
     STATESAVER.state.ParseFromString(pb_str)
