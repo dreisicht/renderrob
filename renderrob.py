@@ -5,8 +5,10 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget, QStackedLayout
+from PySide6.QtGui import (QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor)
+from PySide6.QtWidgets import (QApplication, QFileDialog,
+                               QMessageBox, QStackedLayout, QTableWidgetItem,
+                               QWidget)
 
 import settings_window
 import shot_name_builder
@@ -57,7 +59,7 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
 
-  def closeEvent(self, event):
+  def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
     """Handle the close event."""
     if self.is_saved:
       event.accept()
@@ -228,7 +230,15 @@ class MainWindow(QWidget):
     self.window.actionSettings.triggered.connect(self.open_settings_window)
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
+    self.table.itemChanged.connect(self.table_item_changed)
     #  #20 Add open blender button
+
+  def table_item_changed(self, item: QTableWidgetItem) -> None:
+    """Handle table item changes."""
+    # del item
+    if item.text():
+      self.is_saved = False
+      table_utils.fix_active_row_path(item)
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""

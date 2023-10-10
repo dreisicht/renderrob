@@ -4,14 +4,7 @@ import os
 
 from proto import state_pb2
 from utils import ui_utils
-
-
-def normalize_drive_letter(path):
-  """Normalize the drive letter to upper case."""
-  path = os.path.normpath(path).replace("\\", "/")
-  if path[1] == ":":
-    return path[0].upper() + path[1:]
-  return path
+from utils.table_utils import normalize_drive_letter
 
 
 def render_job_to_render_settings_setter(

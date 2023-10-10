@@ -1,11 +1,13 @@
 """Utility functions for table operations."""
+import os
+
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView,
                                QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
 
-import utils.ui_utils as ui_utils
+from utils import ui_utils
 
 TABLE = None
 # Note: This variable is required because when using clicked.connect() the argument is
@@ -24,6 +26,14 @@ COLORS = {
     "black_light": 0x22282b,
     "black_dark": 0x242a2d
 }
+
+
+def normalize_drive_letter(path: str) -> str:
+  """Normalize the drive letter to upper case."""
+  path = os.path.normpath(path).replace("\\", "/")
+  if path[1] == ":":
+    return path[0].upper() + path[1:]
+  return path
 
 
 def make_editable(table_widget: QTableWidget) -> None:
@@ -165,6 +175,14 @@ def post_process_row(table: QTableWidget, row: int) -> None:
   header.setSectionResizeMode(1, QHeaderView.Stretch)
   table.resizeColumnsToContents()
   ui_utils.fill_row(table, row)
+
+
+def fix_active_row_path(item: QTableWidgetItem) -> None:
+  """Fix the path of the currently selected row."""
+  path = item.text()
+  path = normalize_drive_letter(path)
+  path = path.replace('"', "").replace("\\", "/")
+  item.setText(path)
 
 
 def set_text_alignment(table: QTableWidget, row: int) -> None:
