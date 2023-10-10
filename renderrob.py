@@ -5,12 +5,10 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import (QAction, QCloseEvent, QColor, QDragEnterEvent,
-                           QDropEvent, QIcon, QTextCharFormat, QTextCursor)
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+from PySide6.QtGui import (QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor)
+from PySide6.QtWidgets import (QApplication, QFileDialog,
                                QMessageBox, QStackedLayout, QTableWidgetItem,
                                QWidget)
-from tomlkit import table
 
 import settings_window
 import shot_name_builder
@@ -61,7 +59,7 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
 
-  def closeEvent(self, event: QCloseEvent):
+  def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
     """Handle the close event."""
     if self.is_saved:
       event.accept()
