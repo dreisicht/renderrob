@@ -14,18 +14,6 @@ RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 
 
-def closeEvent(self, event):
-  """Handle the close event."""
-  print("DEBUG")
-  reply = QMessageBox.question(self, 'Message', 'Unsaved state. Quit?',
-                               QMessageBox.StandardButton.Save | QMessageBox.StandardButton.Close | QMessageBox.StandardButton.Cancel)
-
-  if reply == QMessageBox.Yes:
-    event.accept()
-  else:
-    event.ignore()
-
-
 def load_ui_from_file(ui_file_name: str) -> QUiLoader:
   """Load a UI file from the given path and return the widget."""
   ui_file = QFile(ui_file_name)
@@ -39,7 +27,6 @@ def load_ui_from_file(ui_file_name: str) -> QUiLoader:
   if not window:
     print(loader.errorString())
     sys.exit(-1)
-  window.closeEvent = closeEvent
   QMetaObject.connectSlotsByName(window)
   return window
 

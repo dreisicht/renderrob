@@ -5,15 +5,18 @@ import subprocess
 import sys
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QWidget, QStackedLayout, QTableWidgetItem
+from PySide6.QtGui import (QAction, QCloseEvent, QColor, QDragEnterEvent,
+                           QDropEvent, QIcon, QTextCharFormat, QTextCursor)
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMainWindow,
+                               QMessageBox, QStackedLayout, QTableWidgetItem,
+                               QWidget)
+from tomlkit import table
 
 import settings_window
 import shot_name_builder
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from state_saver import STATESAVER
-from tomlkit import table
 from utils import print_utils, table_utils, ui_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
@@ -58,7 +61,7 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
 
-  def closeEvent(self, event):
+  def closeEvent(self, event: QCloseEvent):
     """Handle the close event."""
     if self.is_saved:
       event.accept()
@@ -235,9 +238,9 @@ class MainWindow(QWidget):
   def table_item_changed(self, item: QTableWidgetItem) -> None:
     """Handle table item changes."""
     # del item
-    self.is_saved = False
-    print(item)
-    table_utils.fix_active_row_path(item)
+    if item.text():
+      self.is_saved = False
+      table_utils.fix_active_row_path(item)
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
