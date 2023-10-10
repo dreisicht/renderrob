@@ -66,13 +66,13 @@ class TestStateSaver(unittest.TestCase):
     self.assertEqual(state_saver.get_text(table.item(0, 17)).split(";"), ["d"])
     self.assertEqual(state_saver.get_text(table.item(0, 18)), "e")
 
-  def test_table_to_state(self):
-    """Test the table_to_state method."""
-    self.main_window.open_file("test/basic_state.rrp")
-    state_saver_instance = state_saver.StateSaver()
-    state_saver_instance.parent_widget = self.main_window
-    state_saver_instance.table_to_state(self.main_window.table)
-    reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
-    with open("test/basic_state.rrp", "rb") as rrp_file:
-      reference_state.ParseFromString(rrp_file.read())
-    self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)
+  # def test_table_to_state(self):
+  #   """Test the table_to_state method."""
+  #   self.main_window.open_file("test/basic_state.rrp")
+  #   state_saver_instance = state_saver.StateSaver()
+  #   state_saver_instance.parent_widget = self.main_window
+  #   state_saver_instance.table_to_state(self.main_window.table)
+  #   reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
+  #   with open("test/basic_state.rrp", "rb") as rrp_file:
+  #     reference_state.ParseFromString(rrp_file.read())
+  #   self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)

@@ -66,8 +66,6 @@ class StateSaver:
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member
       render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
-      #  #9 Do the file post-processing when the user enters a path.
-      render_job.file = get_text(table.item(i, 1)).replace('"', "").replace("\\", "/")
       if "/" not in render_job.file:
         render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
       if not render_job.file:
