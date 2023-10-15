@@ -16,7 +16,7 @@ from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from state_saver import STATESAVER
 from utils import print_utils, table_utils, ui_utils
-
+from dropwidget import DropWidget
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 
@@ -43,9 +43,9 @@ class MainWindow(QWidget):
     self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
-    self.window = ui_utils.load_ui_from_file("ui/window.ui")
-
     self.resize(1400, self.app.primaryScreen().size().height() - 100)
+    self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
+
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
@@ -79,8 +79,8 @@ class MainWindow(QWidget):
     """
     self.setup()
     self.new_file()
-    self.show()
     self.save_cache()
+    self.show()
     self.app.exec()
 
   def save_cache(self) -> None:
@@ -235,7 +235,6 @@ class MainWindow(QWidget):
 
   def table_item_changed(self, item: QTableWidgetItem) -> None:
     """Handle table item changes."""
-    # del item
     if item.text():
       self.is_saved = False
       table_utils.fix_active_row_path(item)
