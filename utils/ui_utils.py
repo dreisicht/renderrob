@@ -1,11 +1,14 @@
 """Util functions for helping build the render rob UI."""
 
 import sys
+from contextlib import closing
+from typing import Any, List, Optional
 
-from PySide6.QtCore import QFile, QIODevice, QMetaObject, Qt
+from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget, QMessageBox
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
+                               QWidget)
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
@@ -14,18 +17,25 @@ RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 
 
-def load_ui_from_file(ui_file_name: str) -> QUiLoader:
+def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
   """Load a UI file from the given path and return the widget."""
+  ui_loader = QUiLoader()
+  if custom_widgets:
+    for custom_widget in custom_widgets:
+      ui_loader.registerCustomWidget(custom_widget)
   ui_file = QFile(ui_file_name)
-  if not ui_file.open(QIODevice.ReadOnly):
-    print(f"Cannot open {ui_file_name}: {ui_file.errorString()}")
-    sys.exit(-1)
-  loader = QUiLoader()
-  window = loader.load(ui_file)
 
-  ui_file.close()
+  with closing(ui_file) as qt_file:
+    if qt_file.open(QFile.ReadOnly):
+      window = ui_loader.load(qt_file)
+    else:
+      print('Failed to read UI')
+
+  ui_loader = QUiLoader()
+  window = ui_loader.load(ui_file)
+
   if not window:
-    print(loader.errorString())
+    print(ui_loader.errorString())
     sys.exit(-1)
   QMetaObject.connectSlotsByName(window)
   return window

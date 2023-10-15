@@ -1,6 +1,7 @@
 """Unit tests for table_utils.py."""
-import table_utils
 import unittest
+
+import table_utils
 
 
 class TestTableUtils(unittest.TestCase):

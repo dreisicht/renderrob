@@ -125,10 +125,20 @@ def move_row_up() -> None:
 
 def add_row_below() -> None:
   """Add a row below the current row."""
-  current_row = TABLE.currentRow()
-  TABLE.insertRow(current_row + 1)
-  ui_utils.fill_row(TABLE, current_row + 1)
-  set_text_alignment(TABLE, current_row + 1)
+  current_row = TABLE.currentRow() + 1
+  TABLE.insertRow(current_row)
+  ui_utils.fill_row(TABLE, current_row)
+  set_text_alignment(TABLE, current_row)
+
+
+def add_file_below(path: str) -> None:
+  """Add a file below the current row."""
+  id_row = TABLE.rowCount()
+  TABLE.insertRow(id_row)
+  ui_utils.fill_row(TABLE, id_row)
+  set_text_alignment(TABLE, id_row)
+  TABLE.setItem(id_row, 1, QTableWidgetItem(path))
+  fix_active_row_path(TABLE.item(id_row, 1))
 
 
 def remove_active_row() -> None:
