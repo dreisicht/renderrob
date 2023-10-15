@@ -1,685 +1,687 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1355</width>
-    <height>934</height>
-   </rect>
-  </property>
+  <class>MainWindow</class>
+  <widget class="QMainWindow" name="MainWindow">
+    <property name="geometry">
+      <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>1355</width>
+        <height>934</height>
+      </rect>
+    </property>
     <property name="windowTitle">
-   <string>MainWindow</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
-  <widget class="DropWidget" name="centralwidget">
-   <property name="acceptDrops">
-    <bool>true</bool>
-   </property>
-   <layout class="QVBoxLayout" name="verticalLayout_5">
-    <item>
-     <widget class="QSplitter" name="splitter">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <widget class="QWidget" name="verticalLayoutWidget_2">
-       <layout class="QVBoxLayout" name="verticalLayout_2">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="bottomMargin">
-           <number>5</number>
-          </property>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <layout class="QVBoxLayout" name="verticalLayout">
-              <item>
-               <widget class="QPushButton" name="render_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 80px;
-icon-size: 20px;</string>
-                </property>
-                <property name="text">
-                 <string>Render</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/camera_rr.svg</normaloff>icons/camera_rr.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="stop_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>  Stop</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/stop.svg</normaloff>icons/stop.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="add_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>   Add</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/play-list-add.svg</normaloff>icons/play-list-add.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="delete_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>Delete</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/play-list-remove.svg</normaloff>icons/play-list-remove.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="up_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>   Up  </string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/caret-up.svg</normaloff>icons/caret-up.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="down_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>Down</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/caret-down.svg</normaloff>icons/caret-down.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="verticalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Vertical</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>20</width>
-                  <height>40</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="play_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string>   Play</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/play.svg</normaloff>icons/play.svg</iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="open_button">
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-min-width: 40px;
-icon-size: 25px;</string>
-                </property>
-                <property name="text">
-                 <string> Open</string>
-                </property>
-                <property name="icon">
-                 <iconset>
-                  <normaloff>icons/folder.svg</normaloff>icons/folder.svg</iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="QTableWidget" name="tableWidget">
-              <property name="styleSheet">
-               <string notr="true">QTableWidget {
-background: #ebebeb}</string>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>true</bool>
-              </attribute>
-              <row>
-               <property name="text">
-                <string/>
-               </property>
-              </row>
-              <column>
-               <property name="text">
-                <string>Active</string>
-               </property>
-               <property name="icon">
-                <iconset theme="address-book-new">
-                 <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>File</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Camera</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Start</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>End</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>X res</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Y res</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Samples</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>File \n format</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Engine</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Device</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Motion &lt;br&gt; Blur</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Overwrite</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>High Quality</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Animation Denoise</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Denoise</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Scene</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>View Layer</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
-                <string>Comments</string>
-               </property>
-              </column>
-              <item row="0" column="0">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="font">
-                <font>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-               <property name="icon">
-                <iconset theme="call-start">
-                 <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
-               </property>
-              </item>
-              <item row="0" column="1">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignTrailing|AlignVCenter</set>
-               </property>
-              </item>
-              <item row="0" column="2">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="3">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="4">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="5">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="6">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="7">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="8">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="9">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="10">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="11">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="12">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="13">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="14">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="15">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="16">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="17">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="18">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="verticalLayoutWidget_3">
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <item>
-         <widget class="QTextBrowser" name="textBrowser">
-          <property name="font">
-           <font>
-            <family>Fira Code</family>
-            <pointsize>9</pointsize>
-            <italic>false</italic>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QTextEdit, QListView {
-font: 9pt &quot;Fira Code&quot;;
-color: rgb(255, 255, 255);
-background-color: rgb(52, 80, 100);
-}
-
-
-</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar">
-      <property name="styleSheet">
-       <string notr="true"> QProgressBar::chunk {
-     background-color: #78909c;
-     width: 20px;
-	 text-align: center;
- }
-QProgressBar {
-text-align: center;
-}</string>
-      </property>
-      <property name="value">
-       <number>24</number>
-      </property>
-      <property name="textVisible">
-       <bool>true</bool>
-      </property>
-      <property name="textDirection">
-       <enum>QProgressBar::TopToBottom</enum>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1355</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
+      <string>MainWindow</string>
     </property>
-    <widget class="QMenu" name="menuOpen_Recent">
-     <property name="title">
-      <string>Open Recent</string>
-     </property>
+    <property name="styleSheet">
+      <string notr="true" />
+    </property>
+    <widget class="DropWidget" name="centralwidget">
+      <property name="acceptDrops">
+        <bool>true</bool>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+          <widget class="QSplitter" name="splitter">
+            <property name="orientation">
+              <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QWidget" name="verticalLayoutWidget_2">
+              <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                  <layout class="QVBoxLayout" name="verticalLayout_3">
+                    <property name="bottomMargin">
+                      <number>5</number>
+                    </property>
+                    <item>
+                      <layout class="QHBoxLayout" name="horizontalLayout_2">
+                        <item>
+                          <layout class="QVBoxLayout" name="verticalLayout">
+                            <item>
+                              <widget class="QPushButton" name="render_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 80px;
+                                    icon-size: 20px;</string>
+                                </property>
+                                <property name="text">
+                                  <string>Render</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/camera_rr.svg</normaloff>icons/camera_rr.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="stop_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string> Stop</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/stop.svg</normaloff>icons/stop.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <spacer name="verticalSpacer_3">
+                                <property name="orientation">
+                                  <enum>Qt::Vertical</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                  <size>
+                                    <width>20</width>
+                                    <height>40</height>
+                                  </size>
+                                </property>
+                              </spacer>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="add_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string> Add</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/play-list-add.svg</normaloff>
+                                    icons/play-list-add.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="delete_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string>Delete</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/play-list-remove.svg</normaloff>
+                                    icons/play-list-remove.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <spacer name="verticalSpacer">
+                                <property name="orientation">
+                                  <enum>Qt::Vertical</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                  <size>
+                                    <width>20</width>
+                                    <height>40</height>
+                                  </size>
+                                </property>
+                              </spacer>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="up_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string> Up </string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/caret-up.svg</normaloff>icons/caret-up.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="down_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string>Down</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/caret-down.svg</normaloff>icons/caret-down.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <spacer name="verticalSpacer_2">
+                                <property name="orientation">
+                                  <enum>Qt::Vertical</enum>
+                                </property>
+                                <property name="sizeHint" stdset="0">
+                                  <size>
+                                    <width>20</width>
+                                    <height>40</height>
+                                  </size>
+                                </property>
+                              </spacer>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="play_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string> Play</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/play.svg</normaloff>icons/play.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                            <item>
+                              <widget class="QPushButton" name="open_button">
+                                <property name="styleSheet">
+                                  <string notr="true">min-height: 30px;
+                                    min-width: 40px;
+                                    icon-size: 25px;</string>
+                                </property>
+                                <property name="text">
+                                  <string> Open</string>
+                                </property>
+                                <property name="icon">
+                                  <iconset>
+                                    <normaloff>icons/folder.svg</normaloff>icons/folder.svg</iconset>
+                                </property>
+                              </widget>
+                            </item>
+                          </layout>
+                        </item>
+                        <item>
+                          <widget class="QTableWidget" name="tableWidget">
+                            <property name="styleSheet">
+                              <string notr="true">QTableWidget {
+                                background: #ebebeb}</string>
+                            </property>
+                            <property name="sizeAdjustPolicy">
+                              <enum>QAbstractScrollArea::AdjustToContents</enum>
+                            </property>
+                            <property name="sortingEnabled">
+                              <bool>false</bool>
+                            </property>
+                            <attribute name="horizontalHeaderCascadingSectionResizes">
+                              <bool>true</bool>
+                            </attribute>
+                            <row>
+                              <property name="text">
+                                <string />
+                              </property>
+                            </row>
+                            <column>
+                              <property name="text">
+                                <string>Active</string>
+                              </property>
+                              <property name="icon">
+                                <iconset theme="address-book-new">
+                                  <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>File</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Camera</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Start</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>End</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>X res</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Y res</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Samples</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>File \n format</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Engine</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Device</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Motion &lt;br&gt; Blur</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Overwrite</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>High Quality</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Animation Denoise</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Denoise</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Scene</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>View Layer</string>
+                              </property>
+                            </column>
+                            <column>
+                              <property name="text">
+                                <string>Comments</string>
+                              </property>
+                            </column>
+                            <item row="0" column="0">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="font">
+                                <font>
+                                  <bold>true</bold>
+                                </font>
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                              <property name="icon">
+                                <iconset theme="call-start">
+                                  <normaloff>../../renderrob4</normaloff>../../renderrob4</iconset>
+                              </property>
+                            </item>
+                            <item row="0" column="1">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignTrailing|AlignVCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="2">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="3">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="4">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="5">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="6">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="7">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="8">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="9">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="10">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="11">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="12">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="13">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="14">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="15">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="16">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="17">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                            <item row="0" column="18">
+                              <property name="text">
+                                <string />
+                              </property>
+                              <property name="textAlignment">
+                                <set>AlignCenter</set>
+                              </property>
+                            </item>
+                          </widget>
+                        </item>
+                      </layout>
+                    </item>
+                  </layout>
+                </item>
+              </layout>
+            </widget>
+            <widget class="QWidget" name="verticalLayoutWidget_3">
+              <layout class="QVBoxLayout" name="verticalLayout_4">
+                <item>
+                  <widget class="QTextBrowser" name="textBrowser">
+                    <property name="font">
+                      <font>
+                        <family>Fira Code</family>
+                        <pointsize>9</pointsize>
+                        <italic>false</italic>
+                        <bold>false</bold>
+                      </font>
+                    </property>
+                    <property name="styleSheet">
+                      <string notr="true">QTextEdit, QListView {
+                        font: 9pt &quot;Fira Code&quot;;
+                        color: rgb(255, 255, 255);
+                        background-color: rgb(52, 80, 100);
+                        }
+
+
+                      </string>
+                    </property>
+                  </widget>
+                </item>
+              </layout>
+            </widget>
+          </widget>
+        </item>
+        <item>
+          <widget class="QProgressBar" name="progressBar">
+            <property name="styleSheet">
+              <string notr="true"> QProgressBar::chunk {
+                background-color: #78909c;
+                width: 20px;
+                text-align: center;
+                }
+                QProgressBar {
+                text-align: center;
+                }</string>
+            </property>
+            <property name="value">
+              <number>24</number>
+            </property>
+            <property name="textVisible">
+              <bool>true</bool>
+            </property>
+            <property name="textDirection">
+              <enum>QProgressBar::TopToBottom</enum>
+            </property>
+          </widget>
+        </item>
+      </layout>
     </widget>
-    <addaction name="actionNew"/>
-    <addaction name="separator"/>
-    <addaction name="actionOpen"/>
-    <addaction name="menuOpen_Recent"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave"/>
-    <addaction name="actionSave_As"/>
-    <addaction name="separator"/>
-    <addaction name="actionQuit"/>
-    <addaction name="separator"/>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-    <addaction name="actionSettings"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
+    <widget class="QMenuBar" name="menubar">
+      <property name="geometry">
+        <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>1355</width>
+          <height>22</height>
+        </rect>
+      </property>
+      <widget class="QMenu" name="menuFile">
+        <property name="title">
+          <string>File</string>
+        </property>
+        <widget class="QMenu" name="menuOpen_Recent">
+          <property name="title">
+            <string>Open Recent</string>
+          </property>
+        </widget>
+        <addaction name="actionNew" />
+        <addaction name="separator" />
+        <addaction name="actionOpen" />
+        <addaction name="menuOpen_Recent" />
+        <addaction name="separator" />
+        <addaction name="actionSave" />
+        <addaction name="actionSave_As" />
+        <addaction name="separator" />
+        <addaction name="actionQuit" />
+        <addaction name="separator" />
+      </widget>
+      <widget class="QMenu" name="menuEdit">
+        <property name="title">
+          <string>Edit</string>
+        </property>
+        <addaction name="actionSettings" />
+      </widget>
+      <addaction name="menuFile" />
+      <addaction name="menuEdit" />
+    </widget>
+    <widget class="QStatusBar" name="statusbar" />
+    <action name="actionSave">
+      <property name="text">
+        <string>Save</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+S</string>
+      </property>
+    </action>
+    <action name="actionSave_As">
+      <property name="text">
+        <string>Save As</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+Shift+S</string>
+      </property>
+    </action>
+    <action name="actionOpen">
+      <property name="text">
+        <string>Open</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+O</string>
+      </property>
+    </action>
+    <action name="actionQuit">
+      <property name="text">
+        <string>Quit</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+Q</string>
+      </property>
+    </action>
+    <action name="actionDelete_Recent_Files">
+      <property name="text">
+        <string>Delete Recent Files</string>
+      </property>
+    </action>
+    <action name="actiona_rrp">
+      <property name="text">
+        <string>a.rrp</string>
+      </property>
+    </action>
+    <action name="actionb_rrp">
+      <property name="text">
+        <string>b.rrp</string>
+      </property>
+    </action>
+    <action name="actionOpen_Settings">
+      <property name="text">
+        <string>Open Settings</string>
+      </property>
+    </action>
+    <action name="actionSettings">
+      <property name="text">
+        <string>Open Settings</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+,</string>
+      </property>
+    </action>
+    <action name="actionNew">
+      <property name="text">
+        <string>New</string>
+      </property>
+      <property name="shortcut">
+        <string>Ctrl+N</string>
+      </property>
+    </action>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+S</string>
-   </property>
-  </action>
-  <action name="actionSave_As">
-   <property name="text">
-    <string>Save As</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Shift+S</string>
-   </property>
-  </action>
-  <action name="actionOpen">
-   <property name="text">
-    <string>Open</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
-  </action>
-  <action name="actionQuit">
-   <property name="text">
-    <string>Quit</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+Q</string>
-   </property>
-  </action>
-  <action name="actionDelete_Recent_Files">
-   <property name="text">
-    <string>Delete Recent Files</string>
-   </property>
-  </action>
-  <action name="actiona_rrp">
-   <property name="text">
-    <string>a.rrp</string>
-   </property>
-  </action>
-  <action name="actionb_rrp">
-   <property name="text">
-    <string>b.rrp</string>
-   </property>
-  </action>
-  <action name="actionOpen_Settings">
-   <property name="text">
-    <string>Open Settings</string>
-   </property>
-  </action>
-  <action name="actionSettings">
-   <property name="text">
-    <string>Open Settings</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+,</string>
-   </property>
-  </action>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
- </widget>
- <customwidgets>
-  <customwidget>
-   <class>DropWidget</class>
-   <extends>QWidget</extends>
-   <header>dropwidget.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
- <connections>
-  <connection>
-   <sender>MainWindow</sender>
-   <signal>destroyed()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>677</x>
-     <y>466</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>677</x>
-     <y>466</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+  <customwidgets>
+    <customwidget>
+      <class>DropWidget</class>
+      <extends>QWidget</extends>
+      <header>dropwidget.h</header>
+      <container>1</container>
+    </customwidget>
+  </customwidgets>
+  <resources />
+  <connections>
+    <connection>
+      <sender>MainWindow</sender>
+      <signal>destroyed()</signal>
+      <receiver>MainWindow</receiver>
+      <slot>close()</slot>
+      <hints>
+        <hint type="sourcelabel">
+          <x>677</x>
+          <y>466</y>
+        </hint>
+        <hint type="destinationlabel">
+          <x>677</x>
+          <y>466</y>
+        </hint>
+      </hints>
+    </connection>
+  </connections>
 </ui>
