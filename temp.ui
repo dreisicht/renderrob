@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>800</width>
+                <height>600</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>MainWindow</string>
+        </property>
+        <widget class="DropWidget" name="centralwidget">
+            <property name="acceptDrops">
+                <bool>true</bool>
+            </property>
+            <widget class="QGroupBox" name="groupBox">
+                <property name="geometry">
+                    <rect>
+                        <x>0</x>
+                        <y>0</y>
+                        <width>381</width>
+                        <height>501</height>
+                    </rect>
+                </property>
+                <property name="acceptDrops">
+                    <bool>true</bool>
+                </property>
+                <property name="title">
+                    <string>Device Status</string>
+                </property>
+                <widget class="QGroupBox" name="groupBox_2">
+                    <property name="geometry">
+                        <rect>
+                            <x>10</x>
+                            <y>30</y>
+                            <width>361</width>
+                            <height>111</height>
+                        </rect>
+                    </property>
+                    <property name="acceptDrops">
+                        <bool>true</bool>
+                    </property>
+                    <property name="title">
+                        <string>Deploy Fbx</string>
+                    </property>
+                    <widget class="QLineEdit" name="lineEdit">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>50</y>
+                                <width>341</width>
+                                <height>20</height>
+                            </rect>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="pushButton">
+                        <property name="geometry">
+                            <rect>
+                                <x>270</x>
+                                <y>80</y>
+                                <width>75</width>
+                                <height>23</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Deploy fbx</string>
+                        </property>
+                    </widget>
+                    <widget class="QLabel" name="label_2">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>30</y>
+                                <width>47</width>
+                                <height>13</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Fbx path</string>
+                        </property>
+                    </widget>
+                </widget>
+                <widget class="QGraphicsView" name="graphicsView">
+                    <property name="geometry">
+                        <rect>
+                            <x>20</x>
+                            <y>150</y>
+                            <width>201</width>
+                            <height>91</height>
+                        </rect>
+                    </property>
+                </widget>
+            </widget>
+        </widget>
+    </widget>
+    <customwidgets>
+        <customwidget>
+            <class>DropWidget</class>
+            <extends>QWidget</extends>
+            <header>dropwidget.h</header>
+            <container>1</container>
+        </customwidget>
+    </customwidgets>
+    <resources />
+    <connections />
+</ui>

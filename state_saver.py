@@ -73,7 +73,8 @@ class StateSaver:
                             "The file path cannot be empty.", QMessageBox.Ok)
       if not os.path.exists(render_job.file):
         QMessageBox.warning(
-            self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.", QMessageBox.Ok)
+            self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.",
+            QMessageBox.Ok)
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the
