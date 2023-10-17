@@ -45,7 +45,7 @@ class MainWindow(QWidget):
       self.load_cache()
     self.resize(1400, self.app.primaryScreen().size().height() - 100)
     self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
-    self.window.splitter.setSize(1200)
+    self.window.splitter.setSizes((200, 500))
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
@@ -241,6 +241,7 @@ class MainWindow(QWidget):
     if item.text():
       self.is_saved = False
       table_utils.fix_active_row_path(item)
+    print(STATESAVER.state)
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
@@ -378,7 +379,7 @@ class MainWindow(QWidget):
       return
     filepath = STATESAVER.state.render_jobs[current_row].file
     # Launch Blender with the file.
-    subprocess.run([STATESAVER.state.settings.blender_path, filepath], check=False)
+    subprocess.Popen([STATESAVER.state.settings.blender_path, filepath])
 
   def duplicate_row(self) -> None:
     """Duplicate the currently selected row."""
