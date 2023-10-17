@@ -1,7 +1,7 @@
 """Unit tests for table_utils.py."""
 import unittest
 
-import table_utils
+from utils import table_utils
 
 
 class TestTableUtils(unittest.TestCase):
@@ -21,3 +21,4 @@ class TestTableUtils(unittest.TestCase):
     self.assertEqual(table_utils.normalize_drive_letter(
         "\\\\server\\share\\file.txt"),
         "//server/share/file.txt")
+    self.assertEqual(table_utils.normalize_drive_letter("a"), "a")

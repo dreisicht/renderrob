@@ -45,6 +45,7 @@ class MainWindow(QWidget):
       self.load_cache()
     self.resize(1400, self.app.primaryScreen().size().height() - 100)
     self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
+    self.window.splitter.setSize(1200)
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
@@ -231,6 +232,8 @@ class MainWindow(QWidget):
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
     self.table.itemChanged.connect(self.table_item_changed)
+    self.window.blender_button.clicked.connect(self.open_blender_file)
+    self.window.duplicate_button.clicked.connect(self.duplicate_row)
     #  #20 Add open blender button
 
   def table_item_changed(self, item: QTableWidgetItem) -> None:
@@ -363,6 +366,26 @@ class MainWindow(QWidget):
     else:                                   # Linux variants
       folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
+
+  def open_blender_file(self) -> None:
+    """Open the currently selected Blender file."""
+    STATESAVER.table_to_state(self.table)
+    current_row = self.table.currentRow()
+    if not STATESAVER.state.settings.blender_path:
+      error_message = "The Blender path is not set."
+      print_utils.print_error_no_exit(error_message)
+      QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+      return
+    filepath = STATESAVER.state.render_jobs[current_row].file
+    # Launch Blender with the file.
+    subprocess.run([STATESAVER.state.settings.blender_path, filepath], check=False)
+
+  def duplicate_row(self) -> None:
+    """Duplicate the currently selected row."""
+    STATESAVER.table_to_state(self.table)
+    current_row = self.table.currentRow()
+    STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
+    STATESAVER.state_to_table(self.table)
 
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""

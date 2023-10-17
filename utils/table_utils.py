@@ -31,6 +31,8 @@ COLORS = {
 def normalize_drive_letter(path: str) -> str:
   """Normalize the drive letter to upper case."""
   path = os.path.normpath(path).replace("\\", "/")
+  if len(path) < 2:
+    return path
   if path[1] == ":":
     return path[0].upper() + path[1:]
   return path
