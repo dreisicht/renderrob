@@ -80,7 +80,8 @@ class ShotNameBuilder:
       start_frame = self.render_job.start.zfill(4)
 
     while not os.path.exists(full_frame_path.replace(
-            "v$$", "v" + str(shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 0:
+            "v$$", "v" + str(
+                shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 0:
       shot_iter_num -= 1
     shot_iter_num += 1
 

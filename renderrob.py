@@ -251,7 +251,8 @@ class MainWindow(QWidget):
     if not self.recent_states:
       return
     STATESAVER.state.ParseFromString(self.recent_states.pop())
-    # TODO: The blockSignals could be done as a context manager on the top level operator methods.
+    # Refactor: The blockSignals could be done as a context manager on the top level operator
+    # methods.
     self.table.blockSignals(True)
     STATESAVER.state_to_table(self.table)
     self.table.blockSignals(False)

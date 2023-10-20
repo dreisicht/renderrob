@@ -100,7 +100,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   layout.setContentsMargins(0, 0, 0, 0)
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
-  # TODO: Hook up checkboxes with table_changed function.
+  # Refactor: Hook up checkboxes with table_changed function.
   # check_box.clicked.connect()
   table.setCellWidget(row, col, widget)
 
