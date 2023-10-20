@@ -12,7 +12,8 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
-FILE_FORMATS = ["png", "tiff", "exr", "jpg"]
+FILE_FORMATS_COMMAND = ["PNG", "TIFF", "OPEN_EXR_MULTILAYER", "JPEG"]
+FILE_FORMATS_UI = ["png", "tiff", "exr", "jpeg"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 
@@ -99,6 +100,8 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   layout.setContentsMargins(0, 0, 0, 0)
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
+  # TODO: Hook up checkboxes with table_changed function.
+  # check_box.clicked.connect()
   table.setCellWidget(row, col, widget)
 
 
@@ -112,7 +115,7 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
 def fill_row(table: QTableWidget, row: int) -> None:
   """Fill the table with widgets values."""
   add_checkbox(table, row, 0, checked=True)
-  add_dropdown(table, row, 8, FILE_FORMATS)
+  add_dropdown(table, row, 8, FILE_FORMATS_UI)
   add_dropdown(table, row, 9, RENDER_ENGINES)
   add_dropdown(table, row, 10, DEVICES)
   add_checkbox(table, row, 11, checked=False)

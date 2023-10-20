@@ -125,14 +125,6 @@ def move_row_up() -> None:
     set_text_alignment(TABLE, row - 1)
 
 
-def add_row_below() -> None:
-  """Add a row below the current row."""
-  current_row = TABLE.currentRow() + 1
-  TABLE.insertRow(current_row)
-  ui_utils.fill_row(TABLE, current_row)
-  set_text_alignment(TABLE, current_row)
-
-
 def add_file_below(path: str) -> None:
   """Add a file below the current row."""
   id_row = TABLE.rowCount()
@@ -141,15 +133,6 @@ def add_file_below(path: str) -> None:
   set_text_alignment(TABLE, id_row)
   TABLE.setItem(id_row, 1, QTableWidgetItem(path))
   fix_active_row_path(TABLE.item(id_row, 1))
-
-
-def remove_active_row() -> None:
-  """Remove the currently selected row."""
-  #  #11 Add undo functionality.
-  current_row = TABLE.currentRow()
-  if current_row == -1:
-    current_row = TABLE.rowCount() - 1
-  TABLE.removeRow(current_row)
 
 
 def post_process_row(table: QTableWidget, row: int) -> None:
@@ -215,6 +198,7 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
       item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     else:
       item.setTextAlignment(Qt.AlignCenter)
+
     table.setItem(row, i, item)
 
 

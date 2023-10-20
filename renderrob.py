@@ -3,20 +3,22 @@ import os
 import platform
 import subprocess
 import sys
+from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import (QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor)
-from PySide6.QtWidgets import (QApplication, QFileDialog,
-                               QMessageBox, QStackedLayout, QTableWidgetItem,
-                               QWidget)
+from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
+from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QFileDialog,
+                               QHBoxLayout, QMessageBox, QStackedLayout, QTableWidget,
+                               QTableWidgetItem, QWidget)
 
 import settings_window
 import shot_name_builder
+from dropwidget import DropWidget
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from state_saver import STATESAVER
 from utils import print_utils, table_utils, ui_utils
-from dropwidget import DropWidget
+
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 
@@ -37,13 +39,14 @@ class MainWindow(QWidget):
     self.recent_file_actions = None
     self.process = None
     self.is_saved = True
+    self.recent_states = []
 
   def setup(self) -> None:
     """Provide main function."""
     self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
-    self.resize(1400, self.app.primaryScreen().size().height() - 100)
+    self.resize(1800, self.app.primaryScreen().size().height() - 100)
     self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
@@ -55,10 +58,15 @@ class MainWindow(QWidget):
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
     self.window.progressBar.setMaximum(100)
-    self.make_main_window_connections()
     layout = QStackedLayout()
     layout.addWidget(self.window)
     self.setLayout(layout)
+    self.make_main_window_connections()
+    # self.table.setAcceptDrops(True)
+    # self.table.setDragDropMode(QAbstractItemView.InternalMove)
+    # select one row at a time
+    # self.table.setSelectionMode(QAbstractItemView.SingleSelection)
+    # self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
   def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
     """Handle the close event."""
@@ -132,8 +140,9 @@ class MainWindow(QWidget):
     self.cache.current_file = ""
     STATESAVER.state.FromString(b"")
     STATESAVER.parent_widget = self
+    self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
-    table_utils.add_row_below()
+    self.add_row_below()
 
   def quit(self) -> None:
     """Quit the application."""
@@ -197,6 +206,7 @@ class MainWindow(QWidget):
 
   def open_file(self, file_name: str) -> None:
     """Open a RenderRob file."""
+    self.table.blockSignals(True)
     STATESAVER.parent_widget = self
     with open(file_name, "rb") as pb_file:
       pb_str = pb_file.read()
@@ -207,6 +217,8 @@ class MainWindow(QWidget):
     self.cache.recent_files.remove(file_name)
     self.cache.recent_files.insert(0, file_name)
     self.refresh_recent_files_menu()
+    self.recent_states = [STATESAVER.state.SerializeToString()]
+    self.table.blockSignals(False)
 
   def open_settings_window(self) -> None:
     """Open the settings window."""
@@ -216,8 +228,8 @@ class MainWindow(QWidget):
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
     table_utils.TABLE = self.table
-    self.window.add_button.clicked.connect(table_utils.add_row_below)
-    self.window.delete_button.clicked.connect(table_utils.remove_active_row)
+    self.window.add_button.clicked.connect(self.add_row_below)
+    self.window.delete_button.clicked.connect(self.remove_active_row)
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(table_utils.move_row_up)
@@ -234,14 +246,32 @@ class MainWindow(QWidget):
     self.table.itemChanged.connect(self.table_item_changed)
     self.window.blender_button.clicked.connect(self.open_blender_file)
     self.window.duplicate_button.clicked.connect(self.duplicate_row)
+    self.window.actionUndo.triggered.connect(self.undo)
     #  #20 Add open blender button
 
-  def table_item_changed(self, item: QTableWidgetItem) -> None:
+  def undo(self) -> None:
+    """Undo the last action."""
+    print(self.recent_states)
+    if not self.recent_states:
+      return
+    STATESAVER.state.ParseFromString(self.recent_states.pop())
+    # TODO: The blockSignals could be done as a context manager on the top level operator methods.
+    self.table.blockSignals(True)
+    STATESAVER.state_to_table(self.table)
+    self.table.blockSignals(False)
+
+  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle table item changes."""
-    if item.text():
-      self.is_saved = False
+    print(".", end="")
+    self.is_saved = False
+    STATESAVER.table_to_state(self.table)
+    state_string = STATESAVER.state.SerializeToString()
+    if not self.recent_states or self.recent_states[-1] != state_string:
+      self.recent_states.append(state_string)
+    if item:
+      self.table.blockSignals(True)
       table_utils.fix_active_row_path(item)
-    print(STATESAVER.state)
+      self.table.blockSignals(False)
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
@@ -355,17 +385,15 @@ class MainWindow(QWidget):
       filepath = snb.frame_path.replace(
           "####",
           STATESAVER.state.render_jobs[current_row].start.zfill(4))
-
-    if not os.path.exists(filepath):
+    folder_path = os.path.dirname(filepath)
+    if not os.path.exists(folder_path):
       QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
+      return
     if platform.system() == 'Darwin':       # macOS
-      folder_path = os.path.dirname(filepath)
       subprocess.call(('open', folder_path))
     elif platform.system() == 'Windows':    # Windows
-      folder_path = os.path.dirname(filepath)
       os.startfile(folder_path)
     else:                                   # Linux variants
-      folder_path = os.path.dirname(filepath)
       subprocess.call(('xdg-open', folder_path))
 
   def open_blender_file(self) -> None:
@@ -386,7 +414,9 @@ class MainWindow(QWidget):
     STATESAVER.table_to_state(self.table)
     current_row = self.table.currentRow()
     STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
+    self.table.blockSignals(True)
     STATESAVER.state_to_table(self.table)
+    self.table.blockSignals(False)
 
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
@@ -415,7 +445,7 @@ class MainWindow(QWidget):
     args = ["-b", job.file,
             "-y",
             "-o", snb.frame_path,
-            "-F", ui_utils.FILE_FORMATS[job.file_format],
+            "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "--python-expr", inline_python,
             ]
     args.extend(render_frame_command.split(" "))
@@ -467,6 +497,27 @@ class MainWindow(QWidget):
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
     self.window.render_button.setEnabled(True)
+
+  def add_row_below(self) -> None:
+    """Add a row below the current row."""
+    self.table.blockSignals(True)
+    self.table_item_changed()
+    current_row = self.table.currentRow() + 1
+    self.table.insertRow(current_row)
+    ui_utils.fill_row(self.table, current_row)
+    table_utils.set_text_alignment(self.table, current_row)
+    self.table.blockSignals(False)
+
+  def remove_active_row(self) -> None:
+    """Remove the currently selected row."""
+    self.table.blockSignals(True)
+    #  #11 Add undo functionality.
+    self.table_item_changed()
+    current_row = self.table.currentRow()
+    if current_row == -1:
+      current_row = self.table.rowCount() - 1
+    self.table.removeRow(current_row)
+    self.table.blockSignals(False)
 
 
 if __name__ == "__main__":

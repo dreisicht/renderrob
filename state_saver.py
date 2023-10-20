@@ -5,7 +5,7 @@ is being handled in the settings window class.
 """
 import os
 
-from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
 from utils import table_utils, ui_utils
@@ -32,6 +32,7 @@ class StateSaver:
 
   def state_to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
+    # table.blockSignals(True)
     for _ in range(table.rowCount()):
       table.removeRow(0)
     for i, render_job in enumerate(self.state.render_jobs):
@@ -58,6 +59,7 @@ class StateSaver:
       table.setItem(i, 17, QTableWidgetItem(";".join(render_job.view_layers)))
       table.setItem(i, 18, QTableWidgetItem(render_job.comments))
       table_utils.set_text_alignment(table, i)
+    # table.blockSignals(False)
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
