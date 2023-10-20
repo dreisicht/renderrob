@@ -30,9 +30,9 @@ COLORS = {
 
 def normalize_drive_letter(path: str) -> str:
   """Normalize the drive letter to upper case."""
-  path = os.path.normpath(path).replace("\\", "/")
   if len(path) < 2:
     return path
+  path = os.path.normpath(path).replace("\\", "/")
   if path[1] == ":":
     return path[0].upper() + path[1:]
   return path
@@ -127,12 +127,14 @@ def move_row_up() -> None:
 
 def add_file_below(path: str) -> None:
   """Add a file below the current row."""
+  TABLE.blockSignals(True)
   id_row = TABLE.rowCount()
   TABLE.insertRow(id_row)
   ui_utils.fill_row(TABLE, id_row)
   set_text_alignment(TABLE, id_row)
   TABLE.setItem(id_row, 1, QTableWidgetItem(path))
   fix_active_row_path(TABLE.item(id_row, 1))
+  TABLE.blockSignals(False)
 
 
 def post_process_row(table: QTableWidget, row: int) -> None:
@@ -186,10 +188,10 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
     if i in ui_utils.COMBOBOX_COLUMNS or i in ui_utils.CHECKBOX_COLUMNS:
       continue
     old_item = table.item(row, i)
-    if not old_item:
-      text = None
-    else:
+    if old_item:
       text = old_item.text()
+    else:
+      text = ""
     item = QTableWidgetItem(text)
     if not item:
       continue
@@ -198,7 +200,6 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
       item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     else:
       item.setTextAlignment(Qt.AlignCenter)
-
     table.setItem(row, i, item)
 
 

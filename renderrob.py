@@ -7,8 +7,7 @@ from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QComboBox, QFileDialog,
-                               QHBoxLayout, QMessageBox, QStackedLayout, QTableWidget,
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedLayout,
                                QTableWidgetItem, QWidget)
 
 import settings_window
@@ -62,11 +61,6 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
     self.make_main_window_connections()
-    # self.table.setAcceptDrops(True)
-    # self.table.setDragDropMode(QAbstractItemView.InternalMove)
-    # select one row at a time
-    # self.table.setSelectionMode(QAbstractItemView.SingleSelection)
-    # self.table.setSelectionBehavior(QAbstractItemView.SelectRows)
 
   def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
     """Handle the close event."""
@@ -124,6 +118,7 @@ class MainWindow(QWidget):
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
     self.is_saved = True
+    self.window.setWindowTitle("RenderRob " + self.cache.current_file)
 
   def save_file(self) -> None:
     """Save the state to a serialized proto file without a dialog."""
@@ -132,6 +127,7 @@ class MainWindow(QWidget):
       protobuf.write(
           STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
     self.is_saved = True
+    self.window.setWindowTitle("RenderRob " + self.cache.current_file)
 
   def new_file(self) -> None:
     """Create a new file."""
@@ -223,6 +219,7 @@ class MainWindow(QWidget):
   def open_settings_window(self) -> None:
     """Open the settings window."""
     self.is_saved = False
+    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
     settings_window.SettingsWindow()
 
   def make_main_window_connections(self) -> None:
@@ -251,7 +248,6 @@ class MainWindow(QWidget):
 
   def undo(self) -> None:
     """Undo the last action."""
-    print(self.recent_states)
     if not self.recent_states:
       return
     STATESAVER.state.ParseFromString(self.recent_states.pop())
@@ -262,16 +258,31 @@ class MainWindow(QWidget):
 
   def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle table item changes."""
-    print(".", end="")
     self.is_saved = False
+    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
+
     STATESAVER.table_to_state(self.table)
     state_string = STATESAVER.state.SerializeToString()
     if not self.recent_states or self.recent_states[-1] != state_string:
       self.recent_states.append(state_string)
     if item:
       self.table.blockSignals(True)
-      table_utils.fix_active_row_path(item)
+      if item.column() == 1:
+        table_utils.fix_active_row_path(item)
       self.table.blockSignals(False)
+    self.check_table_for_errors()
+
+  def check_table_for_errors(self) -> bool:
+    """Check the table for errors."""
+    # Double occurrences of jobs
+    self.table.blockSignals(True)
+    for i in range(self.table.rowCount()):
+      if list(STATESAVER.state.render_jobs).count(STATESAVER.state.render_jobs[i]) > 1:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+      else:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+    self.table.blockSignals(False)
+    # Ignoring animation denoising for now, since # it's deprecated in Blender.
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
@@ -366,9 +377,8 @@ class MainWindow(QWidget):
 
       # The call does not take frame step and fps into account.
       # Investigated and turns out problem on Blender's side.
-      blenderplayer_call = (f"{STATESAVER.state.settings.blender_path} -a {filepath} -f"
-                            f"{STATESAVER.state.settings.fps} -j {frame_step} -p 0 0")
-      subprocess.call(blenderplayer_call)
+      subprocess.Popen([STATESAVER.state.settings.blender_path, "-a", filepath,
+                       "-f", str(STATESAVER.state.settings.fps), "-j", str(frame_step)])
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
@@ -416,6 +426,7 @@ class MainWindow(QWidget):
     STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
     self.table.blockSignals(True)
     STATESAVER.state_to_table(self.table)
+    self.table_item_changed()
     self.table.blockSignals(False)
 
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
@@ -458,6 +469,7 @@ class MainWindow(QWidget):
     self.window.progressBar.setValue(progress_value)
 
   def _continue_render(self, exit_code: int) -> None:
+    self.table.blockSignals(True)
     # 62097 is the exit code for an interrupted process -> cancelled render.
     table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
     print_utils.print_info("Continuing render.")
@@ -476,9 +488,11 @@ class MainWindow(QWidget):
       self.window.progressBar.setValue(100)
       table_utils.make_editable(self.table)
       self.window.render_button.setEnabled(True)
+    self.blockSignals(False)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
+    self.table.blockSignals(True)
     self.window.progressBar.setValue(0)
     self.window.render_button.setEnabled(False)
     table_utils.make_read_only_selectable(self.table)
@@ -488,6 +502,7 @@ class MainWindow(QWidget):
     table_utils.reset_all_backgruond_colors(self.table)
     self.number_active_jobs = self._get_active_jobs_number()
     self._continue_render(0)
+    self.table.blockSignals(False)
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
@@ -512,12 +527,12 @@ class MainWindow(QWidget):
     """Remove the currently selected row."""
     self.table.blockSignals(True)
     #  #11 Add undo functionality.
-    self.table_item_changed()
     current_row = self.table.currentRow()
     if current_row == -1:
       current_row = self.table.rowCount() - 1
     self.table.removeRow(current_row)
     self.table.blockSignals(False)
+    self.table_item_changed()
 
 
 if __name__ == "__main__":

@@ -57,7 +57,7 @@
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_8">
        <item>
-        <widget class="QPushButton" name="pushButton_3">
+        <widget class="QPushButton" name="blender_button">
          <property name="maximumSize">
           <size>
            <width>34</width>
@@ -70,7 +70,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton_2">
+        <widget class="QPushButton" name="output_button">
          <property name="maximumSize">
           <size>
            <width>34</width>
@@ -83,7 +83,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="files_button">
          <property name="maximumSize">
           <size>
            <width>34</width>
