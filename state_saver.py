@@ -5,7 +5,7 @@ is being handled in the settings window class.
 """
 import os
 
-from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem, QMessageBox
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
 from utils import table_utils, ui_utils
@@ -66,15 +66,16 @@ class StateSaver:
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member
       render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
+      render_job.file = get_text(table.item(i, 1))
       if "/" not in render_job.file:
         render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
-      if not render_job.file:
-        QMessageBox.warning(self.parent_widget, "Warning",
-                            "The file path cannot be empty.", QMessageBox.Ok)
-      if not os.path.exists(render_job.file):
-        QMessageBox.warning(
-            self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.",
-            QMessageBox.Ok)
+      # if not render_job.file:
+      #   QMessageBox.warning(self.parent_widget, "Warning",
+      #                       "The file path cannot be empty.", QMessageBox.Ok)
+      # if render_job.file and not os.path.exists(render_job.file):
+      #   QMessageBox.warning(
+      #       self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.",
+      #       QMessageBox.Ok)
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the

@@ -70,7 +70,7 @@ class ShotNameBuilder:
 
   def set_version_number(self, full_frame_path: str) -> str:
     """Get the version number of the shot."""
-    shot_iter_num = 1
+    shot_iter_num = 1000
     if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
       if self.render_job.start == "":
         start_frame = str(1).zfill(4)
@@ -79,14 +79,16 @@ class ShotNameBuilder:
     else:
       start_frame = self.render_job.start.zfill(4)
 
-    while os.path.exists(full_frame_path.replace(
-            "v$$", "v" + str(shot_iter_num).zfill(2)).replace("####", start_frame)):
-      shot_iter_num = shot_iter_num + 1
+    while not os.path.exists(full_frame_path.replace(
+            "v$$", "v" + str(
+                shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 0:
+      shot_iter_num -= 1
+    shot_iter_num += 1
 
     if self.replay_mode:
-      shot_iter_num = shot_iter_num - 1
+      shot_iter_num -= 1
     elif self.render_job.overwrite and shot_iter_num > 1:
-      shot_iter_num = shot_iter_num - 1
+      shot_iter_num -= 1
     # Update full_frame_path with iteration number.
     return full_frame_path.replace(
         "v$$", f"v{str(shot_iter_num).zfill(2)}")
@@ -102,7 +104,7 @@ class ShotNameBuilder:
     else:
       frame_render_folder = os.path.join(output_path, shotname)
 
-    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS[self.render_job.file_format]}"
+    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_UI[self.render_job.file_format]}"
     full_frame_path = os.path.join(frame_render_folder, frame_name)
     # if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
     #   if

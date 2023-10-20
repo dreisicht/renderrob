@@ -4,6 +4,7 @@ import os
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtUiTools import QUiLoader
+from PySide6.QtWidgets import QFileDialog
 
 from state_saver import STATESAVER
 from utils import ui_utils
@@ -54,6 +55,28 @@ class SettingsWindow():
   def make_settings_window_connections(self, window: QUiLoader) -> None:
     """Make connections for buttons in settings dialog.."""
     window.buttonBox.accepted.connect(self.save_settings_state)
+    window.blender_button.clicked.connect(self.open_blender_path)
+    window.files_button.clicked.connect(self.open_blender_files_path)
+    window.output_button.clicked.connect(self.open_output_path)
+
+  def open_blender_path(self) -> None:
+    """Open a file dialog to select the path to Blender."""
+    path = QFileDialog.getOpenFileName(
+        self.window, caption="Select Blender Path", filter="Blender (*.exe)")
+    if path:
+      self.window.lineEdit_3.setText(path[0])
+
+  def open_blender_files_path(self) -> None:
+    """Open a file dialog to select the path to Blender files."""
+    path = QFileDialog.getExistingDirectory(self.window, caption="Select Blender Files Path")
+    if path:
+      self.window.lineEdit.setText(path)
+
+  def open_output_path(self) -> None:
+    """Open a file dialog to select the output path."""
+    path = QFileDialog.getExistingDirectory(self.window, caption="Select Output Path")
+    if path:
+      self.window.lineEdit_2.setText(path)
 
   def save_settings_state(self) -> None:
     """Save the state from the settings dialog into the global state."""
