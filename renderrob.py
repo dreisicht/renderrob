@@ -23,6 +23,7 @@ MAX_NUMBER_OF_RECENT_FILES = 5
 
 class MainWindow(QWidget):
   """Main window for RenderRob."""
+  ########### SETUP ############
 
   def __init__(self) -> None:
     """Initialize the main window."""
@@ -62,6 +63,18 @@ class MainWindow(QWidget):
     self.setLayout(layout)
     self.make_main_window_connections()
 
+  def execute(self) -> None:
+    """Execute the main window.
+
+    NOTE: For unit testing, this function should not be called.
+    """
+    self.setup()
+    self.new_file()
+    self.save_cache()
+    self.show()
+    self.app.exec()
+
+  ############### EVENTS ###############
   def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
     """Handle the close event."""
     if self.is_saved:
@@ -75,16 +88,37 @@ class MainWindow(QWidget):
     else:
       event.ignore()
 
-  def execute(self) -> None:
-    """Execute the main window.
-
-    NOTE: For unit testing, this function should not be called.
-    """
-    self.setup()
-    self.new_file()
+  def quit(self) -> None:
+    """Quit the application."""
     self.save_cache()
-    self.show()
-    self.app.exec()
+    QCoreApplication.quit()
+
+  def make_main_window_connections(self) -> None:
+    """Make connections for buttons."""
+    table_utils.TABLE = self.table
+    self.window.add_button.clicked.connect(self.add_row_below)
+    self.window.delete_button.clicked.connect(self.remove_active_row)
+    self.window.play_button.clicked.connect(self.play_job)
+    self.window.open_button.clicked.connect(self.open_output_folder)
+    self.window.up_button.clicked.connect(table_utils.move_row_up)
+    self.window.down_button.clicked.connect(table_utils.move_row_down)
+
+    self.window.render_button.clicked.connect(self.start_render)
+    self.window.stop_button.clicked.connect(self.stop_render)
+    self.window.actionOpen.triggered.connect(self.open_file_dialog)
+    self.window.actionSave.triggered.connect(self.save_file)
+    self.window.actionSave_As.triggered.connect(self.save_as_file)
+    self.window.actionSettings.triggered.connect(self.open_settings_window)
+    self.window.actionNew.triggered.connect(self.new_file)
+    self.window.actionQuit.triggered.connect(self.quit)
+    self.table.itemChanged.connect(self.table_item_changed)
+    self.window.blender_button.clicked.connect(self.open_blender_file)
+    self.window.duplicate_button.clicked.connect(self.duplicate_row)
+    self.window.actionUndo.triggered.connect(self.undo)
+    #  #20 Add open blender button
+
+
+##### FILE OPS#####
 
   def save_cache(self) -> None:
     """Store the cache to a file."""
@@ -139,11 +173,6 @@ class MainWindow(QWidget):
     self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
     self.add_row_below()
-
-  def quit(self) -> None:
-    """Quit the application."""
-    self.save_cache()
-    QCoreApplication.quit()
 
   def open_recent_file0(self) -> None:
     """Open the 0st recent file."""
@@ -216,74 +245,7 @@ class MainWindow(QWidget):
     self.recent_states = [STATESAVER.state.SerializeToString()]
     self.table.blockSignals(False)
 
-  def open_settings_window(self) -> None:
-    """Open the settings window."""
-    self.is_saved = False
-    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
-    settings_window.SettingsWindow()
-
-  def make_main_window_connections(self) -> None:
-    """Make connections for buttons."""
-    table_utils.TABLE = self.table
-    self.window.add_button.clicked.connect(self.add_row_below)
-    self.window.delete_button.clicked.connect(self.remove_active_row)
-    self.window.play_button.clicked.connect(self.play_job)
-    self.window.open_button.clicked.connect(self.open_output_folder)
-    self.window.up_button.clicked.connect(table_utils.move_row_up)
-    self.window.down_button.clicked.connect(table_utils.move_row_down)
-
-    self.window.render_button.clicked.connect(self.start_render)
-    self.window.stop_button.clicked.connect(self.stop_render)
-    self.window.actionOpen.triggered.connect(self.open_file_dialog)
-    self.window.actionSave.triggered.connect(self.save_file)
-    self.window.actionSave_As.triggered.connect(self.save_as_file)
-    self.window.actionSettings.triggered.connect(self.open_settings_window)
-    self.window.actionNew.triggered.connect(self.new_file)
-    self.window.actionQuit.triggered.connect(self.quit)
-    self.table.itemChanged.connect(self.table_item_changed)
-    self.window.blender_button.clicked.connect(self.open_blender_file)
-    self.window.duplicate_button.clicked.connect(self.duplicate_row)
-    self.window.actionUndo.triggered.connect(self.undo)
-    #  #20 Add open blender button
-
-  def undo(self) -> None:
-    """Undo the last action."""
-    if not self.recent_states:
-      return
-    STATESAVER.state.ParseFromString(self.recent_states.pop())
-    # Refactor: The blockSignals could be done as a context manager on the top level operator
-    # methods.
-    self.table.blockSignals(True)
-    STATESAVER.state_to_table(self.table)
-    self.table.blockSignals(False)
-
-  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
-    """Handle table item changes."""
-    self.is_saved = False
-    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
-
-    STATESAVER.table_to_state(self.table)
-    state_string = STATESAVER.state.SerializeToString()
-    if not self.recent_states or self.recent_states[-1] != state_string:
-      self.recent_states.append(state_string)
-    if item:
-      self.table.blockSignals(True)
-      if item.column() == 1:
-        table_utils.fix_active_row_path(item)
-      self.table.blockSignals(False)
-    self.check_table_for_errors()
-
-  def check_table_for_errors(self) -> bool:
-    """Check the table for errors."""
-    # Double occurrences of jobs
-    self.table.blockSignals(True)
-    for i in range(self.table.rowCount()):
-      if list(STATESAVER.state.render_jobs).count(STATESAVER.state.render_jobs[i]) > 1:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
-      else:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
-    self.table.blockSignals(False)
-    # Ignoring animation denoising for now, since # it's deprecated in Blender.
+  ######### CONSOLE WINDOW ###########
 
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
@@ -335,13 +297,64 @@ class MainWindow(QWidget):
       self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
-  def _get_active_jobs_number(self) -> int:
-    """Get the number of active jobs."""
-    counter = 0
-    for job in STATESAVER.state.render_jobs:
-      if job.active:
-        counter += 1
-    return counter
+  ##### STATE OPS #####
+  def undo(self) -> None:
+    """Undo the last action."""
+    if not self.recent_states:
+      return
+    STATESAVER.state.ParseFromString(self.recent_states.pop())
+    # Refactor: The blockSignals could be done as a context manager on the top level operator
+    # methods.
+    self.table.blockSignals(True)
+    STATESAVER.state_to_table(self.table)
+    self.table.blockSignals(False)
+
+  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
+    """Handle table item changes."""
+    self.is_saved = False
+    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
+
+    STATESAVER.table_to_state(self.table)
+    state_string = STATESAVER.state.SerializeToString()
+    if not self.recent_states or self.recent_states[-1] != state_string:
+      self.recent_states.append(state_string)
+    if item:
+      self.table.blockSignals(True)
+      if item.column() == 1:
+        table_utils.fix_active_row_path(item)
+      self.table.blockSignals(False)
+    self.check_table_for_errors()
+
+  ########### MAIN WINDOW OPS #############
+
+  def open_settings_window(self) -> None:
+    """Open the settings window."""
+    self.is_saved = False
+    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
+    settings_window.SettingsWindow()
+
+  def start_render(self) -> None:
+    """Render operator called by the Render button."""
+    self.table.blockSignals(True)
+    self.window.progressBar.setValue(0)
+    self.window.render_button.setEnabled(False)
+    table_utils.make_read_only_selectable(self.table)
+    STATESAVER.table_to_state(self.table)
+    self.job_row_index = 0
+    self.current_job = 0
+    table_utils.reset_all_backgruond_colors(self.table)
+    self.number_active_jobs = self._get_active_jobs_number()
+    self._continue_render(0)
+    self.table.blockSignals(False)
+
+  def stop_render(self) -> None:
+    """Interrupt the render operator."""
+    self.process.kill()
+    del STATESAVER.state.render_jobs[:]
+    self.window.progressBar.setValue(0)
+    table_utils.make_editable(self.table)
+    print_utils.print_info("Render stopped.")
+    self.window.render_button.setEnabled(True)
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blender Player."""
@@ -420,15 +433,35 @@ class MainWindow(QWidget):
     # Launch Blender with the file.
     subprocess.Popen([STATESAVER.state.settings.blender_path, filepath])
 
-  def duplicate_row(self) -> None:
-    """Duplicate the currently selected row."""
-    STATESAVER.table_to_state(self.table)
-    current_row = self.table.currentRow()
-    STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
+  ######### MAIN WINDOW UTILS ###########
+
+  def _refresh_progress_bar(self) -> None:
+    progress_value = int(100 / self.number_active_jobs) * self.current_job
+    self.window.progressBar.setValue(progress_value)
+
+  def _continue_render(self, exit_code: int) -> None:
     self.table.blockSignals(True)
-    STATESAVER.state_to_table(self.table)
-    self.table_item_changed()
-    self.table.blockSignals(False)
+    # 62097 is the exit code for an interrupted process -> cancelled render.
+    table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
+    print_utils.print_info("Continuing render.")
+    if STATESAVER.state.render_jobs:
+      job = STATESAVER.state.render_jobs.pop(0)
+      if not job.active:
+        self.job_row_index += 1
+        self._continue_render(664)
+      else:
+        print_utils.print_info(f"Starting render of {job.file}")
+        self.job_row_index += 1
+        self.current_job += 1
+        self.render_job(job)
+    else:
+      print_utils.print_info("No more render jobs left.")
+      self.window.progressBar.setValue(100)
+      table_utils.make_editable(self.table)
+      self.window.render_button.setEnabled(True)
+    self.blockSignals(False)
+
+  ########## TABLE OPS ############
 
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
@@ -465,54 +498,15 @@ class MainWindow(QWidget):
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def _refresh_progress_bar(self) -> None:
-    progress_value = int(100 / self.number_active_jobs) * self.current_job
-    self.window.progressBar.setValue(progress_value)
-
-  def _continue_render(self, exit_code: int) -> None:
-    self.table.blockSignals(True)
-    # 62097 is the exit code for an interrupted process -> cancelled render.
-    table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
-    print_utils.print_info("Continuing render.")
-    if STATESAVER.state.render_jobs:
-      job = STATESAVER.state.render_jobs.pop(0)
-      if not job.active:
-        self.job_row_index += 1
-        self._continue_render(664)
-      else:
-        print_utils.print_info(f"Starting render of {job.file}")
-        self.job_row_index += 1
-        self.current_job += 1
-        self.render_job(job)
-    else:
-      print_utils.print_info("No more render jobs left.")
-      self.window.progressBar.setValue(100)
-      table_utils.make_editable(self.table)
-      self.window.render_button.setEnabled(True)
-    self.blockSignals(False)
-
-  def start_render(self) -> None:
-    """Render operator called by the Render button."""
-    self.table.blockSignals(True)
-    self.window.progressBar.setValue(0)
-    self.window.render_button.setEnabled(False)
-    table_utils.make_read_only_selectable(self.table)
+  def duplicate_row(self) -> None:
+    """Duplicate the currently selected row."""
     STATESAVER.table_to_state(self.table)
-    self.job_row_index = 0
-    self.current_job = 0
-    table_utils.reset_all_backgruond_colors(self.table)
-    self.number_active_jobs = self._get_active_jobs_number()
-    self._continue_render(0)
+    current_row = self.table.currentRow()
+    STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
+    self.table.blockSignals(True)
+    STATESAVER.state_to_table(self.table)
+    self.table_item_changed()
     self.table.blockSignals(False)
-
-  def stop_render(self) -> None:
-    """Interrupt the render operator."""
-    self.process.kill()
-    del STATESAVER.state.render_jobs[:]
-    self.window.progressBar.setValue(0)
-    table_utils.make_editable(self.table)
-    print_utils.print_info("Render stopped.")
-    self.window.render_button.setEnabled(True)
 
   def add_row_below(self) -> None:
     """Add a row below the current row."""
@@ -534,6 +528,28 @@ class MainWindow(QWidget):
     self.table.removeRow(current_row)
     self.table.blockSignals(False)
     self.table_item_changed()
+
+  ########### TABLE UTILS #############
+
+  def check_table_for_errors(self) -> bool:
+    """Check the table for errors."""
+    # Double occurrences of jobs
+    self.table.blockSignals(True)
+    for i in range(self.table.rowCount()):
+      if list(STATESAVER.state.render_jobs).count(STATESAVER.state.render_jobs[i]) > 1:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+      else:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+    self.table.blockSignals(False)
+    # Ignoring animation denoising for now, since # it's deprecated in Blender.
+
+  def _get_active_jobs_number(self) -> int:
+    """Get the number of active jobs."""
+    counter = 0
+    for job in STATESAVER.state.render_jobs:
+      if job.active:
+        counter += 1
+    return counter
 
 
 if __name__ == "__main__":
