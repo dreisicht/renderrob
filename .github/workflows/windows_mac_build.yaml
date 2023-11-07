@@ -71,7 +71,7 @@ jobs:
           sudo cp bin/protoc /usr/local/bin/protoc
           bin/protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
           bin/protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
-          brew install ccache
+                    brew install ccache
 
       - name: Create Python virtual environment
         if: matrix.os == 'windows-latest'

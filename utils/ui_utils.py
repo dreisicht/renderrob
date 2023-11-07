@@ -1,5 +1,5 @@
 """Util functions for helping build the render rob UI."""
-
+import os
 import sys
 from contextlib import closing
 from typing import Any, List, Optional
@@ -7,11 +7,10 @@ from typing import Any, List, Optional
 from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QTableWidget,
-                               QWidget)
+from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
 
 COMBOBOX_COLUMNS = [8, 9, 10]
-CHECKBOX_COLUMNS = [0, 11, 12, 13, 14, 15]
+CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
 FILE_FORMATS_COMMAND = ["PNG", "TIFF", "OPEN_EXR_MULTILAYER", "JPEG"]
 FILE_FORMATS_UI = ["png", "tiff", "exr", "jpeg"]
 RENDER_ENGINES = ["cycles", "eevee"]
@@ -123,3 +122,17 @@ def fill_row(table: QTableWidget, row: int) -> None:
   add_checkbox(table, row, 13, checked=False)
   add_checkbox(table, row, 14, checked=False)
   add_checkbox(table, row, 15, checked=False)
+
+
+def discover_blender_path() -> None:
+  """Discover the path to Blender."""
+  possibilities = ["C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
+                   "C:/Program Files/Blender Foundation/Blender/blender.exe",
+                   "/Applications/blender/blender.app/Contents/MacOS/blender",
+                   "/usr/bin/blender",
+                   "/usr/local/bin/blender",
+                   "~/blender/"]
+
+  for blender_path in possibilities:
+    if os.path.exists(blender_path):
+      return blender_path

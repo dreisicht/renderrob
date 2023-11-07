@@ -370,11 +370,6 @@
               </column>
               <column>
                <property name="text">
-                <string>Animation Denoise</string>
-               </property>
-              </column>
-              <column>
-               <property name="text">
                 <string>Denoise</string>
                </property>
               </column>
@@ -539,14 +534,6 @@
                </property>
               </item>
               <item row="0" column="17">
-               <property name="text">
-                <string/>
-               </property>
-               <property name="textAlignment">
-                <set>AlignCenter</set>
-               </property>
-              </item>
-              <item row="0" column="18">
                <property name="text">
                 <string/>
                </property>

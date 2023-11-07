@@ -12,10 +12,10 @@ from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedL
 
 import settings_window
 import shot_name_builder
+import state_saver
 from dropwidget import DropWidget
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from state_saver import STATESAVER
 from utils import print_utils, table_utils, ui_utils
 
 MAX_NUMBER_OF_RECENT_FILES = 5
@@ -36,6 +36,8 @@ class MainWindow(QWidget):
     self.job_row_index = 0
     self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()  # pylint: disable=no-member
+    self.state_saver = state_saver.StateSaver()
+
     self.recent_file_actions = None
     self.process = None
     self.is_saved = True
@@ -53,7 +55,7 @@ class MainWindow(QWidget):
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
-    self.table = self.window.tableWidget
+    self.table = self.window.tableWidget  # XXX: needed?
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -95,13 +97,12 @@ class MainWindow(QWidget):
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
-    table_utils.TABLE = self.table
-    self.window.add_button.clicked.connect(self.add_row_below)
+    self.window.add_button.clicked.connect(lambda: self.add_row_below(register_undo=True))
     self.window.delete_button.clicked.connect(self.remove_active_row)
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
-    self.window.up_button.clicked.connect(table_utils.move_row_up)
-    self.window.down_button.clicked.connect(table_utils.move_row_down)
+    self.window.up_button.clicked.connect(lambda: table_utils.move_row_up(self.table))
+    self.window.down_button.clicked.connect(lambda: table_utils.move_row_down(self.table))
 
     self.window.render_button.clicked.connect(self.start_render)
     self.window.stop_button.clicked.connect(self.stop_render)
@@ -115,10 +116,8 @@ class MainWindow(QWidget):
     self.window.blender_button.clicked.connect(self.open_blender_file)
     self.window.duplicate_button.clicked.connect(self.duplicate_row)
     self.window.actionUndo.triggered.connect(self.undo)
-    #  #20 Add open blender button
 
-
-##### FILE OPS#####
+  ##### FILE OPS#####
 
   def save_cache(self) -> None:
     """Store the cache to a file."""
@@ -142,12 +141,12 @@ class MainWindow(QWidget):
 
   def save_as_file(self) -> None:
     """Save the state to a serialized proto file with a dialog."""
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     file_name, _ = QFileDialog.getSaveFileName(
         self.window, "Save File", "", "RenderRob Files (*.rrp)")
     with open(file_name, "wb") as protobuf:
       protobuf.write(
-          STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
+          self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
@@ -156,10 +155,10 @@ class MainWindow(QWidget):
 
   def save_file(self) -> None:
     """Save the state to a serialized proto file without a dialog."""
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     with open(self.cache.current_file, "wb") as protobuf:
       protobuf.write(
-          STATESAVER.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
+          self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
     self.is_saved = True
     self.window.setWindowTitle("RenderRob " + self.cache.current_file)
 
@@ -168,31 +167,11 @@ class MainWindow(QWidget):
     for _ in range(self.table.rowCount()):
       self.table.removeRow(0)
     self.cache.current_file = ""
-    STATESAVER.state.FromString(b"")
-    STATESAVER.parent_widget = self
+    self.state_saver.state.FromString(b"")
+    self.state_saver.parent_widget = self
     self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
-    self.add_row_below()
-
-  def open_recent_file0(self) -> None:
-    """Open the 0st recent file."""
-    self.open_file(self.cache.recent_files[0])
-
-  def open_recent_file1(self) -> None:
-    """Open the 1st recent file."""
-    self.open_file(self.cache.recent_files[1])
-
-  def open_recent_file2(self) -> None:
-    """Open the 2st recent file."""
-    self.open_file(self.cache.recent_files[2])
-
-  def open_recent_file3(self) -> None:
-    """Open the 3st recent file."""
-    self.open_file(self.cache.recent_files[3])
-
-  def open_recent_file4(self) -> None:
-    """Open the 4st recent file."""
-    self.open_file(self.cache.recent_files[4])
+    self.add_row_below(register_undo=False)
 
   def clear_recent_files(self) -> None:
     """Clear the recent files."""
@@ -204,11 +183,11 @@ class MainWindow(QWidget):
     """Add the recent files to the file menu."""
     self.window.menuOpen_Recent.clear()
     open_recent_functions = [
-        self.open_recent_file0,
-        self.open_recent_file1,
-        self.open_recent_file2,
-        self.open_recent_file3,
-        self.open_recent_file4,
+        lambda: self.open_file(self.cache.recent_files[0]),
+        lambda: self.open_file(self.cache.recent_files[1]),
+        lambda: self.open_file(self.cache.recent_files[2]),
+        lambda: self.open_file(self.cache.recent_files[3]),
+        lambda: self.open_file(self.cache.recent_files[4]),
     ]
     for i, file_path in enumerate(self.cache.recent_files):
       action_recent = QAction(os.path.basename(
@@ -232,17 +211,15 @@ class MainWindow(QWidget):
   def open_file(self, file_name: str) -> None:
     """Open a RenderRob file."""
     self.table.blockSignals(True)
-    STATESAVER.parent_widget = self
     with open(file_name, "rb") as pb_file:
-      pb_str = pb_file.read()
-    STATESAVER.state.ParseFromString(pb_str)
-    STATESAVER.state_to_table(self.table)
+      self.state_saver.state.ParseFromString(pb_file.read())
+    self.state_saver.state_to_table(self.table)
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
     self.cache.recent_files.remove(file_name)
     self.cache.recent_files.insert(0, file_name)
     self.refresh_recent_files_menu()
-    self.recent_states = [STATESAVER.state.SerializeToString()]
+    self.recent_states = [self.state_saver.state.SerializeToString()]
     self.table.blockSignals(False)
 
   ######### CONSOLE WINDOW ###########
@@ -302,36 +279,38 @@ class MainWindow(QWidget):
     """Undo the last action."""
     if not self.recent_states:
       return
-    STATESAVER.state.ParseFromString(self.recent_states.pop())
+    self.state_saver.state.ParseFromString(self.recent_states.pop())
     # Refactor: The blockSignals could be done as a context manager on the top level operator
     # methods.
     self.table.blockSignals(True)
-    STATESAVER.state_to_table(self.table)
+    self.state_saver.state_to_table(self.table)
     self.table.blockSignals(False)
 
   def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle table item changes."""
+    print_utils.print_info("Table item changed.")
     self.is_saved = False
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
 
-    STATESAVER.table_to_state(self.table)
-    state_string = STATESAVER.state.SerializeToString()
+    self.state_saver.table_to_state(self.table)
+    state_string = self.state_saver.state.SerializeToString()
     if not self.recent_states or self.recent_states[-1] != state_string:
       self.recent_states.append(state_string)
     if item:
       self.table.blockSignals(True)
       if item.column() == 1:
-        table_utils.fix_active_row_path(item)
+        table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
+        if not os.path.exists(item.text()) and not os.path.exists(os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
+          QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       self.table.blockSignals(False)
     self.check_table_for_errors()
 
   ########### MAIN WINDOW OPS #############
-
   def open_settings_window(self) -> None:
     """Open the settings window."""
     self.is_saved = False
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
-    settings_window.SettingsWindow()
+    settings_window.SettingsWindow(self.state_saver.state)
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
@@ -339,7 +318,7 @@ class MainWindow(QWidget):
     self.window.progressBar.setValue(0)
     self.window.render_button.setEnabled(False)
     table_utils.make_read_only_selectable(self.table)
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     self.job_row_index = 0
     self.current_job = 0
     table_utils.reset_all_backgruond_colors(self.table)
@@ -350,7 +329,7 @@ class MainWindow(QWidget):
   def stop_render(self) -> None:
     """Interrupt the render operator."""
     self.process.kill()
-    del STATESAVER.state.render_jobs[:]
+    del self.state_saver.state.render_jobs[:]
     self.window.progressBar.setValue(0)
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
@@ -358,21 +337,21 @@ class MainWindow(QWidget):
 
   def play_job(self) -> int:
     """Open a job in image viewer or Blender Player."""
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
-        STATESAVER.state.render_jobs[current_row],
-        STATESAVER.state.settings.output_path,
+        self.state_saver.state.render_jobs[current_row],
+        self.state_saver.state.settings.output_path,
         is_replay_mode=True)
-    if STATESAVER.state.render_jobs[current_row].start == "":
+    if self.state_saver.state.render_jobs[current_row].start == "":
       filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
     else:
       filepath = snb.frame_path.replace(
           "####",
-          STATESAVER.state.render_jobs[current_row].start.zfill(4))
+          self.state_saver.state.render_jobs[current_row].start.zfill(4))
     if "STILL" == shot_name_builder.still_or_animation(
-            STATESAVER.state.render_jobs[current_row].start,
-            STATESAVER.state.render_jobs[current_row].end):
+            self.state_saver.state.render_jobs[current_row].start,
+            self.state_saver.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
       if platform.system() == 'Darwin':       # macOS
@@ -384,31 +363,31 @@ class MainWindow(QWidget):
     else:
       if not os.path.exists(filepath):
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
-      if STATESAVER.state.settings.preview.frame_step_use:
-        frame_step = STATESAVER.state.settings.preview.frame_step
+      if self.state_saver.state.settings.preview.frame_step_use:
+        frame_step = self.state_saver.state.settings.preview.frame_step
       else:
         frame_step = 1
 
       # The call does not take frame step and fps into account.
       # Investigated and turns out problem on Blender's side.
-      subprocess.Popen([STATESAVER.state.settings.blender_path, "-a", filepath,
-                       "-f", str(STATESAVER.state.settings.fps), "-j", str(frame_step)])
+      subprocess.Popen([self.state_saver.state.settings.blender_path, "-a", filepath,
+                       "-f", str(self.state_saver.state.settings.fps), "-j", str(frame_step)])
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
     # #8 Add keyboard shortcuts.
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
-        STATESAVER.state.render_jobs[current_row],
-        STATESAVER.state.settings.output_path,
+        self.state_saver.state.render_jobs[current_row],
+        self.state_saver.state.settings.output_path,
         is_replay_mode=True)
-    if STATESAVER.state.render_jobs[current_row].start == "":
+    if self.state_saver.state.render_jobs[current_row].start == "":
       filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
     else:
       filepath = snb.frame_path.replace(
           "####",
-          STATESAVER.state.render_jobs[current_row].start.zfill(4))
+          self.state_saver.state.render_jobs[current_row].start.zfill(4))
     folder_path = os.path.dirname(filepath)
     if not os.path.exists(folder_path):
       QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
@@ -422,16 +401,16 @@ class MainWindow(QWidget):
 
   def open_blender_file(self) -> None:
     """Open the currently selected Blender file."""
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()
-    if not STATESAVER.state.settings.blender_path:
+    if not self.state_saver.state.settings.blender_path:
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
       return
-    filepath = STATESAVER.state.render_jobs[current_row].file
+    filepath = self.state_saver.state.render_jobs[current_row].file
     # Launch Blender with the file.
-    subprocess.Popen([STATESAVER.state.settings.blender_path, filepath])
+    subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
   ######### MAIN WINDOW UTILS ###########
 
@@ -444,8 +423,8 @@ class MainWindow(QWidget):
     # 62097 is the exit code for an interrupted process -> cancelled render.
     table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
     print_utils.print_info("Continuing render.")
-    if STATESAVER.state.render_jobs:
-      job = STATESAVER.state.render_jobs.pop(0)
+    if self.state_saver.state.render_jobs:
+      job = self.state_saver.state.render_jobs.pop(0)
       if not job.active:
         self.job_row_index += 1
         self._continue_render(664)
@@ -466,25 +445,27 @@ class MainWindow(QWidget):
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
-        job, STATESAVER.state.settings.output_path)
+        job, self.state_saver.state.settings.output_path)
     inline_python = render_job_to_render_settings_setter(
-        job, STATESAVER.state.settings)
+        job, self.state_saver.state.settings)
 
-    if job.start != "" and job.end == "":
-      render_frame_command = f"-f {str(job.start)}"
-    elif job.start != "" and job.end != "":
-      render_frame_command = f"-s {str(job.start)} -e {str(job.end)} -a"
-    elif job.start == "" and job.end == "":
-      render_frame_command = "-f 1"
+    if "STILL" == shot_name_builder.still_or_animation(job.start, job.end):
+      if job.start:
+        render_frame_command = f"-f {str(job.start)}"
+      else:
+        render_frame_command = "-f 1"
     else:
-      raise ValueError("Invalid start and end frame values.")
+      if job.start:
+        render_frame_command = f"-s {str(job.start)} -e {str(job.end)} -a"
+      else:
+        render_frame_command = "-a"
 
     self.process = QProcess()
-    if not STATESAVER.state.settings.blender_path:
+    if not self.state_saver.state.settings.blender_path:
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
-    self.process.setProgram(STATESAVER.state.settings.blender_path)
+    self.process.setProgram(self.state_saver.state.settings.blender_path)
     self.process.finished.connect(self._continue_render)
 
     args = ["-b", job.file,
@@ -500,28 +481,29 @@ class MainWindow(QWidget):
 
   def duplicate_row(self) -> None:
     """Duplicate the currently selected row."""
-    STATESAVER.table_to_state(self.table)
+    self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()
-    STATESAVER.state.render_jobs.insert(current_row + 1, STATESAVER.state.render_jobs[current_row])
+    self.state_saver.state.render_jobs.insert(
+        current_row + 1, self.state_saver.state.render_jobs[current_row])
     self.table.blockSignals(True)
-    STATESAVER.state_to_table(self.table)
+    self.state_saver.state_to_table(self.table)
     self.table_item_changed()
     self.table.blockSignals(False)
 
-  def add_row_below(self) -> None:
+  def add_row_below(self, register_undo=True) -> None:
     """Add a row below the current row."""
     self.table.blockSignals(True)
-    self.table_item_changed()
     current_row = self.table.currentRow() + 1
     self.table.insertRow(current_row)
     ui_utils.fill_row(self.table, current_row)
     table_utils.set_text_alignment(self.table, current_row)
+    if register_undo:
+      self.table_item_changed()
     self.table.blockSignals(False)
 
   def remove_active_row(self) -> None:
     """Remove the currently selected row."""
     self.table.blockSignals(True)
-    #  #11 Add undo functionality.
     current_row = self.table.currentRow()
     if current_row == -1:
       current_row = self.table.rowCount() - 1
@@ -536,7 +518,7 @@ class MainWindow(QWidget):
     # Double occurrences of jobs
     self.table.blockSignals(True)
     for i in range(self.table.rowCount()):
-      if list(STATESAVER.state.render_jobs).count(STATESAVER.state.render_jobs[i]) > 1:
+      if list(self.state_saver.state.render_jobs).count(self.state_saver.state.render_jobs[i]) > 1:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
       else:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
@@ -546,7 +528,7 @@ class MainWindow(QWidget):
   def _get_active_jobs_number(self) -> int:
     """Get the number of active jobs."""
     counter = 0
-    for job in STATESAVER.state.render_jobs:
+    for job in self.state_saver.state.render_jobs:
       if job.active:
         counter += 1
     return counter

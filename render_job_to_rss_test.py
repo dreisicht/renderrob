@@ -27,7 +27,7 @@ class TestRenderJobToRss(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    render_job.animation_denoise = True
+    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
