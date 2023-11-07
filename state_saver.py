@@ -56,14 +56,13 @@ class StateSaver:
                                               render_job.motion_blur,
                                               render_job.overwrite,
                                               render_job.high_quality,
-                                              # render_job.animation_denoise,
                                               render_job.denoise])
       ui_utils.set_combobox_indexes(table, i, [render_job.file_format,
                                                render_job.engine,
                                                render_job.device])
-      table.setItem(i, 16, QTableWidgetItem(render_job.scene))
-      table.setItem(i, 17, QTableWidgetItem(";".join(render_job.view_layers)))
-      table.setItem(i, 18, QTableWidgetItem(render_job.comments))
+      table.setItem(i, 15, QTableWidgetItem(render_job.scene))
+      table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))
+      table.setItem(i, 17, QTableWidgetItem(render_job.comments))
       table_utils.set_text_alignment(table, i)
 
   def table_to_state(self, table: QTableWidget) -> None:

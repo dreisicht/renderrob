@@ -151,7 +151,7 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
        "Engine",
        "Device",
        "Motion\nBlur",
-       "Overwrite",
+       "Continue\nJob",
        "High\nQuality",
        "Denoise",
        "Scene",
