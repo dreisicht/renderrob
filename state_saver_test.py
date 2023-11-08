@@ -14,7 +14,7 @@ class TestStateSaver(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up the unit tests."""
-    self.main_window = renderrob.MainWindow()
+    self.main_window = renderrob.MainWindow()  # pylint:disable=no-member
     self.main_window.setup()
     table_utils.add_row_below(self.main_window.table)
     return super().setUp()
