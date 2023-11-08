@@ -15,7 +15,7 @@ import shot_name_builder
 import state_saver
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from utils import print_utils, table_utils, ui_utils
+from utils import print_utils, table_utils, ui_utils, path_utils
 from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
@@ -409,8 +409,8 @@ class MainWindow(QWidget):
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
       return
-    filepath = ui_utils.get_blend_path(self.state_saver.state.render_jobs[current_row].file,
-                                       self.state_saver.state.settings.blender_files_path)
+    filepath = path_utils.get_blend_path(self.state_saver.state.render_jobs[current_row].file,
+                                         self.state_saver.state.settings.blender_files_path)
     if not os.path.exists(filepath):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
@@ -472,7 +472,7 @@ class MainWindow(QWidget):
     self.process.finished.connect(self._continue_render)
 
     # Check if the file was converted to a relative path.
-    file_path = ui_utils.get_blend_path(
+    file_path = path_utils.get_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
     args = ["-b", file_path,
             "-y",

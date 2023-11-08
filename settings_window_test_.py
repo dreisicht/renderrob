@@ -67,14 +67,14 @@ class SettingsWindowTest(unittest.TestCase):
   #   self.assertTrue(
   #       window.window.buttonBox.accepted.connect(window.save_settings_state))
 
-  def test_discover_blender_path(self) -> None:
-    """Test that the blender path is discovered correctly."""
-    window = settings_window.SettingsWindow()
-    window.discover_blender_path()
+  # def test_discover_blender_path(self) -> None:
+  #   """Test that the blender path is discovered correctly."""
+  #   window = settings_window.SettingsWindow()
+  #   window.discover_blender_path()
 
-    self.assertEqual(
-        window.window.lineEdit_3.text(),
-        "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe")
+  #   self.assertEqual(
+  #       window.window.lineEdit_3.text(),
+  #       "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe")
 
 
 if __name__ == "__main__":

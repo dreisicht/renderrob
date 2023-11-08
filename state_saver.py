@@ -6,7 +6,7 @@ is being handled in the settings window class.
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
-from utils import table_utils, ui_utils
+from utils import table_utils, ui_utils, path_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -22,7 +22,7 @@ def get_text(item: QTableWidgetItem, widget=None) -> str:
 
 def init_settings(state: state_pb2.render_rob_state) -> None:  # pylint: disable=no-member
   """Initialize the settings."""
-  state.settings.blender_path = ui_utils.discover_blender_path()
+  state.settings.blender_path = path_utils.discover_blender_path()
   state.settings.fps = 24
   state.settings.preview.samples = 16
   state.settings.preview.frame_step = 4
