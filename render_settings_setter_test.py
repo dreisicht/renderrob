@@ -154,10 +154,8 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene.view_layers.new("View Layer2")
     self.rss.set_denoising_settings(False)
     self.assertFalse(scene.cycles.use_denoising)
-    self.assertFalse(scene.cycles.use_denoising),
     self.assertFalse(self.rss.current_scene_data.cycles.use_animated_seed)
     self.rss.set_denoising_settings(True)
-    self.assertTrue(scene.cycles.use_denoising)
     self.assertTrue(scene.cycles.use_denoising)
     self.assertTrue(self.rss.current_scene_data.cycles.use_animated_seed)
 

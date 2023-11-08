@@ -1,5 +1,4 @@
 """Util functions for helping build the render rob UI."""
-import os
 import sys
 from contextlib import closing
 from typing import Any, List, Optional
