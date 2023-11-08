@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 
 import renderrob
 import state_saver
-# from proto import state_pb2
+from proto import state_pb2
 from utils import table_utils
 
 
@@ -16,7 +16,7 @@ class TestStateSaver(unittest.TestCase):
     """Set up the unit tests."""
     self.main_window = renderrob.MainWindow()
     self.main_window.setup()
-    table_utils.add_row_below()
+    table_utils.add_row_below(self.main_window.table)
     return super().setUp()
 
   def tearDown(self) -> None:
@@ -45,7 +45,7 @@ class TestStateSaver(unittest.TestCase):
     table = self.main_window.table
     state_saver_instance.state_to_table(table)
     self.assertEqual(table.rowCount(), 1)
-    self.assertEqual(table.columnCount(), 19)
+    self.assertEqual(table.columnCount(), 18)
     self.assertTrue(state_saver.get_text(table.cellWidget(0, 0), widget="checkbox"))
     self.assertEqual(state_saver.get_text(table.item(0, 1)), "test/cube.blend")
     self.assertEqual(state_saver.get_text(table.item(0, 2)), "b")
@@ -61,18 +61,17 @@ class TestStateSaver(unittest.TestCase):
     self.assertFalse(state_saver.get_text(table.cellWidget(0, 12), widget="checkbox"))
     self.assertTrue(state_saver.get_text(table.cellWidget(0, 13), widget="checkbox"))
     self.assertFalse(state_saver.get_text(table.cellWidget(0, 14), widget="checkbox"))
-    self.assertTrue(state_saver.get_text(table.cellWidget(0, 15), widget="checkbox"))
-    self.assertEqual(state_saver.get_text(table.item(0, 16)), "c")
-    self.assertEqual(state_saver.get_text(table.item(0, 17)).split(";"), ["d"])
-    self.assertEqual(state_saver.get_text(table.item(0, 18)), "e")
+    self.assertEqual(state_saver.get_text(table.item(0, 15)), "c")
+    self.assertEqual(state_saver.get_text(table.item(0, 16)).split(";"), ["d"])
+    self.assertEqual(state_saver.get_text(table.item(0, 17)), "e")
 
-  # def test_table_to_state(self):
-  #   """Test the table_to_state method."""
-  #   self.main_window.open_file("test/basic_state.rrp")
-  #   state_saver_instance = state_saver.StateSaver()
-  #   state_saver_instance.parent_widget = self.main_window
-  #   state_saver_instance.table_to_state(self.main_window.table)
-  #   reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
-  #   with open("test/basic_state.rrp", "rb") as rrp_file:
-  #     reference_state.ParseFromString(rrp_file.read())
-  #   self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)
+  def test_table_to_state(self):
+    """Test the table_to_state method."""
+    self.main_window.open_file("test/basic_state.rrp")
+    state_saver_instance = state_saver.StateSaver()
+    state_saver_instance.parent_widget = self.main_window
+    state_saver_instance.table_to_state(self.main_window.table)
+    reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
+    with open("test/basic_state.rrp", "rb") as rrp_file:
+      reference_state.ParseFromString(rrp_file.read())
+    self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)

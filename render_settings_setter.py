@@ -152,6 +152,9 @@ class RenderSettingsSetter:
     if denoise:
       self.current_scene_data.cycles.use_animated_seed = True
       bpy.context.scene.cycles.use_denoising = True
+    else:
+      self.current_scene_data.cycles.use_animated_seed = False
+      bpy.context.scene.cycles.use_denoising = False
 
   def set_output_settings(self, frame_step: int, xres: int,
                           yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:

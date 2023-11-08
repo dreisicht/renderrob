@@ -4,7 +4,7 @@ import unittest
 import subprocess
 from unittest.mock import patch
 
-import bpy
+import bpy  # pylint: disable=import-error
 
 import render_settings_setter
 
@@ -152,16 +152,14 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene = bpy.context.scene
     scene.view_layers.new("View Layer1")
     scene.view_layers.new("View Layer2")
-    self.rss.current_scene_data = scene
-    self.rss.view_layer_data = [
-        scene.view_layers["View Layer1"], scene.view_layers["View Layer2"]]
-    self.rss.set_denoising_settings(False, False)
-    for view_layer in self.rss.view_layer_data:
-      self.assertEqual(view_layer.cycles.denoising_store_passes, False)
-      self.assertEqual(view_layer.cycles.use_denoising, False)
-    self.assertEqual(self.rss.current_scene_render.use_compositing, False)
-    self.assertEqual(self.rss.current_scene_data.use_nodes, False)
-    self.assertEqual(self.rss.current_scene_data.cycles.use_animated_seed, True)
+    self.rss.set_denoising_settings(False)
+    self.assertFalse(scene.cycles.use_denoising)
+    self.assertFalse(scene.cycles.use_denoising),
+    self.assertFalse(self.rss.current_scene_data.cycles.use_animated_seed)
+    self.rss.set_denoising_settings(True)
+    self.assertTrue(scene.cycles.use_denoising)
+    self.assertTrue(scene.cycles.use_denoising)
+    self.assertTrue(self.rss.current_scene_data.cycles.use_animated_seed)
 
   def test_set_output_settings(self):
     """Test the set_output_settings function."""

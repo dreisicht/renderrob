@@ -27,7 +27,6 @@ class TestRenderJobToRss(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
@@ -41,6 +40,6 @@ class TestRenderJobToRss(unittest.TestCase):
               "import render_settings_setter ; rss = render_settings_setter.RenderSettingsSetter("
               "'Scene', ['View Layer']) ; rss.activate_addons([]) ; rss.set_camera('Camera') ; rss"
               ".set_render_settings(render_device='gpu', border=False, samples=128, motion_blur="
-              "True, engine='cycles') ; rss.set_denoising_settings(an_denoise=True, denoise=True) ;"
+              "True, engine='cycles') ; rss.set_denoising_settings(denoise=True) ;"
               " rss.set_output_settings(frame_step=1, xres=1920, yres=1080, percres=100, "
               "high_quality=True, overwrite=True)"))

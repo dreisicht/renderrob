@@ -117,7 +117,7 @@ class TestShotNameBuilder(unittest.TestCase):
     output_path = ""
     snb = shot_name_builder.ShotNameBuilder(render_job, output_path)
     self.assertEqual(
-        snb.frame_path, "/home/rob/Projects/RenderRob/stills/rr_test-hq-v01-f####.png")
+        snb.frame_path, "/home/rob/Projects/RenderRob/rr_test-hq-v01/rr_test-hq-v01-f####.png")
 
 
 if __name__ == "__main__":

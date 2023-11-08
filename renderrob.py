@@ -301,7 +301,8 @@ class MainWindow(QWidget):
       self.table.blockSignals(True)
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
-        if not os.path.exists(item.text()) and not os.path.exists(os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
+        if not os.path.exists(item.text()) and not os.path.exists(
+                os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
           QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       self.table.blockSignals(False)
     self.check_table_for_errors()
