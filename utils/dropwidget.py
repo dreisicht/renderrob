@@ -1,6 +1,6 @@
 """Helper class to be able to register events for drag and drop operations."""
-
 from PySide6.QtWidgets import QWidget
+
 from utils import table_utils
 
 
@@ -17,9 +17,13 @@ class DropWidget(QWidget):
         file_path = url.toLocalFile()
         if not url.isLocalFile():
           continue
-        if not file_path.endswith('.blend'):
-          continue
-        table_utils.add_file_below(file_path)
+        # if not file_path.endswith('.blend'):
+        #   continue
+        table = self.parent().tableWidget
+        # blend_files_path = self.parent().state_saver.state.settings.blender_files_path
+        # file_path = os.path.relpath(file_path, blend_files_path)
+        table_utils.add_file_below(table, file_path)
+        table.itemChanged.emit(table.item(table.rowCount() - 1, 1))
         event.accept()
     else:
       event.ignore()

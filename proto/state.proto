@@ -48,7 +48,6 @@ message render_job {
     bool motion_blur = 12;
     bool overwrite = 13;
     bool high_quality = 14;
-    bool animation_denoise = 15;
     bool denoise = 16;
     string scene = 17;
     repeated string view_layers = 18;

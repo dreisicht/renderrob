@@ -1,17 +1,13 @@
 """Utility functions for table operations."""
 import os
+from typing import Any, Optional
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView,
-                               QStyledItemDelegate, QTableWidget,
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
 
 from utils import ui_utils
-
-TABLE = None
-# Note: This variable is required because when using clicked.connect() the argument is
-# only the function. Therefore arguments to the function cannot be passed.
 
 COLORS = {
     "red": 0x980030,
@@ -61,7 +57,7 @@ def make_editable(table_widget: QTableWidget) -> None:
         checkbox_item.setDisabled(False)
 
 
-def make_read_only_selectable(table_widget):
+def make_read_only_selectable(table_widget: QTableWidget) -> None:
   """Make QTableWidget only selectable."""
   #  #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
@@ -89,61 +85,98 @@ def make_read_only_selectable(table_widget):
         checkbox_item.setChecked(checked)
 
 
-def move_row_down() -> None:
+def move_row_down(table_widget: QTableWidget) -> None:
   """Move the currently selected row down."""
-  row = TABLE.currentRow()
-  column = TABLE.currentColumn()
-  if row < TABLE.rowCount() - 1:
-    combobox_values = list(ui_utils.get_combobox_indexes(TABLE, row))
-    checkbox_values = list(ui_utils.get_checkbox_values(TABLE, row))
-    TABLE.insertRow(row + 2)
-    for i in range(TABLE.columnCount()):
-      TABLE.setItem(row + 2, i, TABLE.takeItem(row, i))
-      TABLE.setCurrentCell(row + 2, column)
-    TABLE.removeRow(row)
-    ui_utils.fill_row(TABLE, row + 1)
-    ui_utils.set_combobox_indexes(TABLE, row + 1, combobox_values)
-    ui_utils.set_checkbox_values(TABLE, row + 1, checkbox_values)
-    set_text_alignment(TABLE, row + 1)
+  row = table_widget.currentRow()
+  column = table_widget.currentColumn()
+  if row < table_widget.rowCount() - 1:
+    combobox_values = list(ui_utils.get_combobox_indexes(table_widget, row))
+    checkbox_values = list(ui_utils.get_checkbox_values(table_widget, row))
+    table_widget.insertRow(row + 2)
+    for i in range(table_widget.columnCount()):
+      table_widget.setItem(row + 2, i, table_widget.takeItem(row, i))
+      table_widget.setCurrentCell(row + 2, column)
+    table_widget.removeRow(row)
+    ui_utils.fill_row(table_widget, row + 1)
+    ui_utils.set_combobox_indexes(table_widget, row + 1, combobox_values)
+    ui_utils.set_checkbox_values(table_widget, row + 1, checkbox_values)
+    set_text_alignment(table_widget, row + 1)
 
 
-def move_row_up() -> None:
+def move_row_up(table_widget: QTableWidget) -> None:
   """Move the currently selected row up."""
-  row = TABLE.currentRow()
-  column = TABLE.currentColumn()
+  row = table_widget.currentRow()
+  column = table_widget.currentColumn()
   if row > 0:
-    combobox_values = list(ui_utils.get_combobox_indexes(TABLE, row))
-    checkbox_values = list(ui_utils.get_checkbox_values(TABLE, row))
-    TABLE.insertRow(row - 1)
-    for i in range(TABLE.columnCount()):
-      TABLE.setItem(row - 1, i, TABLE.takeItem(row + 1, i))
-      TABLE.setCurrentCell(row - 1, column)
-    TABLE.removeRow(row + 1)
-    ui_utils.fill_row(TABLE, row - 1)
-    ui_utils.set_combobox_indexes(TABLE, row - 1, combobox_values)
-    ui_utils.set_checkbox_values(TABLE, row - 1, checkbox_values)
-    set_text_alignment(TABLE, row - 1)
+    combobox_values = list(ui_utils.get_combobox_indexes(table_widget, row))
+    checkbox_values = list(ui_utils.get_checkbox_values(table_widget, row))
+    table_widget.insertRow(row - 1)
+    for i in range(table_widget.columnCount()):
+      table_widget.setItem(row - 1, i, table_widget.takeItem(row + 1, i))
+      table_widget.setCurrentCell(row - 1, column)
+    table_widget.removeRow(row + 1)
+    ui_utils.fill_row(table_widget, row - 1)
+    ui_utils.set_combobox_indexes(table_widget, row - 1, combobox_values)
+    ui_utils.set_checkbox_values(table_widget, row - 1, checkbox_values)
+    set_text_alignment(table_widget, row - 1)
 
 
-def add_file_below(path: str) -> None:
+def duplicate_row(table_widget: QTableWidget, state_saver: Any,
+                  callback_function: callable) -> None:
+  """Duplicate the currently selected row."""
+  state_saver.table_to_state(table_widget)
+  current_row = table_widget.currentRow()
+  state_saver.state.render_jobs.insert(
+      current_row + 1, state_saver.state.render_jobs[current_row])
+  table_widget.blockSignals(True)
+  state_saver.state_to_table(table_widget)
+  callback_function()
+  table_widget.blockSignals(False)
+
+
+def add_row_below(table_widget: QTableWidget,
+                  callback_function: Optional[callable] = None) -> None:
+  """Add a row below the current row."""
+  table_widget.blockSignals(True)
+  current_row = table_widget.currentRow() + 1
+  table_widget.insertRow(current_row)
+  ui_utils.fill_row(table_widget, current_row)
+  set_text_alignment(table_widget, current_row)
+  if callback_function:
+    callback_function()
+  table_widget.blockSignals(False)
+
+
+def remove_active_row(table_widget: QTableWidget, callback_function: callable) -> None:
+  """Remove the currently selected row."""
+  table_widget.blockSignals(True)
+  current_row = table_widget.currentRow()
+  if current_row == -1:
+    current_row = table_widget.rowCount() - 1
+  table_widget.removeRow(current_row)
+  table_widget.blockSignals(False)
+  callback_function()
+
+
+def add_file_below(table_widget: QTableWidget, path: str) -> None:
   """Add a file below the current row."""
-  TABLE.blockSignals(True)
-  id_row = TABLE.rowCount()
-  TABLE.insertRow(id_row)
-  ui_utils.fill_row(TABLE, id_row)
-  set_text_alignment(TABLE, id_row)
-  TABLE.setItem(id_row, 1, QTableWidgetItem(path))
-  fix_active_row_path(TABLE.item(id_row, 1))
-  TABLE.blockSignals(False)
+  table_widget.blockSignals(True)
+  id_row = table_widget.rowCount()
+  table_widget.insertRow(id_row)
+  ui_utils.fill_row(table_widget, id_row)
+  set_text_alignment(table_widget, id_row)
+  table_widget.setItem(id_row, 1, QTableWidgetItem(path))
+  # fix_active_row_path(table_widget.item(id_row, 1))
+  table_widget.blockSignals(False)
 
 
-def post_process_row(table: QTableWidget, row: int) -> None:
+def post_process_row(table_widget: QTableWidget, row: int) -> None:
   """Post-process the table after loading it from a UI file."""
   # set_text_alignment(table, row)
 
-  header = table.horizontalHeader()
+  header = table_widget.horizontalHeader()
   header.setMinimumHeight(50)
-  table.setHorizontalHeaderLabels(
+  table_widget.setHorizontalHeaderLabels(
       ["Active",
        "File",
        "Camera",
@@ -156,9 +189,8 @@ def post_process_row(table: QTableWidget, row: int) -> None:
        "Engine",
        "Device",
        "Motion\nBlur",
-       "Overwrite",
+       "Continue\nJob",
        "High\nQuality",
-       "Animation\nDenoise",
        "Denoise",
        "Scene",
        "View\nLayer",
@@ -170,24 +202,34 @@ def post_process_row(table: QTableWidget, row: int) -> None:
   # to be checked later.
   header.setSectionResizeMode(QHeaderView.ResizeToContents)
   header.setSectionResizeMode(1, QHeaderView.Stretch)
-  table.resizeColumnsToContents()
-  ui_utils.fill_row(table, row)
+  table_widget.resizeColumnsToContents()
+  ui_utils.fill_row(table_widget, row)
 
 
-def fix_active_row_path(item: QTableWidgetItem) -> None:
+def get_blend_files_rel_path(blend_folder: str, path: str) -> str:
+  """Get the blender files path."""
+  if os.path.basename(path) == path:
+    return path
+  common = os.path.commonpath([blend_folder, path])
+  return os.path.relpath(path, common)
+
+
+def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
   """Fix the path of the currently selected row."""
   path = item.text()
   path = normalize_drive_letter(path)
   path = path.replace('"', "").replace("\\", "/")
+  if blend_folder:
+    path = get_blend_files_rel_path(blend_folder, path)
   item.setText(path)
 
 
-def set_text_alignment(table: QTableWidget, row: int) -> None:
+def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
   """Set the text alignment of the table items."""
-  for i in range(table.columnCount()):
+  for i in range(table_widget.columnCount()):
     if i in ui_utils.COMBOBOX_COLUMNS or i in ui_utils.CHECKBOX_COLUMNS:
       continue
-    old_item = table.item(row, i)
+    old_item = table_widget.item(row, i)
     if old_item:
       text = old_item.text()
     else:
@@ -195,22 +237,22 @@ def set_text_alignment(table: QTableWidget, row: int) -> None:
     item = QTableWidgetItem(text)
     if not item:
       continue
-    table.removeCellWidget(row, i)
+    table_widget.removeCellWidget(row, i)
     if i == 1:
       item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
     else:
       item.setTextAlignment(Qt.AlignCenter)
-    table.setItem(row, i, item)
+    table_widget.setItem(row, i, item)
 
 
-def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> None:
+def color_row_background(table_widget: QTableWidget, row_index: int, color: QColor) -> None:
   """Color the background of a row."""
   #  #3 Add coloring for upfront warnings (double jobs, animation denoising,
   # but exr selected, high quality and animation but no animation denoising,
   # single frame rendering but animation denoising,
   # single frame rendering in high quality but no denoising.)
-  for column_index in range(table.columnCount()):
-    item = table.item(row_index, column_index)
+  for column_index in range(table_widget.columnCount()):
+    item = table_widget.item(row_index, column_index)
     if item is None:
       continue
     if color == QColor(COLORS["green"]):
@@ -221,12 +263,17 @@ def color_row_background(table: QTableWidget, row_index: int, color: QColor) -> 
         continue
       if item.background() == QColor(COLORS["red"]):
         continue
+    if color == QColor(COLORS["yellow"]):
+      if item.background() == QColor(COLORS["red"]):
+        continue
+    table_widget.blockSignals(True)
     item.setBackground(color)
     ui_utils.set_checkbox_background_color(
-        table, row_index, color)
+        table_widget, row_index, color)
+    table_widget.blockSignals(False)
 
 
-def set_background_colors(table: QTableWidget, exit_code: int,
+def set_background_colors(table_widget: QTableWidget, exit_code: int,
                           row_index: int, previous_job: int = 1) -> None:
   """Set the background colors of the rows.
 
@@ -239,29 +286,29 @@ def set_background_colors(table: QTableWidget, exit_code: int,
   Returns:
     None
   """
-  color_row_background(table,
+  color_row_background(table_widget,
                        row_index,
                        QColor(COLORS["blue_grey_lighter"]))
   if exit_code == 0:
-    color_row_background(table,
+    color_row_background(table_widget,
                          row_index - previous_job,
                          QColor(COLORS["green"]))
   elif exit_code == 664:
-    color_row_background(table,
+    color_row_background(table_widget,
                          row_index - previous_job,
                          QColor(COLORS["grey_light"]))
   elif exit_code == 987:
-    color_row_background(table,
+    color_row_background(table_widget,
                          row_index - previous_job,
                          QColor(COLORS["yellow"]))
   else:
-    color_row_background(table,
+    color_row_background(table_widget,
                          row_index - previous_job,
                          QColor(COLORS["red"]))
 
 
-def reset_all_backgruond_colors(table: QTableWidget) -> None:
+def reset_all_backgruond_colors(table_widget: QTableWidget) -> None:
   """Reset the background colors of all rows."""
-  for row_index in range(table.rowCount()):
-    color_row_background(table,
+  for row_index in range(table_widget.rowCount()):
+    color_row_background(table_widget,
                          row_index, QColor(COLORS["grey_light"]))

@@ -9,9 +9,15 @@ from utils import ui_utils
 
 def still_or_animation(start: str, end: str) -> str:
   """Return 'still' or 'animation' depending on the render job."""
+  if start == "" and end == "":
+    return "ANIMATION"
   if start != "" and end != "":
     return "ANIMATION"
-  return "STILL"
+  if start != "" and end == "":
+    return "STILL"
+  if start == "" and end != "":
+    raise ValueError("End frame is set, but start frame is not.")
+  raise ValueError("Could not determine of stil or animation.")
 
 
 class ShotNameBuilder:

@@ -3,12 +3,10 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
-import os
-
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
-from utils import table_utils, ui_utils
+from utils import table_utils, ui_utils, path_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -22,13 +20,22 @@ def get_text(item: QTableWidgetItem, widget=None) -> str:
   return item.text()
 
 
+def init_settings(state: state_pb2.render_rob_state) -> None:  # pylint: disable=no-member
+  """Initialize the settings."""
+  state.settings.blender_path = path_utils.discover_blender_path()
+  state.settings.fps = 24
+  state.settings.preview.samples = 16
+  state.settings.preview.frame_step = 4
+  state.settings.preview.resolution = 50
+
+
 class StateSaver:
   """Class to provide storing methods to the render rob proto class."""
 
   def __init__(self):
     """Initialize the state saver."""
     self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
-    self.parent_widget = None
+    init_settings(self.state)
 
   def state_to_table(self, table: QTableWidget) -> None:
     """Load the state into a table."""
@@ -49,33 +56,22 @@ class StateSaver:
                                               render_job.motion_blur,
                                               render_job.overwrite,
                                               render_job.high_quality,
-                                              render_job.animation_denoise,
                                               render_job.denoise])
       ui_utils.set_combobox_indexes(table, i, [render_job.file_format,
                                                render_job.engine,
                                                render_job.device])
-      table.setItem(i, 16, QTableWidgetItem(render_job.scene))
-      table.setItem(i, 17, QTableWidgetItem(";".join(render_job.view_layers)))
-      table.setItem(i, 18, QTableWidgetItem(render_job.comments))
+      table.setItem(i, 15, QTableWidgetItem(render_job.scene))
+      table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))
+      table.setItem(i, 17, QTableWidgetItem(render_job.comments))
       table_utils.set_text_alignment(table, i)
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
     del self.state.render_jobs[:]
-    assert self.parent_widget
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member
       render_job.active = get_text(table.cellWidget(i, 0), widget="checkbox")
       render_job.file = get_text(table.item(i, 1))
-      if "/" not in render_job.file:
-        render_job.file = os.path.join(self.state.settings.blender_files_path, render_job.file)
-      # if not render_job.file:
-      #   QMessageBox.warning(self.parent_widget, "Warning",
-      #                       "The file path cannot be empty.", QMessageBox.Ok)
-      # if render_job.file and not os.path.exists(render_job.file):
-      #   QMessageBox.warning(
-      #       self.parent_widget, "Warning", f"The file path \"{render_job.file}\" does not exist.",
-      #       QMessageBox.Ok)
       render_job.camera = get_text(table.item(i, 2))
 
       # NOTE: The values are strings and not ints, since the user can leave the
@@ -92,14 +88,11 @@ class StateSaver:
       render_job.motion_blur = get_text(table.cellWidget(i, 11), widget="checkbox")
       render_job.overwrite = get_text(table.cellWidget(i, 12), widget="checkbox")
       render_job.high_quality = get_text(table.cellWidget(i, 13), widget="checkbox")
-      render_job.animation_denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
-      render_job.denoise = get_text(table.cellWidget(i, 15), widget="checkbox")
-      render_job.scene = get_text(table.item(i, 16))
+      # render_job.animation_denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
+      render_job.denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
+      render_job.scene = get_text(table.item(i, 15))
       del render_job.view_layers[:]
-      new_view_layer_list = get_text(table.item(i, 17)).split(";")
+      new_view_layer_list = get_text(table.item(i, 16)).split(";")
       render_job.view_layers.extend(new_view_layer_list)
-      render_job.comments = get_text(table.item(i, 18))
+      render_job.comments = get_text(table.item(i, 17))
       self.state.render_jobs.append(render_job)
-
-
-STATESAVER = StateSaver()

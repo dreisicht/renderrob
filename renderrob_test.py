@@ -14,9 +14,9 @@ class TestMainWindow(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up the unit tests."""
-    self.main_window = renderrob.MainWindow()
+    self.main_window = renderrob.MainWindow()  # pylint:disable=no-member
     self.main_window.setup()
-    table_utils.add_row_below()
+    table_utils.add_row_below(self.main_window.table)
     return super().setUp()
 
   def tearDown(self) -> None:
@@ -48,10 +48,6 @@ class TestMainWindow(unittest.TestCase):
   def test_quit(self):
     """Test the quit function."""
     self.main_window.quit()
-
-  def test_open_recent_file(self):
-    """Test the open_recent_file function."""
-    self.main_window.open_recent_file0()
 
   def test_get_active_jobs_number(self):
     """Test the _get_active_jobs_number function."""

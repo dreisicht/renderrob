@@ -29,7 +29,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    render_job.animation_denoise = True
+    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
@@ -55,7 +55,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    render_job.animation_denoise = True
+    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene.001"
     render_job.view_layers.append("View Layer")
@@ -82,7 +82,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    render_job.animation_denoise = True
+    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
@@ -109,7 +109,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.motion_blur = True
     render_job.overwrite = True
     render_job.high_quality = True
-    render_job.animation_denoise = True
+    # render_job.animation_denoise = True
     render_job.denoise = True
     render_job.scene = "Scene"
     render_job.view_layers.append("View Layer")
@@ -117,7 +117,7 @@ class TestShotNameBuilder(unittest.TestCase):
     output_path = ""
     snb = shot_name_builder.ShotNameBuilder(render_job, output_path)
     self.assertEqual(
-        snb.frame_path, "/home/rob/Projects/RenderRob/stills/rr_test-hq-v01-f####.png")
+        snb.frame_path, "/home/rob/Projects/RenderRob/rr_test-hq-v01/rr_test-hq-v01-f####.png")
 
 
 if __name__ == "__main__":
