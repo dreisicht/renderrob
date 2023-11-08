@@ -408,7 +408,11 @@ class MainWindow(QWidget):
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
       return
-    filepath = self.state_saver.state.render_jobs[current_row].file
+    filepath = ui_utils.get_blend_path(self.state_saver.state.render_jobs[current_row].file,
+                                       self.state_saver.state.settings.blender_files_path)
+    if not os.path.exists(filepath):
+      QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      return
     # Launch Blender with the file.
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
@@ -468,7 +472,10 @@ class MainWindow(QWidget):
     self.process.setProgram(self.state_saver.state.settings.blender_path)
     self.process.finished.connect(self._continue_render)
 
-    args = ["-b", job.file,
+    # Check if the file was converted to a relative path.
+    file_path = ui_utils.get_blend_path(
+        job.file, self.state_saver.state.settings.blender_files_path)
+    args = ["-b", file_path,
             "-y",
             "-o", snb.frame_path,
             "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],

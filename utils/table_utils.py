@@ -225,9 +225,14 @@ def color_row_background(table_widget: QTableWidget, row_index: int, color: QCol
         continue
       if item.background() == QColor(COLORS["red"]):
         continue
+    if color == QColor(COLORS["yellow"]):
+      if item.background() == QColor(COLORS["red"]):
+        continue
+    table_widget.blockSignals(True)
     item.setBackground(color)
     ui_utils.set_checkbox_background_color(
         table_widget, row_index, color)
+    table_widget.blockSignals(False)
 
 
 def set_background_colors(table_widget: QTableWidget, exit_code: int,

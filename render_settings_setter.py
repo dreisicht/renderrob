@@ -24,7 +24,8 @@ class RenderSettingsSetter:
       print_utils.print_warning(
           "I couldn't find the scene you specified. I'm rendering the last used scene.")
     self.set_scene(scene)
-    self.set_view_layers(view_layers)
+    if view_layers != [""]:
+      self.set_view_layers(view_layers)
 
   def set_scene(self, scene_name: str) -> None:
     """Set the scene to be rendered."""
@@ -146,26 +147,11 @@ class RenderSettingsSetter:
       raise ValueError(f"Invalid render engine {engine}.")
     print_utils.print_info("Rendering on " + str(render_device))
 
-  def set_denoising_settings(self, an_denoise: bool, denoise: bool) -> None:
+  def set_denoising_settings(self, denoise: bool) -> None:
     """Set the denoising settings."""
-    if isinstance(self.view_layer_data, (bpy.types.bpy_prop_collection, list)):
-      for view_layer in self.view_layer_data:
-
-        view_layer.cycles.denoising_store_passes = an_denoise
-        view_layer.cycles.use_denoising = denoise
-    elif isinstance(self.view_layer_data, bpy.types.ViewLayer):
-      self.view_layer_data.cycles.denoising_store_passes = an_denoise
-      self.view_layer_data.cycles.use_denoising = denoise
-    else:
-      print_utils.print_error("Denoising handling went wrong.")
-
-    # disable compositing if animation_denoising
-    self.current_scene_render.use_compositing = not an_denoise
-    self.current_scene_data.use_nodes = not an_denoise
-    self.current_scene_data.cycles.use_animated_seed = an_denoise
-    self.current_scene_render.use_compositing = False
-    self.current_scene_data.use_nodes = False
-    self.current_scene_data.cycles.use_animated_seed = True
+    if denoise:
+      self.current_scene_data.cycles.use_animated_seed = True
+      bpy.context.scene.cycles.use_denoising = True
 
   def set_output_settings(self, frame_step: int, xres: int,
                           yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:

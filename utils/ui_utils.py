@@ -136,3 +136,11 @@ def discover_blender_path() -> None:
   for blender_path in possibilities:
     if os.path.exists(blender_path):
       return blender_path
+  return ""
+
+
+def get_blend_path(blend_path: str, blender_files_path: str) -> str:
+  """Get the absolute path of the blend file."""
+  if os.path.basename(blend_path) == blend_path:
+    return os.path.join(blender_files_path, blend_path)
+  return blend_path
