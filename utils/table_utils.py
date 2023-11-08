@@ -1,5 +1,6 @@
 """Utility functions for table operations."""
 import os
+from typing import Any, Optional
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
@@ -118,6 +119,43 @@ def move_row_up(table_widget: QTableWidget) -> None:
     ui_utils.set_combobox_indexes(table_widget, row - 1, combobox_values)
     ui_utils.set_checkbox_values(table_widget, row - 1, checkbox_values)
     set_text_alignment(table_widget, row - 1)
+
+
+def duplicate_row(table_widget: QTableWidget, state_saver: Any,
+                  callback_function: callable) -> None:
+  """Duplicate the currently selected row."""
+  state_saver.table_to_state(table_widget)
+  current_row = table_widget.currentRow()
+  state_saver.state.render_jobs.insert(
+      current_row + 1, state_saver.state.render_jobs[current_row])
+  table_widget.blockSignals(True)
+  state_saver.state_to_table(table_widget)
+  callback_function()
+  table_widget.blockSignals(False)
+
+
+def add_row_below(table_widget: QTableWidget,
+                  callback_function: Optional[callable] = None) -> None:
+  """Add a row below the current row."""
+  table_widget.blockSignals(True)
+  current_row = table_widget.currentRow() + 1
+  table_widget.insertRow(current_row)
+  ui_utils.fill_row(table_widget, current_row)
+  set_text_alignment(table_widget, current_row)
+  if callback_function:
+    callback_function()
+  table_widget.blockSignals(False)
+
+
+def remove_active_row(table_widget: QTableWidget, callback_function: callable) -> None:
+  """Remove the currently selected row."""
+  table_widget.blockSignals(True)
+  current_row = table_widget.currentRow()
+  if current_row == -1:
+    current_row = table_widget.rowCount() - 1
+  table_widget.removeRow(current_row)
+  table_widget.blockSignals(False)
+  callback_function()
 
 
 def add_file_below(table_widget: QTableWidget, path: str) -> None:

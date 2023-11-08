@@ -13,10 +13,10 @@ from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedL
 import settings_window
 import shot_name_builder
 import state_saver
-from dropwidget import DropWidget
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from utils import print_utils, table_utils, ui_utils
+from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -55,7 +55,7 @@ class MainWindow(QWidget):
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
-    self.table = self.window.tableWidget  # XXX: needed?
+    self.table = self.window.tableWidget
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -97,8 +97,10 @@ class MainWindow(QWidget):
 
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
-    self.window.add_button.clicked.connect(lambda: self.add_row_below(register_undo=True))
-    self.window.delete_button.clicked.connect(self.remove_active_row)
+    self.window.add_button.clicked.connect(
+        lambda: table_utils.add_row_below(self.table, self.table_item_changed))
+    self.window.delete_button.clicked.connect(
+        lambda: table_utils.remove_active_row(self.table, self.table_item_changed))
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(lambda: table_utils.move_row_up(self.table))
@@ -114,11 +116,11 @@ class MainWindow(QWidget):
     self.window.actionQuit.triggered.connect(self.quit)
     self.table.itemChanged.connect(self.table_item_changed)
     self.window.blender_button.clicked.connect(self.open_blender_file)
-    self.window.duplicate_button.clicked.connect(self.duplicate_row)
+    self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
+        self.table, self.state_saver, self.table_item_changed))
     self.window.actionUndo.triggered.connect(self.undo)
 
   ##### FILE OPS#####
-
   def save_cache(self) -> None:
     """Store the cache to a file."""
     cache_str = self.cache.SerializeToString()
@@ -171,7 +173,7 @@ class MainWindow(QWidget):
     self.state_saver.parent_widget = self
     self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
-    self.add_row_below(register_undo=False)
+    table_utils.add_row_below(self.table, self.table_item_changed)
 
   def clear_recent_files(self) -> None:
     """Clear the recent files."""
@@ -223,7 +225,6 @@ class MainWindow(QWidget):
     self.table.blockSignals(False)
 
   ######### CONSOLE WINDOW ###########
-
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
     data = self.process.readAllStandardOutput()
@@ -375,7 +376,6 @@ class MainWindow(QWidget):
 
   def open_output_folder(self) -> None:
     """Open the output folder of the currently selected job."""
-    # #8 Add keyboard shortcuts.
     self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()
     snb = shot_name_builder.ShotNameBuilder(
@@ -417,7 +417,6 @@ class MainWindow(QWidget):
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
   ######### MAIN WINDOW UTILS ###########
-
   def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job
     self.window.progressBar.setValue(progress_value)
@@ -445,7 +444,6 @@ class MainWindow(QWidget):
     self.blockSignals(False)
 
   ########## TABLE OPS ############
-
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
@@ -486,40 +484,7 @@ class MainWindow(QWidget):
     self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.start()
 
-  def duplicate_row(self) -> None:
-    """Duplicate the currently selected row."""
-    self.state_saver.table_to_state(self.table)
-    current_row = self.table.currentRow()
-    self.state_saver.state.render_jobs.insert(
-        current_row + 1, self.state_saver.state.render_jobs[current_row])
-    self.table.blockSignals(True)
-    self.state_saver.state_to_table(self.table)
-    self.table_item_changed()
-    self.table.blockSignals(False)
-
-  def add_row_below(self, register_undo=True) -> None:
-    """Add a row below the current row."""
-    self.table.blockSignals(True)
-    current_row = self.table.currentRow() + 1
-    self.table.insertRow(current_row)
-    ui_utils.fill_row(self.table, current_row)
-    table_utils.set_text_alignment(self.table, current_row)
-    if register_undo:
-      self.table_item_changed()
-    self.table.blockSignals(False)
-
-  def remove_active_row(self) -> None:
-    """Remove the currently selected row."""
-    self.table.blockSignals(True)
-    current_row = self.table.currentRow()
-    if current_row == -1:
-      current_row = self.table.rowCount() - 1
-    self.table.removeRow(current_row)
-    self.table.blockSignals(False)
-    self.table_item_changed()
-
   ########### TABLE UTILS #############
-
   def check_table_for_errors(self) -> bool:
     """Check the table for errors."""
     # Double occurrences of jobs
