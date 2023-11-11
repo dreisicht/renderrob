@@ -20,6 +20,14 @@ from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
+# def paintEvent(self, event):
+#       super().paintEvent(event)
+
+#       if self.rowCount() == 0 and self.columnCount() == 0:
+#           painter = QPainter(self.viewport())
+#           painter.setPen(QColor(128, 128, 128))
+#           painter.drawText(self.viewport().rect(), Qt.AlignCenter, self.placeholderText)
+
 
 class MainWindow(QWidget):
   """Main window for RenderRob."""

@@ -34,7 +34,7 @@ class TestStateSaver(unittest.TestCase):
     self.assertTrue(state_saver.get_text(
         self.main_window.table.cellWidget(0, 0), widget="checkbox"))
     self.assertEqual(state_saver.get_text(
-        self.main_window.table.cellWidget(0, 8), widget="dropdown"), "png")
+        self.main_window.table.cellWidget(0, 8), widget="dropdown"), "exr_single")
 
   def test_state_to_table(self):
     """Test the state_to_table method."""
@@ -54,7 +54,7 @@ class TestStateSaver(unittest.TestCase):
     self.assertEqual(state_saver.get_text(table.item(0, 5)), "3")
     self.assertEqual(state_saver.get_text(table.item(0, 6)), "4")
     self.assertEqual(state_saver.get_text(table.item(0, 7)), "5")
-    self.assertEqual(state_saver.get_text(table.cellWidget(0, 8), widget="dropdown"), "png")
+    self.assertEqual(state_saver.get_text(table.cellWidget(0, 8), widget="dropdown"), "exr_single")
     self.assertEqual(state_saver.get_text(table.cellWidget(0, 9), widget="dropdown"), "cycles")
     self.assertEqual(state_saver.get_text(table.cellWidget(0, 10), widget="dropdown"), "gpu")
     self.assertTrue(state_saver.get_text(table.cellWidget(0, 11), widget="checkbox"))

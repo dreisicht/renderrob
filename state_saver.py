@@ -14,7 +14,7 @@ def get_text(item: QTableWidgetItem, widget=None) -> str:
   if not item:
     return ""
   if widget == "dropdown":
-    return item.currentText()
+    return item.currentText().replace(" ", "_")
   if widget == "checkbox":
     return item.findChild(QCheckBox).isChecked()
   return item.text()

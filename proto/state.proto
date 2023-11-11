@@ -20,10 +20,11 @@ message settings {
     int32 fps = 6;
 }
 enum file_format{
-    png = 0;
-    tiff = 1;
-    exr = 2;
-    jpg = 3;
+    exr_single = 0;
+    exr_multi = 1;
+    jpeg = 2;
+    png = 3;
+    tiff = 4;
 }
 enum render_engine{
     cycles = 0;

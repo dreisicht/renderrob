@@ -76,7 +76,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.x_res = str(1920)
     render_job.y_res = str(1080)
     render_job.samples = str(128)
-    render_job.file_format = 0
+    render_job.file_format = "exr_single"
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True
@@ -90,7 +90,7 @@ class TestShotNameBuilder(unittest.TestCase):
     output_path = "/home/rob/Projects/renders/"
     snb = shot_name_builder.ShotNameBuilder(render_job, output_path)
     self.assertEqual(
-        snb.frame_path, "/home/rob/Projects/renders/rr_test-hq-v01/rr_test-hq-v01-f####.png")
+        snb.frame_path, "/home/rob/Projects/renders/rr_test-hq-v01/rr_test-hq-v01-f####.exr")
 
   def test_get_frame_path_no_output(self) -> None:
     """Test that the shot name is built correctly."""
@@ -103,7 +103,7 @@ class TestShotNameBuilder(unittest.TestCase):
     render_job.x_res = str(1920)
     render_job.y_res = str(1080)
     render_job.samples = str(128)
-    render_job.file_format = 0
+    render_job.file_format = "png"
     render_job.engine = 0
     render_job.device = 0
     render_job.motion_blur = True

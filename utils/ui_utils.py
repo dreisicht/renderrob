@@ -10,8 +10,9 @@ from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, Q
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
-FILE_FORMATS_COMMAND = ["PNG", "TIFF", "OPEN_EXR_MULTILAYER", "JPEG"]
-FILE_FORMATS_UI = ["png", "tiff", "exr", "jpeg"]
+FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"]
+FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
+FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 
