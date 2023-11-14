@@ -6,7 +6,7 @@ from typing import Any, List, Optional
 from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
+from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget, QTableWidgetItem, QLineEdit
 
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
@@ -111,8 +111,28 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   table.setCellWidget(row, col, dropdown)
 
 
+def set_cell_widget(table: QTableWidget, row: int, col: int, widget: QWidget):
+  """Add a dropdown to the given table at the given row and column."""
+  table.setCellWidget(row, col, widget)
+  if isinstance(widget, QLineEdit):
+    widget.setPlaceholderText("Enter text here")
+    widget.installEventFilter(table)
+
+
 def fill_row(table: QTableWidget, row: int) -> None:
   """Fill the table with widgets values."""
+  table.setItem(row, 1, QTableWidgetItem("b"))
+  # line_edit = QLineEdit("a")
+  table.setCellWidget(row, 1, QLineEdit("a"))
+  # table.setItem(row, 2, line_edit.setPlaceholderText("Camera"))
+  # table.setItem(row, 3, line_edit.setPlaceholderText("Start"))
+  # table.setItem(row, 4, line_edit.setPlaceholderText("End"))
+  # table.setItem(row, 5, line_edit.setPlaceholderText("X"))
+  # table.setItem(row, 6, line_edit.setPlaceholderText("Y"))
+  # table.setItem(row, 7, line_edit.setPlaceholderText("Samples"))
+  # table.setItem(row, 15, line_edit.setPlaceholderText("Scene"))
+  # table.setItem(row, 16, line_edit.setPlaceholderText("View Layers"))
+  # table.setItem(row, 17, line_edit.setPlaceholderText("Comments"))
   add_checkbox(table, row, 0, checked=True)
   add_dropdown(table, row, 8, FILE_FORMATS_UI)
   add_dropdown(table, row, 9, RENDER_ENGINES)

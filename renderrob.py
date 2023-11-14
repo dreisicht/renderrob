@@ -6,27 +6,35 @@ import sys
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedLayout,
-                               QTableWidgetItem, QWidget)
+from PySide6.QtGui import (QAction, QCloseEvent, QColor, QFocusEvent, QIcon, QTextCharFormat,
+                           QTextCursor)
+from PySide6.QtWidgets import (QApplication, QFileDialog, QLineEdit, QMessageBox, QStackedLayout,
+                               QTableWidget, QTableWidgetItem, QWidget)
 
 import settings_window
 import shot_name_builder
 import state_saver
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from utils import print_utils, table_utils, ui_utils, path_utils
+from utils import path_utils, print_utils, table_utils, ui_utils
 from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
-# def paintEvent(self, event):
-#       super().paintEvent(event)
 
-#       if self.rowCount() == 0 and self.columnCount() == 0:
-#           painter = QPainter(self.viewport())
-#           painter.setPen(QColor(128, 128, 128))
-#           painter.drawText(self.viewport().rect(), Qt.AlignCenter, self.placeholderText)
+class CustomTableWidget(QTableWidget):
+  def setCellWidget(self, row, column, widget):
+    super().setCellWidget(row, column, widget)
+    if isinstance(widget, QLineEdit):
+      widget.setPlaceholderText("Enter text here")
+      widget.installEventFilter(self)
+
+  def eventFilter(self, obj, event):
+    if event == QFocusEvent:
+      if isinstance(obj, QLineEdit):
+        obj.clear()
+        obj.setStyleSheet("color: black")  # Reset text color
+    return super().eventFilter(obj, event)
 
 
 class MainWindow(QWidget):
@@ -63,6 +71,7 @@ class MainWindow(QWidget):
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
+    self.init_table()
     self.table = self.window.tableWidget
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
@@ -83,6 +92,27 @@ class MainWindow(QWidget):
     self.save_cache()
     self.show()
     self.app.exec()
+
+  def init_table(self) -> None:
+    # Replace the QTableWidget with CustomTableWidget
+    custom_table_widget = CustomTableWidget()
+    custom_table_widget.setRowCount(self.window.tableWidget.rowCount())
+    custom_table_widget.setColumnCount(self.window.tableWidget.columnCount())
+
+    for i in range(self.window.tableWidget.rowCount()):
+      for j in range(self.window.tableWidget.columnCount()):
+        item = self.window.tableWidget.item(i, j)
+        if item:
+          custom_table_widget.setItem(i, j, QTableWidgetItem(item.text()))
+
+        cell_widget = self.window.tableWidget.cellWidget(i, j)
+        if cell_widget:
+          custom_table_widget.setCellWidget(i, j, cell_widget)
+    self.window.tableWidget = custom_table_widget
+    # self.table.deleteLater()
+    # layout.addWidget(custom_table_widget)
+    # self.window.setLayout(layout)
+    # return self.table
 
   ############### EVENTS ###############
   def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name

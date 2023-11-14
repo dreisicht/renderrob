@@ -193,7 +193,7 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
        "High\nQuality",
        "Denoise",
        "Scene",
-       "View\nLayer",
+       "View\nLayers",
        "Comments",
        ])
 
