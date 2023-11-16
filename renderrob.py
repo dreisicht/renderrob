@@ -108,7 +108,7 @@ class MainWindow(QWidget):
         cell_widget = self.window.tableWidget.cellWidget(i, j)
         if cell_widget:
           custom_table_widget.setCellWidget(i, j, cell_widget)
-    self.window.tableWidget = custom_table_widget
+    # self.window.tableWidget = custom_table_widget
     # self.table.deleteLater()
     # layout.addWidget(custom_table_widget)
     # self.window.setLayout(layout)

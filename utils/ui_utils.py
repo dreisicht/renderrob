@@ -121,9 +121,13 @@ def set_cell_widget(table: QTableWidget, row: int, col: int, widget: QWidget):
 
 def fill_row(table: QTableWidget, row: int) -> None:
   """Fill the table with widgets values."""
-  table.setItem(row, 1, QTableWidgetItem("b"))
-  # line_edit = QLineEdit("a")
-  table.setCellWidget(row, 1, QLineEdit("a"))
+  # table.setItem(row, 1, QTableWidgetItem("b"))
+  line_edit = QLineEdit("a")
+  line_edit.setText("a")
+  line_edit.setPlaceholderText("AFA")
+  table.setCellWidget(0, 1, line_edit)
+  table.setCellWidget(0, 2, line_edit)
+  table.setCellWidget(0, 3, line_edit)
   # table.setItem(row, 2, line_edit.setPlaceholderText("Camera"))
   # table.setItem(row, 3, line_edit.setPlaceholderText("Start"))
   # table.setItem(row, 4, line_edit.setPlaceholderText("End"))
