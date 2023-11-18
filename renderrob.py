@@ -6,10 +6,8 @@ import sys
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import (QAction, QCloseEvent, QColor, QFocusEvent, QIcon, QTextCharFormat,
-                           QTextCursor)
-from PySide6.QtWidgets import (QApplication, QFileDialog, QLineEdit, QMessageBox, QStackedLayout,
-                               QTableWidget, QTableWidgetItem, QWidget)
+from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
+from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QStackedLayout, QWidget
 
 import settings_window
 import shot_name_builder
@@ -20,21 +18,6 @@ from utils import path_utils, print_utils, table_utils, ui_utils
 from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
-
-
-class CustomTableWidget(QTableWidget):
-  def setCellWidget(self, row, column, widget):
-    super().setCellWidget(row, column, widget)
-    if isinstance(widget, QLineEdit):
-      widget.setPlaceholderText("Enter text here")
-      widget.installEventFilter(self)
-
-  def eventFilter(self, obj, event):
-    if event == QFocusEvent:
-      if isinstance(obj, QLineEdit):
-        obj.clear()
-        obj.setStyleSheet("color: black")  # Reset text color
-    return super().eventFilter(obj, event)
 
 
 class MainWindow(QWidget):
@@ -64,15 +47,15 @@ class MainWindow(QWidget):
     self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
-    self.resize(1800, self.app.primaryScreen().size().height() - 100)
+    self.resize(1800, self.app.primaryScreen().size().height())
     self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.window.setWindowTitle("RenderRob")
-    self.init_table()
     self.table = self.window.tableWidget
+    table_utils.set_table_initial_sizes(self.table)
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -92,27 +75,6 @@ class MainWindow(QWidget):
     self.save_cache()
     self.show()
     self.app.exec()
-
-  def init_table(self) -> None:
-    # Replace the QTableWidget with CustomTableWidget
-    custom_table_widget = CustomTableWidget()
-    custom_table_widget.setRowCount(self.window.tableWidget.rowCount())
-    custom_table_widget.setColumnCount(self.window.tableWidget.columnCount())
-
-    for i in range(self.window.tableWidget.rowCount()):
-      for j in range(self.window.tableWidget.columnCount()):
-        item = self.window.tableWidget.item(i, j)
-        if item:
-          custom_table_widget.setItem(i, j, QTableWidgetItem(item.text()))
-
-        cell_widget = self.window.tableWidget.cellWidget(i, j)
-        if cell_widget:
-          custom_table_widget.setCellWidget(i, j, cell_widget)
-    # self.window.tableWidget = custom_table_widget
-    # self.table.deleteLater()
-    # layout.addWidget(custom_table_widget)
-    # self.window.setLayout(layout)
-    # return self.table
 
   ############### EVENTS ###############
   def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
@@ -157,6 +119,7 @@ class MainWindow(QWidget):
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
         self.table, self.state_saver, self.table_item_changed))
     self.window.actionUndo.triggered.connect(self.undo)
+    ui_utils.TABLE_CHANGED_FUNCTION = self.table_item_changed
 
   ##### FILE OPS#####
   def save_cache(self) -> None:
@@ -325,7 +288,7 @@ class MainWindow(QWidget):
     self.state_saver.state_to_table(self.table)
     self.table.blockSignals(False)
 
-  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
+  def table_item_changed(self, item: Optional[str] = None) -> None:
     """Handle table item changes."""
     print_utils.print_info("Table item changed.")
     self.is_saved = False
@@ -335,7 +298,7 @@ class MainWindow(QWidget):
     state_string = self.state_saver.state.SerializeToString()
     if not self.recent_states or self.recent_states[-1] != state_string:
       self.recent_states.append(state_string)
-    if item:
+    if isinstance(item, str) and self.table.currentColumn() == 1:
       self.table.blockSignals(True)
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)

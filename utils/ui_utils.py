@@ -6,8 +6,11 @@ from typing import Any, List, Optional
 from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget, QTableWidgetItem, QLineEdit
+from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLineEdit, QSizePolicy,
+                               QTableWidget, QWidget)
 
+TEXT_COLUMNS = [1, 2, 15, 16, 17]
+NUMBER_COLUMNS = [3, 4, 5, 6, 7]
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
 FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"]
@@ -15,6 +18,7 @@ FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
 FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
+TABLE_CHANGED_FUNCTION = None
 
 
 def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
@@ -100,7 +104,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
   # Refactor: Hook up checkboxes with table_changed function.
-  # check_box.clicked.connect()
+  check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, widget)
 
 
@@ -108,35 +112,47 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)
+  # dropdown.setStyleSheet("QComboBox {background-color: #ebebeb;}")
+  dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, dropdown)
 
 
-def set_cell_widget(table: QTableWidget, row: int, col: int, widget: QWidget):
-  """Add a dropdown to the given table at the given row and column."""
+def add_line_edit(table: QTableWidget, row: int, col: int, text: str, placeholder: str,
+                  alignment: Any = Qt.AlignCenter):
+  """Add a checkbox to the given table at the given row and column."""
+  line_edit = QLineEdit(text)
+  line_edit.setPlaceholderText(placeholder)
+  line_edit.setAlignment(alignment)
+  line_edit.setStyleSheet("QLineEdit { background-color: #ebebeb; border: 1px;}")
+  line_edit.editingFinished.connect(TABLE_CHANGED_FUNCTION)
+  # line_edit.adjustSize()
+  line_edit.setTextMargins(5, 5, 5, 5)
+  # Make return key work leave the widget.
+  line_edit.returnPressed.connect(line_edit.clearFocus)
+
+  widget = QWidget()
+  layout = QHBoxLayout(widget)
+  layout.addWidget(line_edit)
+  layout.setAlignment(alignment)
+  layout.setContentsMargins(0, 0, 0, 0)
+  widget.setLayout(layout)
+
   table.setCellWidget(row, col, widget)
-  if isinstance(widget, QLineEdit):
-    widget.setPlaceholderText("Enter text here")
-    widget.installEventFilter(table)
 
 
 def fill_row(table: QTableWidget, row: int) -> None:
   """Fill the table with widgets values."""
-  # table.setItem(row, 1, QTableWidgetItem("b"))
-  line_edit = QLineEdit("a")
-  line_edit.setText("a")
-  line_edit.setPlaceholderText("AFA")
-  table.setCellWidget(0, 1, line_edit)
-  table.setCellWidget(0, 2, line_edit)
-  table.setCellWidget(0, 3, line_edit)
-  # table.setItem(row, 2, line_edit.setPlaceholderText("Camera"))
-  # table.setItem(row, 3, line_edit.setPlaceholderText("Start"))
-  # table.setItem(row, 4, line_edit.setPlaceholderText("End"))
-  # table.setItem(row, 5, line_edit.setPlaceholderText("X"))
-  # table.setItem(row, 6, line_edit.setPlaceholderText("Y"))
-  # table.setItem(row, 7, line_edit.setPlaceholderText("Samples"))
-  # table.setItem(row, 15, line_edit.setPlaceholderText("Scene"))
-  # table.setItem(row, 16, line_edit.setPlaceholderText("View Layers"))
-  # table.setItem(row, 17, line_edit.setPlaceholderText("Comments"))
+  add_line_edit(table, row, 1, text="", placeholder="File",
+                alignment=Qt.AlignLeft | Qt.AlignVCenter)
+  add_line_edit(table, row, 2, text="", placeholder="Camera")
+  add_line_edit(table, row, 3, text="", placeholder="Start")
+  add_line_edit(table, row, 4, text="", placeholder="End")
+  add_line_edit(table, row, 5, text="", placeholder="X")
+  add_line_edit(table, row, 6, text="", placeholder="Y")
+  add_line_edit(table, row, 7, text="", placeholder="Samples")
+  add_line_edit(table, row, 15, text="", placeholder="Scene")
+  add_line_edit(table, row, 16, text="", placeholder="View Layers")
+  add_line_edit(table, row, 17, text="", placeholder="Comments")
   add_checkbox(table, row, 0, checked=True)
   add_dropdown(table, row, 8, FILE_FORMATS_UI)
   add_dropdown(table, row, 9, RENDER_ENGINES)
@@ -145,4 +161,3 @@ def fill_row(table: QTableWidget, row: int) -> None:
   add_checkbox(table, row, 12, checked=False)
   add_checkbox(table, row, 13, checked=False)
   add_checkbox(table, row, 14, checked=False)
-  add_checkbox(table, row, 15, checked=False)

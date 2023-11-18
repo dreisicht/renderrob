@@ -3,10 +3,11 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
-from utils import table_utils, ui_utils, path_utils
+from utils import path_utils, table_utils, ui_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -43,27 +44,30 @@ class StateSaver:
       table.removeRow(0)
     for i, render_job in enumerate(self.state.render_jobs):
       table.insertRow(i)
-
-      table_utils.post_process_row(table, i)
-      table.setItem(i, 1, QTableWidgetItem(render_job.file))
-      table.setItem(i, 2, QTableWidgetItem(render_job.camera))
-      table.setItem(i, 3, QTableWidgetItem(str(render_job.start)))
-      table.setItem(i, 4, QTableWidgetItem(str(render_job.end)))
-      table.setItem(i, 5, QTableWidgetItem(str(render_job.x_res)))
-      table.setItem(i, 6, QTableWidgetItem(str(render_job.y_res)))
-      table.setItem(i, 7, QTableWidgetItem(str(render_job.samples)))
-      ui_utils.set_checkbox_values(table, i, [render_job.active,
-                                              render_job.motion_blur,
-                                              render_job.overwrite,
-                                              render_job.high_quality,
-                                              render_job.denoise])
+      # table_utils.post_process_row(table, i)
+      ui_utils.add_line_edit(table, i, 1, text=render_job.file,
+                             placeholder="File", alignment=Qt.AlignLeft | Qt.AlignVCenter)
+      ui_utils.add_line_edit(table, i, 2, text=render_job.camera, placeholder="Camera")
+      ui_utils.add_line_edit(table, i, 3, text=str(render_job.start), placeholder="Start")
+      ui_utils.add_line_edit(table, i, 4, text=str(render_job.end), placeholder="End")
+      ui_utils.add_line_edit(table, i, 5, text=str(render_job.x_res), placeholder="X")
+      ui_utils.add_line_edit(table, i, 6, text=str(render_job.y_res), placeholder="Y")
+      ui_utils.add_line_edit(table, i, 7, text=str(render_job.samples), placeholder="Samples")
+      ui_utils.add_line_edit(table, i, 15, text=render_job.scene, placeholder="Scene")
+      ui_utils.add_line_edit(table, i, 16, text=";".join(
+          render_job.view_layers), placeholder="View Layers")
+      ui_utils.add_line_edit(table, i, 17, text=render_job.comments, placeholder="Comments")
+      ui_utils.add_checkbox(table, i, 0, checked=True)
+      ui_utils.add_dropdown(table, i, 8, ui_utils.FILE_FORMATS_UI)
+      ui_utils.add_dropdown(table, i, 9, ui_utils.RENDER_ENGINES)
+      ui_utils.add_dropdown(table, i, 10, ui_utils.DEVICES)
+      ui_utils.add_checkbox(table, i, 11, checked=render_job.motion_blur)
+      ui_utils.add_checkbox(table, i, 12, checked=render_job.overwrite)
+      ui_utils.add_checkbox(table, i, 13, checked=render_job.high_quality)
+      ui_utils.add_checkbox(table, i, 14, checked=render_job.denoise)
       ui_utils.set_combobox_indexes(table, i, [render_job.file_format,
                                                render_job.engine,
                                                render_job.device])
-      table.setItem(i, 15, QTableWidgetItem(render_job.scene))
-      table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))
-      table.setItem(i, 17, QTableWidgetItem(render_job.comments))
-      table_utils.set_text_alignment(table, i)
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""

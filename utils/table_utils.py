@@ -2,10 +2,9 @@
 import os
 from typing import Any, Optional
 
-from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
-                               QTableWidgetItem, QWidget)
+                               QTableWidgetItem, QWidget, QLineEdit)
 
 from utils import ui_utils
 
@@ -32,6 +31,17 @@ def normalize_drive_letter(path: str) -> str:
   if path[1] == ":":
     return path[0].upper() + path[1:]
   return path
+
+
+def get_table_text(table_widget: QTableWidget, row: int, column: int) -> str:
+  """Get the text from a table item."""
+  item = table_widget.cellWidget(row, column)
+  if not item:
+    return ""
+  qle = item.findChild(QLineEdit)
+  if qle:
+    return qle.text()
+  return item.text()
 
 
 def make_editable(table_widget: QTableWidget) -> None:
@@ -100,7 +110,6 @@ def move_row_down(table_widget: QTableWidget) -> None:
     ui_utils.fill_row(table_widget, row + 1)
     ui_utils.set_combobox_indexes(table_widget, row + 1, combobox_values)
     ui_utils.set_checkbox_values(table_widget, row + 1, checkbox_values)
-    set_text_alignment(table_widget, row + 1)
 
 
 def move_row_up(table_widget: QTableWidget) -> None:
@@ -118,7 +127,6 @@ def move_row_up(table_widget: QTableWidget) -> None:
     ui_utils.fill_row(table_widget, row - 1)
     ui_utils.set_combobox_indexes(table_widget, row - 1, combobox_values)
     ui_utils.set_checkbox_values(table_widget, row - 1, checkbox_values)
-    set_text_alignment(table_widget, row - 1)
 
 
 def duplicate_row(table_widget: QTableWidget, state_saver: Any,
@@ -141,7 +149,6 @@ def add_row_below(table_widget: QTableWidget,
   current_row = table_widget.currentRow() + 1
   table_widget.insertRow(current_row)
   ui_utils.fill_row(table_widget, current_row)
-  set_text_alignment(table_widget, current_row)
   if callback_function:
     callback_function()
   table_widget.blockSignals(False)
@@ -164,15 +171,12 @@ def add_file_below(table_widget: QTableWidget, path: str) -> None:
   id_row = table_widget.rowCount()
   table_widget.insertRow(id_row)
   ui_utils.fill_row(table_widget, id_row)
-  set_text_alignment(table_widget, id_row)
   table_widget.setItem(id_row, 1, QTableWidgetItem(path))
-  # fix_active_row_path(table_widget.item(id_row, 1))
   table_widget.blockSignals(False)
 
 
 def post_process_row(table_widget: QTableWidget, row: int) -> None:
   """Post-process the table after loading it from a UI file."""
-  # set_text_alignment(table, row)
 
   header = table_widget.horizontalHeader()
   header.setMinimumHeight(50)
@@ -200,9 +204,9 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
   # Set the file column to stretch. The other columns will be resized to fit
   # their contents. Some of the functions here might be obsolete though. Needed
   # to be checked later.
-  header.setSectionResizeMode(QHeaderView.ResizeToContents)
+  header.setSectionResizeMode(QHeaderView.Fixed)
   header.setSectionResizeMode(1, QHeaderView.Stretch)
-  table_widget.resizeColumnsToContents()
+  # table_widget.resizeColumnsToContents()
   ui_utils.fill_row(table_widget, row)
 
 
@@ -224,27 +228,6 @@ def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
   item.setText(path)
 
 
-def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
-  """Set the text alignment of the table items."""
-  for i in range(table_widget.columnCount()):
-    if i in ui_utils.COMBOBOX_COLUMNS or i in ui_utils.CHECKBOX_COLUMNS:
-      continue
-    old_item = table_widget.item(row, i)
-    if old_item:
-      text = old_item.text()
-    else:
-      text = ""
-    item = QTableWidgetItem(text)
-    if not item:
-      continue
-    table_widget.removeCellWidget(row, i)
-    if i == 1:
-      item.setTextAlignment(Qt.AlignLeft | Qt.AlignVCenter)
-    else:
-      item.setTextAlignment(Qt.AlignCenter)
-    table_widget.setItem(row, i, item)
-
-
 def color_row_background(table_widget: QTableWidget, row_index: int, color: QColor) -> None:
   """Color the background of a row."""
   #  #3 Add coloring for upfront warnings (double jobs, animation denoising,
@@ -253,6 +236,10 @@ def color_row_background(table_widget: QTableWidget, row_index: int, color: QCol
   # single frame rendering in high quality but no denoising.)
   for column_index in range(table_widget.columnCount()):
     item = table_widget.item(row_index, column_index)
+    cw = table_widget.cellWidget(row_index, column_index)
+    if cw:
+      item = cw.findChild(QLineEdit)
+
     if item is None:
       continue
     if color == QColor(COLORS["green"]):
@@ -312,3 +299,19 @@ def reset_all_backgruond_colors(table_widget: QTableWidget) -> None:
   for row_index in range(table_widget.rowCount()):
     color_row_background(table_widget,
                          row_index, QColor(COLORS["grey_light"]))
+
+
+def set_table_initial_sizes(table_widget: QTableWidget) -> None:
+  """Set the initial sizes of the table."""
+  check_box_width = 50
+  number_width = 50
+  text_width = 80
+  for col in range(table_widget.columnCount()):
+    if col in ui_utils.TEXT_COLUMNS:
+      table_widget.setColumnWidth(col, text_width)
+    elif col in ui_utils.NUMBER_COLUMNS:
+      table_widget.setColumnWidth(col, number_width)
+    elif col in ui_utils.COMBOBOX_COLUMNS:
+      table_widget.setColumnWidth(col, text_width)
+    elif col in ui_utils.CHECKBOX_COLUMNS:
+      table_widget.setColumnWidth(col, check_box_width)
