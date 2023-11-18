@@ -6,8 +6,7 @@ from typing import Any, List, Optional
 from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHBoxLayout, QLineEdit, QSizePolicy,
-                               QTableWidget, QWidget)
+from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
 
 TEXT_COLUMNS = [1, 2, 15, 16, 17]
 NUMBER_COLUMNS = [3, 4, 5, 6, 7]
@@ -19,6 +18,18 @@ FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 TABLE_CHANGED_FUNCTION = None
+PLACEHOLDER_TEXT = {
+    1: "File",
+    2: "Camera",
+    3: "Start",
+    4: "End",
+    5: "X Res",
+    6: "Y Res",
+    7: "Samples",
+    15: "Scene",
+    16: "View Layers",
+    17: "Comments",
+}
 
 
 def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
@@ -117,42 +128,8 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   table.setCellWidget(row, col, dropdown)
 
 
-def add_line_edit(table: QTableWidget, row: int, col: int, text: str, placeholder: str,
-                  alignment: Any = Qt.AlignCenter):
-  """Add a checkbox to the given table at the given row and column."""
-  line_edit = QLineEdit(text)
-  line_edit.setPlaceholderText(placeholder)
-  line_edit.setAlignment(alignment)
-  line_edit.setStyleSheet("QLineEdit { background-color: #ebebeb; border: 1px;}")
-  line_edit.editingFinished.connect(TABLE_CHANGED_FUNCTION)
-  # line_edit.adjustSize()
-  line_edit.setTextMargins(5, 5, 5, 5)
-  # Make return key work leave the widget.
-  line_edit.returnPressed.connect(line_edit.clearFocus)
-
-  widget = QWidget()
-  layout = QHBoxLayout(widget)
-  layout.addWidget(line_edit)
-  layout.setAlignment(alignment)
-  layout.setContentsMargins(0, 0, 0, 0)
-  widget.setLayout(layout)
-
-  table.setCellWidget(row, col, widget)
-
-
 def fill_row(table: QTableWidget, row: int) -> None:
   """Fill the table with widgets values."""
-  add_line_edit(table, row, 1, text="", placeholder="File",
-                alignment=Qt.AlignLeft | Qt.AlignVCenter)
-  add_line_edit(table, row, 2, text="", placeholder="Camera")
-  add_line_edit(table, row, 3, text="", placeholder="Start")
-  add_line_edit(table, row, 4, text="", placeholder="End")
-  add_line_edit(table, row, 5, text="", placeholder="X")
-  add_line_edit(table, row, 6, text="", placeholder="Y")
-  add_line_edit(table, row, 7, text="", placeholder="Samples")
-  add_line_edit(table, row, 15, text="", placeholder="Scene")
-  add_line_edit(table, row, 16, text="", placeholder="View Layers")
-  add_line_edit(table, row, 17, text="", placeholder="Comments")
   add_checkbox(table, row, 0, checked=True)
   add_dropdown(table, row, 8, FILE_FORMATS_UI)
   add_dropdown(table, row, 9, RENDER_ENGINES)
