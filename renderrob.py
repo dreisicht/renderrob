@@ -119,7 +119,6 @@ class MainWindow(QWidget):
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
         self.table, self.state_saver, self.table_item_changed))
     self.window.actionUndo.triggered.connect(self.undo)
-    ui_utils.TABLE_CHANGED_FUNCTION = self.table_item_changed
 
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
@@ -165,7 +164,6 @@ class MainWindow(QWidget):
     self.is_saved = True
     self.window.setWindowTitle("RenderRob " + self.cache.current_file)
 
-  # @operator
   def new_file(self) -> None:
     """Create a new file."""
     for _ in range(self.table.rowCount()):
