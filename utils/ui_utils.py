@@ -8,12 +8,28 @@ from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
 
+TEXT_COLUMNS = [1, 2, 15, 16, 17]
+NUMBER_COLUMNS = [3, 4, 5, 6, 7]
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
-FILE_FORMATS_COMMAND = ["PNG", "TIFF", "OPEN_EXR_MULTILAYER", "JPEG"]
-FILE_FORMATS_UI = ["png", "tiff", "exr", "jpeg"]
+FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"]
+FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
+FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
+TABLE_CHANGED_FUNCTION = None
+PLACEHOLDER_TEXT = {
+    1: "File",
+    2: "Camera",
+    3: "Start",
+    4: "End",
+    5: "X Res",
+    6: "Y Res",
+    7: "Samples",
+    15: "Scene",
+    16: "View Layers",
+    17: "Comments",
+}
 
 
 def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
@@ -99,7 +115,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
   # Refactor: Hook up checkboxes with table_changed function.
-  # check_box.clicked.connect()
+  # check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, widget)
 
 
@@ -107,6 +123,7 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)
+  # dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, dropdown)
 
 
@@ -120,4 +137,3 @@ def fill_row(table: QTableWidget, row: int) -> None:
   add_checkbox(table, row, 12, checked=False)
   add_checkbox(table, row, 13, checked=False)
   add_checkbox(table, row, 14, checked=False)
-  add_checkbox(table, row, 15, checked=False)

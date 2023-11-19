@@ -9,33 +9,6 @@ from PySide6.QtWidgets import QFileDialog
 from proto import state_pb2
 from utils import ui_utils
 
-# class SettingsHandler():
-#   """Class to handle the storage of the settings."""
-
-#   def __init__(self) -> None:
-#     self.settings_path = os.path.join(self.get_settings_output_dir(), ".rr_settings")
-#     print_utils.print_info("The settings are stored in: " + self.settings_path)
-
-#   def get_settings(self) -> None:
-#     """Get the settings from the settings file if existing."""
-#     settings_state = settings_pb2.settings()  # pylint: disable=no-member
-#     if os.path.exists(self.settings_path):
-#       with open(self.settings_path, "rb") as settings_file:
-#         settings_state.ParseFromString(settings_file.read())
-#     return settings_state  # pylint: disable=no-member
-
-#   def save_settings(self, settings_state: settings_pb2) -> None:
-#     """Save the settings to the settings file."""
-#     with open(self.settings_path, "wb") as settings_file:
-#       settings_file.write(settings_state.SerializeToString())
-
-#   def get_settings_output_dir(self) -> str:
-#     """Get the output directory from the settings."""
-#     data_dir = os.path.join(appdirs.AppDirs().user_data_dir, "RenderRob")
-#     if not os.path.exists(data_dir):
-#       os.makedirs(data_dir)
-#     return data_dir
-
 
 class SettingsWindow():
   """Settings dialog for RenderRob.

@@ -110,7 +110,7 @@ class ShotNameBuilder:
     else:
       frame_render_folder = os.path.join(output_path, shotname)
 
-    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_UI[self.render_job.file_format]}"
+    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
     full_frame_path = os.path.join(frame_render_folder, frame_name)
     # if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
     #   if

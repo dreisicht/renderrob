@@ -2,8 +2,7 @@
 import os
 from typing import Any, Optional
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
+from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
 
@@ -85,6 +84,7 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
         checkbox_item.setChecked(checked)
 
 
+# @operator
 def move_row_down(table_widget: QTableWidget) -> None:
   """Move the currently selected row down."""
   row = table_widget.currentRow()
@@ -103,6 +103,7 @@ def move_row_down(table_widget: QTableWidget) -> None:
     set_text_alignment(table_widget, row + 1)
 
 
+# @operator
 def move_row_up(table_widget: QTableWidget) -> None:
   """Move the currently selected row up."""
   row = table_widget.currentRow()
@@ -121,6 +122,7 @@ def move_row_up(table_widget: QTableWidget) -> None:
     set_text_alignment(table_widget, row - 1)
 
 
+# @operator
 def duplicate_row(table_widget: QTableWidget, state_saver: Any,
                   callback_function: callable) -> None:
   """Duplicate the currently selected row."""
@@ -128,51 +130,43 @@ def duplicate_row(table_widget: QTableWidget, state_saver: Any,
   current_row = table_widget.currentRow()
   state_saver.state.render_jobs.insert(
       current_row + 1, state_saver.state.render_jobs[current_row])
-  table_widget.blockSignals(True)
   state_saver.state_to_table(table_widget)
   callback_function()
-  table_widget.blockSignals(False)
 
 
+# @operator
 def add_row_below(table_widget: QTableWidget,
                   callback_function: Optional[callable] = None) -> None:
   """Add a row below the current row."""
-  table_widget.blockSignals(True)
   current_row = table_widget.currentRow() + 1
   table_widget.insertRow(current_row)
   ui_utils.fill_row(table_widget, current_row)
   set_text_alignment(table_widget, current_row)
   if callback_function:
     callback_function()
-  table_widget.blockSignals(False)
 
 
+# @operator
 def remove_active_row(table_widget: QTableWidget, callback_function: callable) -> None:
   """Remove the currently selected row."""
-  table_widget.blockSignals(True)
   current_row = table_widget.currentRow()
   if current_row == -1:
     current_row = table_widget.rowCount() - 1
   table_widget.removeRow(current_row)
-  table_widget.blockSignals(False)
   callback_function()
 
 
 def add_file_below(table_widget: QTableWidget, path: str) -> None:
   """Add a file below the current row."""
-  table_widget.blockSignals(True)
   id_row = table_widget.rowCount()
   table_widget.insertRow(id_row)
   ui_utils.fill_row(table_widget, id_row)
   set_text_alignment(table_widget, id_row)
   table_widget.setItem(id_row, 1, QTableWidgetItem(path))
-  # fix_active_row_path(table_widget.item(id_row, 1))
-  table_widget.blockSignals(False)
 
 
 def post_process_row(table_widget: QTableWidget, row: int) -> None:
   """Post-process the table after loading it from a UI file."""
-  # set_text_alignment(table, row)
 
   header = table_widget.horizontalHeader()
   header.setMinimumHeight(50)
@@ -193,7 +187,7 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
        "High\nQuality",
        "Denoise",
        "Scene",
-       "View\nLayer",
+       "View\nLayers",
        "Comments",
        ])
 
@@ -266,11 +260,9 @@ def color_row_background(table_widget: QTableWidget, row_index: int, color: QCol
     if color == QColor(COLORS["yellow"]):
       if item.background() == QColor(COLORS["red"]):
         continue
-    table_widget.blockSignals(True)
     item.setBackground(color)
     ui_utils.set_checkbox_background_color(
         table_widget, row_index, color)
-    table_widget.blockSignals(False)
 
 
 def set_background_colors(table_widget: QTableWidget, exit_code: int,

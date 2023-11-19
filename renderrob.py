@@ -48,7 +48,7 @@ class MainWindow(QWidget):
     self.app.setStyle("Breeze")
     if os.path.exists(".rr_cache"):
       self.load_cache()
-    self.resize(1800, self.app.primaryScreen().size().height() - 100)
+    self.resize(1800, self.app.primaryScreen().size().height())
     self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
@@ -120,7 +120,7 @@ class MainWindow(QWidget):
         self.table, self.state_saver, self.table_item_changed))
     self.window.actionUndo.triggered.connect(self.undo)
 
-  ##### FILE OPS#####
+  ######## CACHE UTILS ##########
   def save_cache(self) -> None:
     """Store the cache to a file."""
     cache_str = self.cache.SerializeToString()

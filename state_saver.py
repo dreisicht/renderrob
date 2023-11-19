@@ -3,10 +3,11 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
-from utils import table_utils, ui_utils, path_utils
+from utils import path_utils, table_utils, ui_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
@@ -14,7 +15,7 @@ def get_text(item: QTableWidgetItem, widget=None) -> str:
   if not item:
     return ""
   if widget == "dropdown":
-    return item.currentText()
+    return item.currentText().replace(" ", "_")
   if widget == "checkbox":
     return item.findChild(QCheckBox).isChecked()
   return item.text()
@@ -67,6 +68,7 @@ class StateSaver:
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
+
     del self.state.render_jobs[:]
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member
