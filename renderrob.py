@@ -109,6 +109,9 @@ class MainWindow(QWidget):
     self.window.down_button.clicked.connect(lambda: table_utils.move_row_down(
         self.table, self.before_table_change, self.after_table_change))
 
+    self.window.actionCopy_cell.triggered.connect(self.copy_from_cell)
+    self.window.actionPaste_cell.triggered.connect(self.paste_into_cell)
+
     self.window.render_button.clicked.connect(self.start_render)
     self.window.stop_button.clicked.connect(self.stop_render)
     self.window.actionOpen.triggered.connect(self.open_file_dialog)
@@ -230,6 +233,7 @@ class MainWindow(QWidget):
   ######### CONSOLE WINDOW ###########
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
+    self.table.blockSignals(True)
     data = self.process.readAllStandardOutput()
     output = data.data().decode()
     color_format = QTextCharFormat()
@@ -254,12 +258,15 @@ class MainWindow(QWidget):
                                            QColor(table_utils.COLORS["yellow"]))
           table_utils.set_background_colors(self.table, 987, self.job_row_index)
 
-        if line.startswith(error):
+        if line.startswith(error) or "blender.crash.txt" in line:
           line = line.replace(error, '')
           color_format.setBackground(QColor(table_utils.COLORS["red"]))
           color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
 
-        self.window.textBrowser.moveCursor(QTextCursor.End)
+          # Only scroll down if user is at bottom.
+        if self.window.textBrowser.verticalScrollBar().value() > (
+                self.window.textBrowser.verticalScrollBar().maximum()) - 200:
+          self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
         self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
 
@@ -268,15 +275,28 @@ class MainWindow(QWidget):
           color_format.setBackground(QColor(52, 80, 100))
           color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
     else:
-      self.window.textBrowser.moveCursor(QTextCursor.End)
+      # Only scroll down if user is at bottom.
+      print(self.window.textBrowser.verticalScrollBar().value(),
+            self.window.textBrowser.verticalScrollBar().maximum(),
+            self.window.textBrowser.verticalScrollBar().value() > self.window.textBrowser.verticalScrollBar().maximum() - 500)
+      if self.window.textBrowser.verticalScrollBar().value() > (
+              self.window.textBrowser.verticalScrollBar().maximum()) - 500:
+        self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
       self.window.textBrowser.insertPlainText(output)
 
-    #  Find a more elegant way to do this.
+    # Find a more elegant way to do this.
     if "Blender quit" in output:
       self._refresh_progress_bar()
       self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
+
+    if "blender.crash.txt" in output:
+      self._refresh_progress_bar()
+      self.window.textBrowser.insertPlainText("\n")
+      self.window.textBrowser.moveCursor(QTextCursor.End)
+
+    self.table.blockSignals(False)
 
   ##### STATE OPS #####
   def undo(self) -> None:
@@ -306,19 +326,17 @@ class MainWindow(QWidget):
     print_utils.print_info("After table changed.")
     self.state_saver.table_to_state(self.table)
     if item:
-      self.table.blockSignals(True)
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
         if not os.path.exists(item.text()) and not os.path.exists(
                 os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
           QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
-      self.table.blockSignals(False)
     self.check_table_for_errors()
 
-  def before_and_after_table_change(self) -> None:
+  def before_and_after_table_change(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle before and after table change."""
     self.before_table_change()
-    self.after_table_change()
+    self.after_table_change(item)
   ########### MAIN WINDOW OPS #############
 
   def open_settings_window(self) -> None:
@@ -458,6 +476,26 @@ class MainWindow(QWidget):
     self.blockSignals(False)
 
   ########## TABLE OPS ############
+  def copy_from_cell(self) -> None:
+    """Copies the content of the active cell into the clipboard."""
+    current_row = self.table.currentRow()
+    current_column = self.table.currentColumn()
+    clipboard = QApplication.clipboard()
+    clipboard.setText(self.table.item(current_row, current_column).text())
+
+  def paste_into_cell(self) -> None:
+    """Pastes the content of clipboard into the active cell."""
+    self.table.blockSignals(True)
+    self.before_table_change()
+
+    current_row = self.table.currentRow()
+    current_column = self.table.currentColumn()
+    clipboard = QApplication.clipboard()
+    self.table.item(current_row, current_column).setText(clipboard.text())
+
+    self.after_table_change()
+    self.table.blockSignals(False)
+
   def render_job(self, job: state_pb2.render_job) -> None:  # pylint: disable=no-member
     """Render a job."""
     snb = shot_name_builder.ShotNameBuilder(
