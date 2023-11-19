@@ -76,9 +76,6 @@
                  <iconset>
                   <normaloff>icons/stop.svg</normaloff>icons/stop.svg</iconset>
                 </property>
-                <property name="shortcut">
-                 <string>Ctrl+C</string>
-                </property>
                </widget>
               </item>
               <item>
@@ -637,6 +634,9 @@
     </property>
     <addaction name="actionUndo"/>
     <addaction name="separator"/>
+    <addaction name="actionCopy_cell"/>
+    <addaction name="actionPaste_cell"/>
+    <addaction name="separator"/>
     <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuFile"/>
@@ -725,6 +725,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Z</string>
+   </property>
+  </action>
+  <action name="actionCopy_cell">
+   <property name="text">
+    <string>Copy cell</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionPaste_cell">
+   <property name="text">
+    <string>Paste cell</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
  </widget>
