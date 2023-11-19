@@ -99,9 +99,11 @@ class MainWindow(QWidget):
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
     self.window.add_button.clicked.connect(
-        lambda: table_utils.add_row_below(self.table, self.before_table_change, self.after_table_change))
+        lambda: table_utils.add_row_below(self.table, self.before_table_change,
+                                          self.after_table_change))
     self.window.delete_button.clicked.connect(
-        lambda: table_utils.remove_active_row(self.table, self.before_table_change, self.after_table_change))
+        lambda: table_utils.remove_active_row(self.table, self.before_table_change,
+                                              self.after_table_change))
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(lambda: table_utils.move_row_up(
@@ -276,9 +278,6 @@ class MainWindow(QWidget):
           color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
     else:
       # Only scroll down if user is at bottom.
-      print(self.window.textBrowser.verticalScrollBar().value(),
-            self.window.textBrowser.verticalScrollBar().maximum(),
-            self.window.textBrowser.verticalScrollBar().value() > self.window.textBrowser.verticalScrollBar().maximum() - 500)
       if self.window.textBrowser.verticalScrollBar().value() > (
               self.window.textBrowser.verticalScrollBar().maximum()) - 500:
         self.window.textBrowser.moveCursor(QTextCursor.End)
