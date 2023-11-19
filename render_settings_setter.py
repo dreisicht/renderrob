@@ -171,3 +171,10 @@ class RenderSettingsSetter:
     self.current_scene_data.frame_step = frame_step
     self.current_scene_data.render.use_stamp = not high_quality
     print_utils.print_info("Finished setting the rendering settings!")
+
+  def user_commands(self) -> None:
+    """Import user commands."""
+    try:
+      import user_commands  # pylint: disable=import-error,import-outside-toplevel,unused-import
+    except ImportError:
+      print_utils.print_info("No user commands found.")
