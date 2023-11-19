@@ -85,8 +85,11 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
 
 
 # @operator
-def move_row_down(table_widget: QTableWidget) -> None:
+def move_row_down(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
   """Move the currently selected row down."""
+  table_widget.blockSignals(True)
+  before_callback_function()
+
   row = table_widget.currentRow()
   column = table_widget.currentColumn()
   if row < table_widget.rowCount() - 1:
@@ -102,10 +105,16 @@ def move_row_down(table_widget: QTableWidget) -> None:
     ui_utils.set_checkbox_values(table_widget, row + 1, checkbox_values)
     set_text_alignment(table_widget, row + 1)
 
+  after_callback_function()
+  table_widget.blockSignals(False)
+
 
 # @operator
-def move_row_up(table_widget: QTableWidget) -> None:
+def move_row_up(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
   """Move the currently selected row up."""
+  table_widget.blockSignals(True)
+  before_callback_function()
+
   row = table_widget.currentRow()
   column = table_widget.currentColumn()
   if row > 0:
@@ -121,41 +130,62 @@ def move_row_up(table_widget: QTableWidget) -> None:
     ui_utils.set_checkbox_values(table_widget, row - 1, checkbox_values)
     set_text_alignment(table_widget, row - 1)
 
+  after_callback_function()
+  table_widget.blockSignals(False)
+
 
 # @operator
 def duplicate_row(table_widget: QTableWidget, state_saver: Any,
-                  callback_function: callable) -> None:
+                  before_callback_function: callable, after_callback_function: callable) -> None:
   """Duplicate the currently selected row."""
+  table_widget.blockSignals(True)
+  before_callback_function()
+
   state_saver.table_to_state(table_widget)
   current_row = table_widget.currentRow()
   state_saver.state.render_jobs.insert(
       current_row + 1, state_saver.state.render_jobs[current_row])
   state_saver.state_to_table(table_widget)
-  callback_function()
+
+  after_callback_function()
+  table_widget.blockSignals(False)
 
 
 # @operator
 def add_row_below(table_widget: QTableWidget,
-                  callback_function: Optional[callable] = None) -> None:
+                  before_callback_function: Optional[callable] = None,
+                  after_callback_function: Optional[callable] = None) -> None:
   """Add a row below the current row."""
+  table_widget.blockSignals(True)
+  if before_callback_function:
+    before_callback_function()
+
   current_row = table_widget.currentRow() + 1
   table_widget.insertRow(current_row)
   ui_utils.fill_row(table_widget, current_row)
   set_text_alignment(table_widget, current_row)
-  if callback_function:
-    callback_function()
+
+  if after_callback_function:
+    after_callback_function()
+  table_widget.blockSignals(False)
 
 
 # @operator
-def remove_active_row(table_widget: QTableWidget, callback_function: callable) -> None:
+def remove_active_row(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
   """Remove the currently selected row."""
+  table_widget.blockSignals(True)
+  before_callback_function()
+
   current_row = table_widget.currentRow()
   if current_row == -1:
     current_row = table_widget.rowCount() - 1
   table_widget.removeRow(current_row)
-  callback_function()
+
+  after_callback_function()
+  table_widget.blockSignals(False)
 
 
+# @operator
 def add_file_below(table_widget: QTableWidget, path: str) -> None:
   """Add a file below the current row."""
   id_row = table_widget.rowCount()

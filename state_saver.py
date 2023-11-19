@@ -3,7 +3,6 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
-from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
