@@ -85,7 +85,8 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
 
 
 # @operator
-def move_row_down(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
+def move_row_down(table_widget: QTableWidget, before_callback_function: callable,
+                  after_callback_function: callable) -> None:
   """Move the currently selected row down."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -110,7 +111,8 @@ def move_row_down(table_widget: QTableWidget, before_callback_function: callable
 
 
 # @operator
-def move_row_up(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
+def move_row_up(table_widget: QTableWidget, before_callback_function: callable,
+                after_callback_function: callable) -> None:
   """Move the currently selected row up."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -171,7 +173,8 @@ def add_row_below(table_widget: QTableWidget,
 
 
 # @operator
-def remove_active_row(table_widget: QTableWidget, before_callback_function: callable, after_callback_function: callable) -> None:
+def remove_active_row(table_widget: QTableWidget, before_callback_function: callable,
+                      after_callback_function: callable) -> None:
   """Remove the currently selected row."""
   table_widget.blockSignals(True)
   before_callback_function()
