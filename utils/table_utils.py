@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
-                               QTableWidgetItem, QWidget, QLineEdit)
+                               QTableWidgetItem, QWidget)
 
 from utils import ui_utils
 
@@ -84,6 +84,7 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
         checkbox_item.setChecked(checked)
 
 
+# @operator
 def move_row_down(table_widget: QTableWidget) -> None:
   """Move the currently selected row down."""
   row = table_widget.currentRow()
@@ -102,6 +103,7 @@ def move_row_down(table_widget: QTableWidget) -> None:
     set_text_alignment(table_widget, row + 1)
 
 
+# @operator
 def move_row_up(table_widget: QTableWidget) -> None:
   """Move the currently selected row up."""
   row = table_widget.currentRow()
@@ -120,6 +122,7 @@ def move_row_up(table_widget: QTableWidget) -> None:
     set_text_alignment(table_widget, row - 1)
 
 
+# @operator
 def duplicate_row(table_widget: QTableWidget, state_saver: Any,
                   callback_function: callable) -> None:
   """Duplicate the currently selected row."""
@@ -131,6 +134,7 @@ def duplicate_row(table_widget: QTableWidget, state_saver: Any,
   callback_function()
 
 
+# @operator
 def add_row_below(table_widget: QTableWidget,
                   callback_function: Optional[callable] = None) -> None:
   """Add a row below the current row."""
@@ -142,6 +146,7 @@ def add_row_below(table_widget: QTableWidget,
     callback_function()
 
 
+# @operator
 def remove_active_row(table_widget: QTableWidget, callback_function: callable) -> None:
   """Remove the currently selected row."""
   current_row = table_widget.currentRow()

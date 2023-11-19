@@ -68,6 +68,7 @@ class StateSaver:
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
+
     del self.state.render_jobs[:]
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member

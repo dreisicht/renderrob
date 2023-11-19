@@ -7,16 +7,16 @@ from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
 from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
-from PySide6.QtWidgets import QApplication, QFileDialog, QMessageBox, QStackedLayout, QWidget, QTableWidgetItem
+from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedLayout,
+                               QTableWidgetItem, QWidget)
 
 import settings_window
 import shot_name_builder
 import state_saver
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from utils import path_utils, print_utils, table_utils, ui_utils
+from utils import print_utils, table_utils, ui_utils, path_utils
 from utils.dropwidget import DropWidget
-from utils import placeholder_delegate
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -64,7 +64,6 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
     self.make_main_window_connections()
-    placeholder_delegate.setup_placeholder_delegate(self.table)
 
   def execute(self) -> None:
     """Execute the main window.
@@ -117,13 +116,12 @@ class MainWindow(QWidget):
     self.window.actionQuit.triggered.connect(self.quit)
     self.table.itemChanged.connect(self.table_item_changed)
     self.window.blender_button.clicked.connect(self.open_blender_file)
-
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
         self.table, self.state_saver, self.table_item_changed))
     self.window.actionUndo.triggered.connect(self.undo)
     ui_utils.TABLE_CHANGED_FUNCTION = self.table_item_changed
 
-  ##### FILE OPS#####
+  ######## CACHE UTILS ##########
   def save_cache(self) -> None:
     """Store the cache to a file."""
     cache_str = self.cache.SerializeToString()
@@ -167,9 +165,9 @@ class MainWindow(QWidget):
     self.is_saved = True
     self.window.setWindowTitle("RenderRob " + self.cache.current_file)
 
+  # @operator
   def new_file(self) -> None:
     """Create a new file."""
-    self.table.blockSignals(True)
     for _ in range(self.table.rowCount()):
       self.table.removeRow(0)
     self.cache.current_file = ""
@@ -178,7 +176,6 @@ class MainWindow(QWidget):
     self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
     table_utils.add_row_below(self.table, self.table_item_changed)
-    self.table.blockSignals(False)
 
   def clear_recent_files(self) -> None:
     """Clear the recent files."""
@@ -292,7 +289,7 @@ class MainWindow(QWidget):
     self.state_saver.state_to_table(self.table)
     self.table.blockSignals(False)
 
-  def table_item_changed(self, item: Optional[str] = None) -> None:
+  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle table item changes."""
     print_utils.print_info("Table item changed.")
     self.is_saved = False
@@ -302,12 +299,14 @@ class MainWindow(QWidget):
     state_string = self.state_saver.state.SerializeToString()
     if not self.recent_states or self.recent_states[-1] != state_string:
       self.recent_states.append(state_string)
-    if item and isinstance(item, QTableWidgetItem):
+    if item:
+      self.table.blockSignals(True)
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
         if not os.path.exists(item.text()) and not os.path.exists(
                 os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
           QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      self.table.blockSignals(False)
     self.check_table_for_errors()
 
   ########### MAIN WINDOW OPS #############

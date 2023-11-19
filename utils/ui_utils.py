@@ -115,7 +115,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
   # Refactor: Hook up checkboxes with table_changed function.
-  check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
+  # check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, widget)
 
 
@@ -123,8 +123,7 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)
-  # dropdown.setStyleSheet("QComboBox {background-color: #ebebeb;}")
-  dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
+  # dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, dropdown)
 
 
