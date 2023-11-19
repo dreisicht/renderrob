@@ -15,7 +15,7 @@ import shot_name_builder
 import state_saver
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from utils import print_utils, table_utils, ui_utils, path_utils
+from utils import path_utils, placeholder_delegate, print_utils, table_utils, ui_utils
 from utils.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
@@ -64,6 +64,7 @@ class MainWindow(QWidget):
     layout.addWidget(self.window)
     self.setLayout(layout)
     self.make_main_window_connections()
+    placeholder_delegate.setup_placeholder_delegate(self.table)
 
   def execute(self) -> None:
     """Execute the main window.
@@ -98,13 +99,15 @@ class MainWindow(QWidget):
   def make_main_window_connections(self) -> None:
     """Make connections for buttons."""
     self.window.add_button.clicked.connect(
-        lambda: table_utils.add_row_below(self.table, self.table_item_changed))
+        lambda: table_utils.add_row_below(self.table, self.before_table_change, self.after_table_change))
     self.window.delete_button.clicked.connect(
-        lambda: table_utils.remove_active_row(self.table, self.table_item_changed))
+        lambda: table_utils.remove_active_row(self.table, self.before_table_change, self.after_table_change))
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
-    self.window.up_button.clicked.connect(lambda: table_utils.move_row_up(self.table))
-    self.window.down_button.clicked.connect(lambda: table_utils.move_row_down(self.table))
+    self.window.up_button.clicked.connect(lambda: table_utils.move_row_up(
+        self.table, self.before_table_change, self.after_table_change))
+    self.window.down_button.clicked.connect(lambda: table_utils.move_row_down(
+        self.table, self.before_table_change, self.after_table_change))
 
     self.window.render_button.clicked.connect(self.start_render)
     self.window.stop_button.clicked.connect(self.stop_render)
@@ -114,10 +117,10 @@ class MainWindow(QWidget):
     self.window.actionSettings.triggered.connect(self.open_settings_window)
     self.window.actionNew.triggered.connect(self.new_file)
     self.window.actionQuit.triggered.connect(self.quit)
-    self.table.itemChanged.connect(self.table_item_changed)
+    self.table.itemChanged.connect(self.before_and_after_table_change)
     self.window.blender_button.clicked.connect(self.open_blender_file)
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
-        self.table, self.state_saver, self.table_item_changed))
+        self.table, self.state_saver, self.before_table_change, self.after_table_change))
     self.window.actionUndo.triggered.connect(self.undo)
 
   ######## CACHE UTILS ##########
@@ -173,7 +176,7 @@ class MainWindow(QWidget):
     self.state_saver.parent_widget = self
     self.recent_states = [b""]
     table_utils.post_process_row(self.table, 0)
-    table_utils.add_row_below(self.table, self.table_item_changed)
+    table_utils.add_row_below(self.table)
 
   def clear_recent_files(self) -> None:
     """Clear the recent files."""
@@ -287,9 +290,9 @@ class MainWindow(QWidget):
     self.state_saver.state_to_table(self.table)
     self.table.blockSignals(False)
 
-  def table_item_changed(self, item: Optional[QTableWidgetItem] = None) -> None:
-    """Handle table item changes."""
-    print_utils.print_info("Table item changed.")
+  def before_table_change(self) -> None:
+    """Handle before table change."""
+    print_utils.print_info("Before table changed.")
     self.is_saved = False
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
 
@@ -297,6 +300,11 @@ class MainWindow(QWidget):
     state_string = self.state_saver.state.SerializeToString()
     if not self.recent_states or self.recent_states[-1] != state_string:
       self.recent_states.append(state_string)
+
+  def after_table_change(self, item: Optional[QTableWidgetItem] = None) -> None:
+    """Handle after table change."""
+    print_utils.print_info("After table changed.")
+    self.state_saver.table_to_state(self.table)
     if item:
       self.table.blockSignals(True)
       if item.column() == 1:
@@ -307,10 +315,15 @@ class MainWindow(QWidget):
       self.table.blockSignals(False)
     self.check_table_for_errors()
 
+  def before_and_after_table_change(self) -> None:
+    """Handle before and after table change."""
+    self.before_table_change()
+    self.after_table_change()
   ########### MAIN WINDOW OPS #############
+
   def open_settings_window(self) -> None:
     """Open the settings window."""
-    self.is_saved = False
+    self.is_saved = False,
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
     settings_window.SettingsWindow(self.state_saver.state)
 
