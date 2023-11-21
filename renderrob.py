@@ -17,6 +17,7 @@ from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from utils import path_utils, placeholder_delegate, print_utils, table_utils, ui_utils
 from utils.dropwidget import DropWidget
+from utils.table_utils import normalize_drive_letter
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -127,6 +128,7 @@ class MainWindow(QWidget):
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
         self.table, self.state_saver, self.before_table_change, self.after_table_change))
     self.window.actionUndo.triggered.connect(self.undo)
+    self.window.sync_button.clicked.connect(self.load_settings_from_blender)
 
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
@@ -336,11 +338,11 @@ class MainWindow(QWidget):
     """Handle before and after table change."""
     self.before_table_change()
     self.after_table_change(item)
-  ########### MAIN WINDOW OPS #############
 
+  ########### MAIN WINDOW OPS #############
   def open_settings_window(self) -> None:
     """Open the settings window."""
-    self.is_saved = False,
+    self.is_saved = False
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
     settings_window.SettingsWindow(self.state_saver.state)
 
@@ -447,7 +449,46 @@ class MainWindow(QWidget):
     # Launch Blender with the file.
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
+  def load_settings_from_blender(self) -> None:
+    """Opens Blender and syncs the settings."""
+    self.table.blockSignals(True)
+    self.before_table_change()
+
+    job_index = self.table.currentRow()
+    job = self.state_saver.state.render_jobs.pop(job_index)
+
+    if not self.state_saver.state.settings.blender_path:
+      error_message = "The Blender path is not set."
+      print_utils.print_error_no_exit(error_message)
+      QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+    file_path = path_utils.get_blend_path(
+        job.file, self.state_saver.state.settings.blender_files_path)
+    if not os.path.exists(file_path):
+      QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      return
+
+    cwd = normalize_drive_letter(os.getcwd())
+    python_command = ['import sys',
+                      f"sys.path.append(\'{cwd}\')",
+                      "import settings_loader"]
+    python_command = " ; ".join(python_command)
+    blender_args = ["-b", file_path,
+                    "-y",
+                    "--factory-startup",
+                    "--python-expr", python_command]
+    QApplication.setOverrideCursor(Qt.WaitCursor)
+    subprocess.run([self.state_saver.state.settings.blender_path] + blender_args, check=True)
+    QApplication.restoreOverrideCursor()
+    loaded_job = self.state_saver.load_job_from_json(".sync.json")
+    print_utils.print_info("Settings loaded from Blender.")
+    self.state_saver.state.render_jobs.insert(job_index, loaded_job)
+    self.state_saver.state_to_table(self.table)
+
+    self.after_table_change(self.table.item(job_index, 1))
+    self.table.blockSignals(False)
+
   ######### MAIN WINDOW UTILS ###########
+
   def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job
     self.window.progressBar.setValue(progress_value)

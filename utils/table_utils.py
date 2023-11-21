@@ -191,11 +191,13 @@ def remove_active_row(table_widget: QTableWidget, before_callback_function: call
 # @operator
 def add_file_below(table_widget: QTableWidget, path: str) -> None:
   """Add a file below the current row."""
+  table_widget.blockSignals(True)
   id_row = table_widget.rowCount()
   table_widget.insertRow(id_row)
   ui_utils.fill_row(table_widget, id_row)
   set_text_alignment(table_widget, id_row)
   table_widget.setItem(id_row, 1, QTableWidgetItem(path))
+  table_widget.blockSignals(False)
 
 
 def post_process_row(table_widget: QTableWidget, row: int) -> None:
