@@ -76,7 +76,7 @@
                                     icon-size: 25px;</string>
                 </property>
                 <property name="text">
-                 <string>     Stop</string>
+                 <string>    Stop</string>
                 </property>
                 <property name="icon">
                  <iconset>

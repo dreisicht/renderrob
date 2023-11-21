@@ -1,1 +1,0 @@
-{"file": "C:\\Users\\peter\\Desktop\\my_project\\blender_files\\animation.blend", "active": true, "camera": "Camera", "start": "1", "end": "250", "x_res": "1920", "y_res": "1080", "samples": "128", "device": "gpu", "engine": "cycles", "motion_blur": false, "overwrite": true, "high_quality": true, "denoise": true, "scene": "Scene", "view_layers": ["View Layer_001"]}
