@@ -585,7 +585,8 @@ class MainWindow(QWidget):
     # Double occurrences of jobs
     self.table.blockSignals(True)
     for row_index in range(self.table.rowCount()):
-      if list(self.state_saver.state.render_jobs).count(self.state_saver.state.render_jobs[row_index]) > 1:
+      if list(self.state_saver.state.render_jobs).count(
+              self.state_saver.state.render_jobs[row_index]) > 1:
         table_utils.color_row_background(
             self.table, row_index, QColor(table_utils.COLORS["yellow"]))
       else:
