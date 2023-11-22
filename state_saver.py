@@ -3,6 +3,8 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
+import json
+
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
@@ -97,3 +99,27 @@ class StateSaver:
       render_job.view_layers.extend(new_view_layer_list)
       render_job.comments = get_text(table.item(i, 17))
       self.state.render_jobs.append(render_job)
+
+  def load_job_from_json(self, json_path: str) -> state_pb2.render_job:  # pylint: disable=no-member
+    """Load the state from a json file."""
+    with open(json_path, "r", encoding="utf-8") as json_file:
+      json_state = json.loads(json_file.read())
+    render_job = state_pb2.render_job()  # pylint: disable=no-member
+    render_job.file = json_state["file"]
+    render_job.active = json_state["active"]
+    render_job.camera = json_state["camera"]
+    render_job.start = json_state["start"]
+    render_job.end = json_state["end"]
+    render_job.x_res = json_state["x_res"]
+    render_job.y_res = json_state["y_res"]
+    render_job.samples = json_state["samples"]
+    render_job.device = json_state["device"]
+    render_job.engine = json_state["engine"]
+    render_job.motion_blur = json_state["motion_blur"]
+    render_job.overwrite = json_state["overwrite"]
+    render_job.high_quality = json_state["high_quality"]
+    render_job.denoise = json_state["denoise"]
+    render_job.scene = json_state["scene"]
+    render_job.view_layers.extend(json_state["view_layers"])
+    render_job.file_format = json_state["file_format"]
+    return render_job

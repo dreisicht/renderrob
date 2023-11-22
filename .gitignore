@@ -10,3 +10,4 @@ deployment/*
 experiment.py
 tmp/*
 appmap.yml
+.sync.json

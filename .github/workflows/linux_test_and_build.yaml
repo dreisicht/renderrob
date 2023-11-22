@@ -62,7 +62,7 @@ jobs:
           test_files=$(find . -name '*_test.py')
           for file in $test_files; do
               echo "Running tests in $file"
-              xvfb-run python -m unittest "$file"
+              xvfb-run -a python -m unittest "$file"
           done
 
       - name: Create Python virtual environment

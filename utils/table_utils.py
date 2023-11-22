@@ -17,9 +17,11 @@ COLORS = {
     "blue_grey": 0x4f7997,
     "blue_grey_darker": 0x345064,
     "grey_light": 0xebebeb,
+    "grey_inactive": 0xf8f8f8,
     "grey_neutral": 0x999999,
     "black_light": 0x22282b,
-    "black_dark": 0x242a2d
+    "black_dark": 0x242a2d,
+    "white": 0xffffff,
 }
 
 
@@ -191,11 +193,13 @@ def remove_active_row(table_widget: QTableWidget, before_callback_function: call
 # @operator
 def add_file_below(table_widget: QTableWidget, path: str) -> None:
   """Add a file below the current row."""
+  table_widget.blockSignals(True)
   id_row = table_widget.rowCount()
   table_widget.insertRow(id_row)
   ui_utils.fill_row(table_widget, id_row)
   set_text_alignment(table_widget, id_row)
   table_widget.setItem(id_row, 1, QTableWidgetItem(path))
+  table_widget.blockSignals(False)
 
 
 def post_process_row(table_widget: QTableWidget, row: int) -> None:
@@ -229,6 +233,7 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
   # to be checked later.
   header.setSectionResizeMode(QHeaderView.ResizeToContents)
   header.setSectionResizeMode(1, QHeaderView.Stretch)
+  # header.setSectionResizeMode(17, QHeaderView.Fixed)
   table_widget.resizeColumnsToContents()
   ui_utils.fill_row(table_widget, row)
 
@@ -272,30 +277,44 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
     table_widget.setItem(row, i, item)
 
 
-def color_row_background(table_widget: QTableWidget, row_index: int, color: QColor) -> None:
+def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
-  #  #3 Add coloring for upfront warnings (double jobs, animation denoising,
-  # but exr selected, high quality and animation but no animation denoising,
-  # single frame rendering but animation denoising,
-  # single frame rendering in high quality but no denoising.)
+  widget = table_widget.cellWidget(row_index, 0)
+  checkbox = widget.findChild(QCheckBox)
+  all_grey = False
+  if not checkbox.isChecked():
+    all_grey = True
+
   for column_index in range(table_widget.columnCount()):
+    color = base_color
     item = table_widget.item(row_index, column_index)
+
+    if column_index in ui_utils.CHECKBOX_COLUMNS:
+      ui_utils.set_checkbox_background_color(
+          table_widget, row_index, column_index, color)
     if item is None:
       continue
+    # Set the background color to grey if the row is inactive.
+    if all_grey:
+      color = QColor(COLORS["grey_inactive"])
+
+    # If the background is already yellow or read means that there was a warning or an error in the
+    # render job and therefore not coloring it green.
     if color == QColor(COLORS["green"]):
-      # If the background is already yellow or read means that there was a
-      # warning or an error in the render job and therefore not coloring it
-      # green.
       if item.background() == QColor(COLORS["yellow"]):
         continue
       if item.background() == QColor(COLORS["red"]):
         continue
+    # Similarly, if the background is already red means that there was an error and skipping
+    # therefore.
     if color == QColor(COLORS["yellow"]):
       if item.background() == QColor(COLORS["red"]):
         continue
+
+    # Check if the value in the numbers columns is valid.
+    if item.text() and column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric():
+      color = QColor(COLORS["red"])
     item.setBackground(color)
-    ui_utils.set_checkbox_background_color(
-        table_widget, row_index, color)
 
 
 def set_background_colors(table_widget: QTableWidget, exit_code: int,
@@ -321,7 +340,7 @@ def set_background_colors(table_widget: QTableWidget, exit_code: int,
   elif exit_code == 664:
     color_row_background(table_widget,
                          row_index - previous_job,
-                         QColor(COLORS["grey_light"]))
+                         QColor(COLORS["grey_inactive"]))
   elif exit_code == 987:
     color_row_background(table_widget,
                          row_index - previous_job,

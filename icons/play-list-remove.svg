@@ -1,15 +1,8 @@
-<svg
-  width="24"
-  height="24"
-  viewBox="0 0 24 24"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
->
-  <path d="M15.9644 4.63379H3.96442V6.63379H15.9644V4.63379Z" fill="rgb(149, 179, 194)" />
-  <path d="M15.9644 8.63379H3.96442V10.6338H15.9644V8.63379Z" fill="rgb(149, 179, 194)" />
-  <path d="M3.96442 12.6338H11.9644V14.6338H3.96442V12.6338Z" fill="rgb(149, 179, 194)" />
-  <path
-    d="M12.9645 13.7093L14.3787 12.295L16.5 14.4163L18.6213 12.2951L20.0355 13.7093L17.9142 15.8305L20.0356 17.9519L18.6214 19.3661L16.5 17.2447L14.3786 19.3661L12.9644 17.9519L15.0858 15.8305L12.9645 13.7093Z"
-    fill="rgb(152, 0, 48)"
-  />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <rect x="3.964" y="4.634" width="12" height="2" style="fill:rgb(120,144,156);fill-rule:nonzero;"/>
+    <rect x="3.964" y="8.634" width="12" height="2" style="fill:rgb(120,144,156);fill-rule:nonzero;"/>
+    <rect x="3.964" y="12.634" width="8" height="2" style="fill:rgb(120,144,156);fill-rule:nonzero;"/>
+    <path d="M12.964,13.709L14.379,12.295L16.5,14.416L18.621,12.295L20.036,13.709L17.914,15.831L20.036,17.952L18.621,19.366L16.5,17.245L14.379,19.366L12.964,17.952L15.086,15.831L12.964,13.709Z" style="fill:rgb(152,0,48);fill-rule:nonzero;"/>
 </svg>

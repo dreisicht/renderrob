@@ -17,6 +17,7 @@ from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from utils import path_utils, placeholder_delegate, print_utils, table_utils, ui_utils
 from utils.dropwidget import DropWidget
+from utils.table_utils import normalize_drive_letter
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -127,6 +128,8 @@ class MainWindow(QWidget):
     self.window.duplicate_button.clicked.connect(lambda: table_utils.duplicate_row(
         self.table, self.state_saver, self.before_table_change, self.after_table_change))
     self.window.actionUndo.triggered.connect(self.undo)
+    self.window.sync_button.clicked.connect(self.load_settings_from_blender)
+    ui_utils.TABLE_CHANGED_FUNCTION = self.before_and_after_table_change
 
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
@@ -324,23 +327,24 @@ class MainWindow(QWidget):
     """Handle after table change."""
     print_utils.print_info("After table changed.")
     self.state_saver.table_to_state(self.table)
-    if item:
+    if item and isinstance(item, QTableWidgetItem):
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
         if not os.path.exists(item.text()) and not os.path.exists(
                 os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
           QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
     self.check_table_for_errors()
+    self.table.blockSignals(False)
 
   def before_and_after_table_change(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle before and after table change."""
     self.before_table_change()
     self.after_table_change(item)
-  ########### MAIN WINDOW OPS #############
 
+  ########### MAIN WINDOW OPS #############
   def open_settings_window(self) -> None:
     """Open the settings window."""
-    self.is_saved = False,
+    self.is_saved = False
     self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
     settings_window.SettingsWindow(self.state_saver.state)
 
@@ -447,7 +451,46 @@ class MainWindow(QWidget):
     # Launch Blender with the file.
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
+  def load_settings_from_blender(self) -> None:
+    """Opens Blender and syncs the settings."""
+    self.table.blockSignals(True)
+    self.before_table_change()
+
+    job_index = self.table.currentRow()
+    job = self.state_saver.state.render_jobs.pop(job_index)
+
+    if not self.state_saver.state.settings.blender_path:
+      error_message = "The Blender path is not set."
+      print_utils.print_error_no_exit(error_message)
+      QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+    file_path = path_utils.get_blend_path(
+        job.file, self.state_saver.state.settings.blender_files_path)
+    if not os.path.exists(file_path):
+      QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      return
+
+    cwd = normalize_drive_letter(os.getcwd())
+    python_command = ['import sys',
+                      f"sys.path.append(\'{cwd}\')",
+                      "import settings_loader"]
+    python_command = " ; ".join(python_command)
+    blender_args = ["-b", file_path,
+                    "-y",
+                    "--factory-startup",
+                    "--python-expr", python_command]
+    QApplication.setOverrideCursor(Qt.WaitCursor)
+    subprocess.run([self.state_saver.state.settings.blender_path] + blender_args, check=True)
+    QApplication.restoreOverrideCursor()
+    loaded_job = self.state_saver.load_job_from_json(".sync.json")
+    print_utils.print_info("Settings loaded from Blender.")
+    self.state_saver.state.render_jobs.insert(job_index, loaded_job)
+    self.state_saver.state_to_table(self.table)
+
+    self.after_table_change(self.table.item(job_index, 1))
+    self.table.blockSignals(False)
+
   ######### MAIN WINDOW UTILS ###########
+
   def _refresh_progress_bar(self) -> None:
     progress_value = int(100 / self.number_active_jobs) * self.current_job
     self.window.progressBar.setValue(progress_value)
@@ -538,13 +581,24 @@ class MainWindow(QWidget):
   ########### TABLE UTILS #############
   def check_table_for_errors(self) -> bool:
     """Check the table for errors."""
+    # Unclean structure, but some other errors are handled in the color_row_background function.
     # Double occurrences of jobs
     self.table.blockSignals(True)
-    for i in range(self.table.rowCount()):
-      if list(self.state_saver.state.render_jobs).count(self.state_saver.state.render_jobs[i]) > 1:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+    for row_index in range(self.table.rowCount()):
+      if list(self.state_saver.state.render_jobs).count(
+              self.state_saver.state.render_jobs[row_index]) > 1:
+        table_utils.color_row_background(
+            self.table, row_index, QColor(table_utils.COLORS["yellow"]))
       else:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+        table_utils.color_row_background(
+            self.table, row_index, QColor(table_utils.COLORS["grey_light"]))
+
+      # Set the background color of the blend path.
+      blend_path_item = self.table.item(row_index, 1)
+      blend_path = blend_path_item.text()
+      if not os.path.exists(blend_path) and not os.path.exists(
+              os.path.join(self.state_saver.state.settings.blender_files_path, blend_path)):
+        blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
     self.table.blockSignals(False)
     # Ignoring animation denoising for now, since # it's deprecated in Blender.
 
