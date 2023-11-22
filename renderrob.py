@@ -129,6 +129,7 @@ class MainWindow(QWidget):
         self.table, self.state_saver, self.before_table_change, self.after_table_change))
     self.window.actionUndo.triggered.connect(self.undo)
     self.window.sync_button.clicked.connect(self.load_settings_from_blender)
+    ui_utils.TABLE_CHANGED_FUNCTION = self.before_and_after_table_change
 
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
@@ -326,13 +327,14 @@ class MainWindow(QWidget):
     """Handle after table change."""
     print_utils.print_info("After table changed.")
     self.state_saver.table_to_state(self.table)
-    if item:
+    if item and isinstance(item, QTableWidgetItem):
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
         if not os.path.exists(item.text()) and not os.path.exists(
                 os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
           QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
     self.check_table_for_errors()
+    self.table.blockSignals(False)
 
   def before_and_after_table_change(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle before and after table change."""
@@ -579,13 +581,23 @@ class MainWindow(QWidget):
   ########### TABLE UTILS #############
   def check_table_for_errors(self) -> bool:
     """Check the table for errors."""
+    # Unclean structure, but some other errors are handled in the color_row_background function.
     # Double occurrences of jobs
     self.table.blockSignals(True)
-    for i in range(self.table.rowCount()):
-      if list(self.state_saver.state.render_jobs).count(self.state_saver.state.render_jobs[i]) > 1:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+    for row_index in range(self.table.rowCount()):
+      if list(self.state_saver.state.render_jobs).count(self.state_saver.state.render_jobs[row_index]) > 1:
+        table_utils.color_row_background(
+            self.table, row_index, QColor(table_utils.COLORS["yellow"]))
       else:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+        table_utils.color_row_background(
+            self.table, row_index, QColor(table_utils.COLORS["grey_light"]))
+
+      # Set the background color of the blend path.
+      blend_path_item = self.table.item(row_index, 1)
+      blend_path = blend_path_item.text()
+      if not os.path.exists(blend_path) and not os.path.exists(
+              os.path.join(self.state_saver.state.settings.blender_files_path, blend_path)):
+        blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
     self.table.blockSignals(False)
     # Ignoring animation denoising for now, since # it's deprecated in Blender.
 

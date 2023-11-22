@@ -17,7 +17,6 @@ FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
 FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
-TABLE_CHANGED_FUNCTION = None
 PLACEHOLDER_TEXT = {
     1: "File",
     2: "Camera",
@@ -30,6 +29,7 @@ PLACEHOLDER_TEXT = {
     16: "View Layers",
     17: "Comments",
 }
+TABLE_CHANGED_FUNCTION = None
 
 
 def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
@@ -65,7 +65,10 @@ def get_combobox_indexes(table: QTableWidget, row: int) -> list:
 def set_combobox_indexes(table: QTableWidget, row: int, values: list[int]) -> None:
   """Set all values of combo boxes in a row."""
   for j, i in enumerate(COMBOBOX_COLUMNS):
-    table.cellWidget(row, i).setCurrentIndex(values[j])
+    widget = table.cellWidget(row, i)
+    widget.blockSignals(True)
+    widget.setCurrentIndex(values[j])
+    widget.blockSignals(False)
 
 
 def get_checkbox_values(table: QTableWidget, row: int) -> list:
@@ -81,7 +84,9 @@ def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> No
   for j, i in enumerate(CHECKBOX_COLUMNS):
     widget = table.cellWidget(row, i)
     checkbox_item = widget.findChild(QCheckBox)
+    checkbox_item.blockSignals(True)
     checkbox_item.setChecked(values[j])
+    checkbox_item.blockSignals(False)
 
 
 def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
@@ -93,12 +98,11 @@ def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) 
           f"QComboBox:drop-down {{background-color: {color.name()};}}")
 
 
-def set_checkbox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
+def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
   """Set color of checkboxes."""
-  for i in CHECKBOX_COLUMNS:
-    widget = table.cellWidget(row, i)
-    if widget:
-      widget.setStyleSheet(f"background-color: {color.name()};")
+  widget = table.cellWidget(row, col)
+  if widget:
+    widget.setStyleSheet(f"background-color: {color.name()};")
 
 
 def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
@@ -115,7 +119,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   widget.setLayout(layout)
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
   # Refactor: Hook up checkboxes with table_changed function.
-  # check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
+  check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, widget)
 
 
@@ -123,7 +127,7 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items):
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)
-  # dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
+  dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
   table.setCellWidget(row, col, dropdown)
 
 
