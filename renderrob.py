@@ -84,12 +84,16 @@ class MainWindow(QWidget):
     if self.is_saved:
       event.accept()
       return
-    reply = QMessageBox.question(self, 'Message', 'Are you sure you want to quit?',
-                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    reply = QMessageBox.question(
+        self, 'Message', 'Save changes?',
+        QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel, QMessageBox.Cancel)
 
     if reply == QMessageBox.Yes:
+      self.save_file()
       event.accept()
-    else:
+    elif reply == QMessageBox.No:
+      event.accept()
+    elif reply == QMessageBox.Cancel:
       event.ignore()
 
   def quit(self) -> None:
@@ -177,12 +181,16 @@ class MainWindow(QWidget):
 
   def new_file(self) -> None:
     """Create a new file."""
+    if not self.ask_for_save():
+      return
     for _ in range(self.table.rowCount()):
       self.table.removeRow(0)
     self.cache.current_file = ""
     self.state_saver.state.FromString(b"")
     self.state_saver.parent_widget = self
     self.recent_states = [b""]
+    self.window.render_button.setEnabled(True)
+    self.window.stop_button.setEnabled(False)
     table_utils.post_process_row(self.table, 0)
     table_utils.add_row_below(self.table)
 
@@ -217,12 +225,19 @@ class MainWindow(QWidget):
 
   def open_file_dialog(self) -> None:
     """Open a RenderRob file with a dialog."""
+    if not self.ask_for_save():
+      return
     file_name, _ = QFileDialog.getOpenFileName(
         self.window, "Open File", "", "RenderRob Files (*.rrp)")
-    self.open_file(file_name)
+    self.open_file(file_name, ask_for_save=False)
 
-  def open_file(self, file_name: str) -> None:
+  def open_file(self, file_name: str, ask_for_save: bool = True) -> None:
     """Open a RenderRob file."""
+    if ask_for_save:
+      if not self.ask_for_save():
+        return
+    if file_name == "":
+      return
     self.table.blockSignals(True)
     with open(file_name, "rb") as pb_file:
       self.state_saver.state.ParseFromString(pb_file.read())
@@ -235,6 +250,21 @@ class MainWindow(QWidget):
     self.recent_states = [self.state_saver.state.SerializeToString()]
     self.after_table_change()
     self.table.blockSignals(False)
+
+  def ask_for_save(self) -> bool:
+    """Ask the user to save the current file. Returns True if the user wants to continue."""
+    if self.is_saved:
+      return True
+    reply = QMessageBox.question(self, 'Message', 'Save changes?',
+                                 QMessageBox.Yes | QMessageBox.No | QMessageBox.Cancel,
+                                 QMessageBox.Cancel)
+    if reply == QMessageBox.Yes:
+      self.save_file()
+      return True
+    if reply == QMessageBox.No:
+      return True
+    if reply == QMessageBox.Cancel:
+      return False
 
   ######### CONSOLE WINDOW ###########
   def _handle_output(self):
@@ -354,6 +384,7 @@ class MainWindow(QWidget):
     self.table.blockSignals(True)
     self.window.progressBar.setValue(0)
     self.window.render_button.setEnabled(False)
+    self.window.stop_button.setEnabled(True)
     table_utils.make_read_only_selectable(self.table)
     self.state_saver.table_to_state(self.table)
     self.job_row_index = 0
@@ -367,6 +398,8 @@ class MainWindow(QWidget):
     """Interrupt the render operator."""
     self.process.kill()
     del self.state_saver.state.render_jobs[:]
+    self.window.stop_button.setEnabled(False)
+    self.window.render_button.setEnabled(True)
     self.window.progressBar.setValue(0)
     table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
@@ -464,9 +497,9 @@ class MainWindow(QWidget):
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
-    file_path = path_utils.get_blend_path(
+    filepath = path_utils.get_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
-    if not os.path.exists(file_path):
+    if filepath == "" or not os.path.exists(filepath):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
@@ -475,7 +508,7 @@ class MainWindow(QWidget):
                       f"sys.path.append(\'{cwd}\')",
                       "import settings_loader"]
     python_command = " ; ".join(python_command)
-    blender_args = ["-b", file_path,
+    blender_args = ["-b", filepath,
                     "-y",
                     "--factory-startup",
                     "--python-expr", python_command]
