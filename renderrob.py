@@ -233,6 +233,7 @@ class MainWindow(QWidget):
     self.cache.recent_files.insert(0, file_name)
     self.refresh_recent_files_menu()
     self.recent_states = [self.state_saver.state.SerializeToString()]
+    self.after_table_change()
     self.table.blockSignals(False)
 
   ######### CONSOLE WINDOW ###########
