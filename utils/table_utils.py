@@ -311,7 +311,8 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
       ui_utils.set_checkbox_background_color(
           table_widget, row_index, column_index, color)
     # Check if the value in the numbers columns is valid.
-    if item and item.text() and column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric():
+    if item and item.text() and (
+            column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric()):
       color = QColor(COLORS["red"])
     if item:
       item.setBackground(color)
