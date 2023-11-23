@@ -24,7 +24,12 @@ Individuals and small teams.
 - Automatic organizing of render output folder.
 - Cross plattform compatible.
 
-![Screenshot](img/marketing/screenshot.png)
+![screenshot](img/marketing/screenshot.png)
+
+<video width="100%" controls>
+  <source src="https://dreisicht.net/video/renderrob_v3.mp4" type="video/mp4">
+Your browser does not support the video tag.
+</video>
 
 ## Support
 

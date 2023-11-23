@@ -51,7 +51,7 @@ class RenderSettingsSetter:
     if isinstance(view_layer_names, str):
       raise ValueError("View Layer names should be a list of strings.")
 
-    if not view_layer_names:
+    if not view_layer_names or view_layer_names == [""]:
       if len(self.current_scene_data.view_layers) == 1:
         self.view_layer_data = self.current_scene_data.view_layers[0]
       else:
