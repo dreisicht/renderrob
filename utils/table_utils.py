@@ -279,19 +279,16 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
 
 def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
-  widget = table_widget.cellWidget(row_index, 0)
-  checkbox = widget.findChild(QCheckBox)
   all_grey = False
-  if not checkbox.isChecked():
-    all_grey = True
+  widget = table_widget.cellWidget(row_index, 0)
+  if widget:
+    checkbox = widget.findChild(QCheckBox)
+    if not checkbox.isChecked():
+      all_grey = True
 
   for column_index in range(table_widget.columnCount()):
     color = base_color
     item = table_widget.item(row_index, column_index)
-
-    if column_index in ui_utils.CHECKBOX_COLUMNS:
-      ui_utils.set_checkbox_background_color(
-          table_widget, row_index, column_index, color)
     if item is None:
       continue
     # Set the background color to grey if the row is inactive.
@@ -311,6 +308,9 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
       if item.background() == QColor(COLORS["red"]):
         continue
 
+    if column_index in ui_utils.CHECKBOX_COLUMNS:
+      ui_utils.set_checkbox_background_color(
+          table_widget, row_index, column_index, color)
     # Check if the value in the numbers columns is valid.
     if item.text() and column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric():
       color = QColor(COLORS["red"])

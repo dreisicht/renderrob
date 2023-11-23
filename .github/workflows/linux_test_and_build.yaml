@@ -83,3 +83,4 @@ jobs:
             renderrob.bin
             renderrob
             icon.png
+            custom_commands.py

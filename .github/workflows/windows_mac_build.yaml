@@ -98,6 +98,7 @@ jobs:
             icons/
             ui/
             renderrob.exe
+            custom_commands.py
 
       - uses: actions/upload-artifact@v3
         if: matrix.os == 'macos-latest'
@@ -107,3 +108,4 @@ jobs:
             icons/
             ui/
             deployment/
+            custom_commands.py
