@@ -13,7 +13,7 @@ Save time managing your render jobs!
 
 ## Who is it for?
 
-Individuals and small teams.
+Individuals and small teams, who don't want to render with a render farm, but still want to manage their render jobs in a simple way.
 
 ## Features
 
@@ -22,14 +22,14 @@ Individuals and small teams.
 - Only one click needed to start rendering your jobs.
 - Warnings for implausible render settings directly in the table.
 - Automatic organizing of render output folder.
-- Cross plattform compatible.
+- Cross platform compatible.
 
-![screenshot](img/marketing/screenshot.png)
+![screenshot](img/documentation/docu.png)
 
-<video width="100%" controls>
+<!-- <video width="100%" controls>
   <source src="https://dreisicht.net/video/renderrob_v3.mp4" type="video/mp4">
 Your browser does not support the video tag.
-</video>
+</video> -->
 
 ## Support
 
@@ -41,9 +41,8 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 
 ### Render output
 
-- If you want to render a still, you can either leave the start and end frame empty. If you want to
-render a specific frame as a still, enter a number in the start frame field, but leave the end frame empty.
-- For rendering an animation enter both start and end frame.
+- If you want to render a still, enter a frame number.
+- For rendering an animation enter both start and end frame, or leave the start and end frame empty.
 - If read only is enabled, a new folder with a new version number is created and used as render output.
 - The Folder and frame name consists of `filename-camera-Scene-viewlayer-quality-version`
 - Empty folders of failed renders get cleaned up.
@@ -53,12 +52,7 @@ render a specific frame as a still, enter a number in the start frame field, but
 ### Rendering
 
 - Border rendering gets disabled, if high quality is active. Otherwise it remains enabled.
-- Random seed is enabled, if Animation Denoising is enabled.
-- Jobs get rendered in the order, they are shown in the list. You can reorder them with the up and down buttons.
 - You can only render one scene in one job. If you want to render a second scene just duplicate the job.
-- If no Scene is given, Render Rob renders the last active Scene.
-- If no View Layer is given, Render Rob renders every View Layer.
-- If Animation Denoising is activated, compositing is deactivated.
 
 ## Developer area
 
