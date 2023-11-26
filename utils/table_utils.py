@@ -5,7 +5,6 @@ from typing import Any, Optional
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
-
 from utils import ui_utils
 
 COLORS = {
@@ -283,19 +282,8 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
   # Taking the background color of the file table item as reference.
   previous_color = table_widget.item(row_index, 1).background()
 
-  # Checking if background should be grey.
-  all_grey = False
-  widget = table_widget.cellWidget(row_index, 0)
-  if widget:
-    checkbox = widget.findChild(QCheckBox)
-    if not checkbox.isChecked():
-      all_grey = True
-
-  # TODO: Cleanup.
   color = base_color
-  if all_grey:
-    color = QColor(COLORS["grey_inactive"])
-  elif previous_color == QColor(COLORS["red"]):
+  if previous_color == QColor(COLORS["red"]):
     color = QColor(COLORS["red"])
   elif previous_color == QColor(COLORS["yellow"]):
     if base_color == QColor(COLORS["green"]):
@@ -314,10 +302,3 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
       item.setBackground(QColor(COLORS["red"]))
     elif item:
       item.setBackground(color)
-
-
-def reset_all_backgruond_colors(table_widget: QTableWidget) -> None:
-  """Reset the background colors of all rows."""
-  for row_index in range(table_widget.rowCount()):
-    color_row_background(table_widget,
-                         row_index, QColor(COLORS["grey_light"]))

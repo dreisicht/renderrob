@@ -42,4 +42,4 @@ class TestRenderJobToRss(unittest.TestCase):
               ".set_render_settings(render_device='gpu', border=False, samples=128, motion_blur="
               "True, engine='cycles') ; rss.set_denoising_settings(denoise=True) ;"
               " rss.set_output_settings(frame_step=1, xres=1920, yres=1080, percres=100, "
-              "high_quality=True, overwrite=True) ; rss.custom_commands()"))
+              "high_quality=True) ; rss.custom_commands()"))
