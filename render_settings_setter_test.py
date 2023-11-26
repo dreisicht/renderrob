@@ -167,12 +167,12 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene.render.resolution_percentage = 100
     scene.frame_step = 1
     rss = render_settings_setter.RenderSettingsSetter()
-    rss.set_output_settings(2, 1920, 1080, 50, high_quality=True, overwrite=True)
+    rss.set_output_settings(2, 1920, 1080, 50, high_quality=True)
     self.assertEqual(scene.render.resolution_x, 1920)
     self.assertEqual(scene.render.resolution_y, 1080)
     self.assertEqual(scene.render.resolution_percentage, 50)
     self.assertEqual(scene.frame_step, 2)
-    self.assertTrue(scene.render.use_overwrite)
+    self.assertFalse(scene.render.use_overwrite)
     self.assertFalse(scene.render.use_stamp)
 
 

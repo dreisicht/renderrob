@@ -279,8 +279,8 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
 def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
 
-  # Taking the background color of the file table item as reference.
-  previous_color = table_widget.item(row_index, 1).background()
+  # Taking the background color of the camera tableitem as reference.
+  previous_color = table_widget.item(row_index, 2).background()
 
   color = base_color
   if previous_color == QColor(COLORS["red"]):

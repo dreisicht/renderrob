@@ -333,13 +333,9 @@ class MainWindow(QWidget):
 
     # Find a more elegant way to do this.
     if "Blender quit" in output:
-      # self._refresh_progress_bar()
-      # self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
     if "blender.crash.txt" in output:
-      # self._refresh_progress_bar()
-      # self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
     self.table.blockSignals(False)
@@ -413,6 +409,7 @@ class MainWindow(QWidget):
     self.window.stop_button.setEnabled(False)
     self.window.render_button.setEnabled(True)
     self.window.textBrowser.moveCursor(QTextCursor.End)
+
     self.set_table_colors()
     self.table.blockSignals(False)
 
@@ -577,9 +574,9 @@ class MainWindow(QWidget):
       self.window.render_button.setEnabled(True)
       self.window.stop_button.setEnabled(False)
     else:
-      self.window.progressBar.setValue(
-          100 * len(self.green_jobs) + len(self.yellow_jobs) + len(self.red_jobs) / len(
-              self.state_saver.state.render_jobs))
+      all_jobs_count = len([x for x in self.state_saver.state.render_jobs if x.active])
+      done_jobs_count = len(self.green_jobs) + len(self.yellow_jobs) + len(self.red_jobs)
+      self.window.progressBar.setValue(100 * done_jobs_count / all_jobs_count)
       if self.active_render_job.active:
         self.render_job(self.active_render_job)
     self.window.textBrowser.moveCursor(QTextCursor.End)
@@ -587,20 +584,7 @@ class MainWindow(QWidget):
 
   def set_table_colors(self):
     """Set the colors of the table."""
-    # Check for duplicates.
-    for row_index in range(self.table.rowCount()):
-      if list(self.state_saver.state.render_jobs).count(
-              self.state_saver.state.render_jobs[row_index]) > 1:
-        table_utils.color_row_background(
-            self.table, row_index, QColor(table_utils.COLORS["yellow"]))
-
-      # Set the background color of the blend path.
-      blend_path_item = self.table.item(row_index, 1)
-      blend_path = blend_path_item.text()
-      if not os.path.exists(blend_path) and not os.path.exists(
-              os.path.join(self.state_saver.state.settings.blender_files_path, blend_path)):
-        blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
-
+    self.table.blockSignals(True)
     temp_active_job = None
     for i, job in enumerate(self.state_saver.state.render_jobs):
       if job in self.green_jobs:
@@ -618,6 +602,20 @@ class MainWindow(QWidget):
             self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]))
       else:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+
+    # Check for duplicates.
+    for row_index in range(self.table.rowCount()):
+      if list(self.state_saver.state.render_jobs).count(
+              self.state_saver.state.render_jobs[row_index]) > 1:
+        table_utils.color_row_background(
+            self.table, row_index, QColor(table_utils.COLORS["yellow"]))
+
+      # Set the background color of the blend path.
+      blend_path_item = self.table.item(row_index, 1)
+      blend_path = blend_path_item.text()
+      if not os.path.exists(blend_path) and not os.path.exists(
+              os.path.join(self.state_saver.state.settings.blender_files_path, blend_path)):
+        blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
 
   ########## TABLE OPS ############
   def copy_from_cell(self) -> None:
