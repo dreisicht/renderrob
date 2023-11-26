@@ -4,6 +4,7 @@ Note: Only the state of the table is being handled here. The state of the settin
 is being handled in the settings window class.
 """
 import json
+from typing import Any
 
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
@@ -29,6 +30,14 @@ def init_settings(state: state_pb2.render_rob_state) -> None:  # pylint: disable
   state.settings.preview.samples = 16
   state.settings.preview.frame_step = 4
   state.settings.preview.resolution = 50
+
+
+def find_job(jobs: Any, job: Any) -> int:
+  """Find a job in a list of jobs."""
+  for i, current_job in enumerate(jobs):
+    if current_job == job:
+      return i
+  return -1
 
 
 class StateSaver:

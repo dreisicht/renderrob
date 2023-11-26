@@ -157,7 +157,7 @@ class RenderSettingsSetter:
       bpy.context.scene.cycles.use_denoising = False
 
   def set_output_settings(self, frame_step: int, xres: int,
-                          yres: int, percres: int, high_quality: bool, overwrite: bool) -> None:
+                          yres: int, percres: int, high_quality: bool) -> None:
     """Set the output settings."""
     if xres:
       self.current_scene_render.resolution_x = int(xres)
@@ -165,7 +165,7 @@ class RenderSettingsSetter:
       self.current_scene_render.resolution_y = int(yres)
     self.current_scene_render.resolution_percentage = percres
 
-    self.current_scene_render.use_overwrite = overwrite
+    self.current_scene_render.use_overwrite = False
     self.current_scene_render.use_placeholder = False
 
     self.current_scene_data.frame_step = frame_step
