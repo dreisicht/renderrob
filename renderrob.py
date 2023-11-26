@@ -33,9 +33,9 @@ class MainWindow(QWidget):
     super().__init__()
     self.window = None
     self.table = None
-    self.number_active_jobs = 0
-    self.job_row_index = 0
-    self.current_job = 0
+    # self.number_active_jobs = 0
+    # self.job_row_index = 0
+    # self.current_job = 0
     self.cache = cache_pb2.RenderRobCache()  # pylint: disable=no-member
     self.state_saver = state_saver.StateSaver()
 
@@ -43,6 +43,11 @@ class MainWindow(QWidget):
     self.process = None
     self.is_saved = True
     self.recent_states = []
+
+    self.active_render_job = None
+    self.green_jobs = []
+    self.yellow_jobs = []
+    self.red_jobs = []
 
   def setup(self) -> None:
     """Provide main function."""
@@ -289,15 +294,26 @@ class MainWindow(QWidget):
           line = line.replace(warning, '')
           color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
           color_format.setForeground(QColor(Qt.black))
-          table_utils.color_row_background(self.table,
-                                           self.job_row_index - 1,
-                                           QColor(table_utils.COLORS["yellow"]))
-          table_utils.set_background_colors(self.table, 987, self.job_row_index)
 
+          self.state_saver.table_to_state(self.table)
+          row_number = state_saver.find_job(
+              self.state_saver.state.render_jobs, self.active_render_job)
+
+          table_utils.color_row_background(self.table,
+                                           row_number,
+                                           QColor(table_utils.COLORS["yellow"]))
         if line.startswith(error) or "blender.crash.txt" in line:
           line = line.replace(error, '')
           color_format.setBackground(QColor(table_utils.COLORS["red"]))
           color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
+
+          self.state_saver.table_to_state(self.table)
+          row_number = state_saver.find_job(
+              self.state_saver.state.render_jobs, self.active_render_job)
+
+          table_utils.color_row_background(self.table,
+                                           row_number,
+                                           QColor(table_utils.COLORS["red"]))
 
           # Only scroll down if user is at bottom.
         if self.window.textBrowser.verticalScrollBar().value() > (
@@ -320,13 +336,13 @@ class MainWindow(QWidget):
 
     # Find a more elegant way to do this.
     if "Blender quit" in output:
-      self._refresh_progress_bar()
-      self.window.textBrowser.insertPlainText("\n")
+      # self._refresh_progress_bar()
+      # self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
     if "blender.crash.txt" in output:
-      self._refresh_progress_bar()
-      self.window.textBrowser.insertPlainText("\n")
+      # self._refresh_progress_bar()
+      # self.window.textBrowser.insertPlainText("\n")
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
     self.table.blockSignals(False)
@@ -361,9 +377,9 @@ class MainWindow(QWidget):
     if item and isinstance(item, QTableWidgetItem):
       if item.column() == 1:
         table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
-        if not os.path.exists(item.text()) and not os.path.exists(
-                os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
-          QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+        # if not os.path.exists(item.text()) and not os.path.exists(
+        #         os.path.join(self.state_saver.state.settings.blender_files_path, item.text())):
+        #   QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
     self.check_table_for_errors()
     self.table.blockSignals(False)
 
@@ -381,28 +397,33 @@ class MainWindow(QWidget):
 
   def start_render(self) -> None:
     """Render operator called by the Render button."""
-    self.table.blockSignals(True)
+    self.green_jobs = []
+    self.yellow_jobs = []
+    self.red_jobs = []
+    self.active_render_job = None
     self.window.progressBar.setValue(0)
     self.window.render_button.setEnabled(False)
     self.window.stop_button.setEnabled(True)
-    table_utils.make_read_only_selectable(self.table)
     self.state_saver.table_to_state(self.table)
-    self.job_row_index = 0
-    self.current_job = 0
     table_utils.reset_all_backgruond_colors(self.table)
-    self.number_active_jobs = self._get_active_jobs_number()
+    # self.number_active_jobs = self._get_active_jobs_number()
     self._continue_render(0)
     self.table.blockSignals(False)
 
   def stop_render(self) -> None:
     """Interrupt the render operator."""
-    self.process.kill()
+    if self.process:
+      self.process.kill()
     del self.state_saver.state.render_jobs[:]
     self.window.stop_button.setEnabled(False)
     self.window.render_button.setEnabled(True)
     self.window.progressBar.setValue(0)
-    table_utils.make_editable(self.table)
+    # table_utils.make_editable(self.table)
     print_utils.print_info("Render stopped.")
+    self.green_jobs = []
+    self.yellow_jobs = []
+    self.red_jobs = []
+    self.active_render_job = None
     self.window.render_button.setEnabled(True)
 
   def play_job(self) -> int:
@@ -524,31 +545,52 @@ class MainWindow(QWidget):
     self.table.blockSignals(False)
 
   ######### MAIN WINDOW UTILS ###########
-
-  def _refresh_progress_bar(self) -> None:
-    progress_value = int(100 / self.number_active_jobs) * self.current_job
-    self.window.progressBar.setValue(progress_value)
-
   def _continue_render(self, exit_code: int) -> None:
     self.table.blockSignals(True)
-    # 62097 is the exit code for an interrupted process -> cancelled render.
-    table_utils.set_background_colors(self.table, exit_code, self.job_row_index)
     print_utils.print_info("Continuing render.")
-    if self.state_saver.state.render_jobs:
-      job = self.state_saver.state.render_jobs.pop(0)
-      if not job.active:
-        self.job_row_index += 1
-        self._continue_render(664)
+
+    # Handle the previous render job and store it in the correct list.
+    if self.active_render_job:
+      if exit_code == 0:
+        self.green_jobs.append(self.active_render_job)
+      elif exit_code == 987:
+        self.yellow_jobs.append(self.active_render_job)
+      elif exit_code in (62097, 11):
+        self.red_jobs.append(self.active_render_job)
       else:
-        print_utils.print_info(f"Starting render of {job.file}")
-        self.job_row_index += 1
-        self.current_job += 1
-        self.render_job(job)
-    else:
+        raise ValueError(f"Exit code {exit_code} not recognized.")
+
+    self.active_render_job = None
+
+    self.state_saver.table_to_state(self.table)
+
+    for i, job in enumerate(self.state_saver.state.render_jobs):
+      if job in self.green_jobs:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["green"]))
+      elif job in self.yellow_jobs:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+      elif job in self.red_jobs:
+        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["red"]))
+      elif not job.active:
+        pass
+      elif self.active_render_job is None:
+        self.active_render_job = job
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]))
+
+    if not self.active_render_job:
       print_utils.print_info("No more render jobs left.")
       self.window.progressBar.setValue(100)
-      table_utils.make_editable(self.table)
       self.window.render_button.setEnabled(True)
+      self.window.stop_button.setEnabled(False)
+
+    else:
+      self.window.progressBar.setValue(
+          100 * len(self.green_jobs) + len(self.yellow_jobs) + len(self.red_jobs) / len(
+              self.state_saver.state.render_jobs))
+      if self.active_render_job.active:
+        self.render_job(self.active_render_job)
+    self.window.textBrowser.moveCursor(QTextCursor.End)
     self.blockSignals(False)
 
   ########## TABLE OPS ############

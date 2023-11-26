@@ -87,7 +87,7 @@ class ShotNameBuilder:
 
     while not os.path.exists(full_frame_path.replace(
             "v$$", "v" + str(
-                shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 0:
+                shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 1:
       shot_iter_num -= 1
     shot_iter_num += 1
 
@@ -112,8 +112,6 @@ class ShotNameBuilder:
 
     frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
     full_frame_path = os.path.join(frame_render_folder, frame_name)
-    # if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
-    #   if
     full_frame_path = self.set_version_number(full_frame_path)
 
     return full_frame_path.replace("\\", "/")

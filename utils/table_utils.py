@@ -279,6 +279,11 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
 
 def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
+
+  # Taking the background color of the file table item as reference.
+  previous_color = table_widget.item(row_index, 1).background()
+
+  # Checking if background should be grey.
   all_grey = False
   widget = table_widget.cellWidget(row_index, 0)
   if widget:
@@ -286,70 +291,29 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
     if not checkbox.isChecked():
       all_grey = True
 
+  # TODO: Cleanup.
+  color = base_color
+  if all_grey:
+    color = QColor(COLORS["grey_inactive"])
+  elif previous_color == QColor(COLORS["red"]):
+    color = QColor(COLORS["red"])
+  elif previous_color == QColor(COLORS["yellow"]):
+    if base_color == QColor(COLORS["green"]):
+      color = QColor(COLORS["yellow"])
+
   for column_index in range(table_widget.columnCount()):
-    color = base_color
     item = table_widget.item(row_index, column_index)
-
-    # Set the background color to grey if the row is inactive.
-    if all_grey:
-      color = QColor(COLORS["grey_inactive"])
-
-    # If the background is already yellow or read means that there was a warning or an error in the
-    # render job and therefore not coloring it green.
-    if color == QColor(COLORS["green"]):
-      if item and item.background() == QColor(COLORS["yellow"]):
-        continue
-      if item and item.background() == QColor(COLORS["red"]):
-        continue
-    # Similarly, if the background is already red means that there was an error and skipping
-    # therefore.
-    if color == QColor(COLORS["yellow"]):
-      if item and item.background() == QColor(COLORS["red"]):
-        continue
 
     if column_index in ui_utils.CHECKBOX_COLUMNS:
       ui_utils.set_checkbox_background_color(
           table_widget, row_index, column_index, color)
+
     # Check if the value in the numbers columns is valid.
     if item and item.text() and (
             column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric()):
-      color = QColor(COLORS["red"])
-    if item:
+      item.setBackground(QColor(COLORS["red"]))
+    elif item:
       item.setBackground(color)
-
-
-def set_background_colors(table_widget: QTableWidget, exit_code: int,
-                          row_index: int, previous_job: int = 1) -> None:
-  """Set the background colors of the rows.
-
-  Args:
-    exit_code: The exit code of the previous job. 0 means success, 664 means
-      job was skipped, other values mean error.
-    row_index: The row index of the current job.
-    previous_job: The row index of the previous job. Needed because jobs can
-      inactive and therefore skipped.
-  Returns:
-    None
-  """
-  color_row_background(table_widget,
-                       row_index,
-                       QColor(COLORS["blue_grey_lighter"]))
-  if exit_code == 0:
-    color_row_background(table_widget,
-                         row_index - previous_job,
-                         QColor(COLORS["green"]))
-  elif exit_code == 664:
-    color_row_background(table_widget,
-                         row_index - previous_job,
-                         QColor(COLORS["grey_inactive"]))
-  elif exit_code == 987:
-    color_row_background(table_widget,
-                         row_index - previous_job,
-                         QColor(COLORS["yellow"]))
-  else:
-    color_row_background(table_widget,
-                         row_index - previous_job,
-                         QColor(COLORS["red"]))
 
 
 def reset_all_backgruond_colors(table_widget: QTableWidget) -> None:
