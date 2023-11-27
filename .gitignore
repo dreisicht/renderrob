@@ -11,3 +11,4 @@ experiment.py
 tmp/*
 appmap.yml
 .sync.json
+*~lock~*
