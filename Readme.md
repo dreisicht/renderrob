@@ -24,7 +24,7 @@ Individuals and small teams, who don't want to render with a render farm, but st
 - Automatic organizing of render output folder.
 - Cross platform compatible.
 
-![screenshot](img/documentation/docu.png)
+![screenshot](img/documentation/docu.svg)
 
 <!-- <video width="100%" controls>
   <source src="https://dreisicht.net/video/renderrob_v3.mp4" type="video/mp4">
