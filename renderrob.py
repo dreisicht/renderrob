@@ -235,6 +235,9 @@ class MainWindow(QWidget):
 
   def open_file(self, file_name: str, ask_for_save: bool = True) -> None:
     """Open a RenderRob file."""
+    self.green_jobs = []
+    self.yellow_jobs = []
+    self.red_jobs = []
     if ask_for_save:
       if not self.ask_for_save():
         return
@@ -282,6 +285,10 @@ class MainWindow(QWidget):
         warning = back_color["BACK_YELLOW"] + " " + back_color["FORE_BLACK"]
         error = back_color["BACK_RED"] + " " + back_color["FORE_WHITE"]
         reset = back_color["RESET_ALL"]
+        if line.startswith(reset):
+          line = line.replace(reset, '')
+          color_format.setBackground(QColor(table_utils.COLORS["grey_light"]))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
         if line.startswith(info):
           line = line.replace(info, '')
           color_format.setBackground(
@@ -543,7 +550,7 @@ class MainWindow(QWidget):
 
     # Handle the previous render job and store it in the correct list.
     if self.active_render_job:
-      if exit_code == 0:
+      if exit_code in (0, 1):
         self.green_jobs.append(self.active_render_job)
       elif exit_code == 987:
         self.yellow_jobs.append(self.active_render_job)
@@ -555,18 +562,16 @@ class MainWindow(QWidget):
     self.active_render_job = None
 
     self.state_saver.table_to_state(self.table)
-    self.set_table_colors()
 
     # Get the next render job.
-    for i, job in enumerate(self.state_saver.state.render_jobs):
+    for job in self.state_saver.state.render_jobs:
       if job in self.green_jobs or job in self.yellow_jobs or job in self.red_jobs:
         continue
       if not job.active:
         continue
       self.active_render_job = job
-      table_utils.color_row_background(
-          self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]))
       break
+    self.set_table_colors()
 
     if not self.active_render_job:
       print_utils.print_info("No more render jobs left.")
@@ -585,7 +590,8 @@ class MainWindow(QWidget):
   def set_table_colors(self):
     """Set the colors of the table."""
     self.table.blockSignals(True)
-    temp_active_job = None
+    active_job_index = state_saver.find_job(
+        self.state_saver.state.render_jobs, self.active_render_job)
     for i, job in enumerate(self.state_saver.state.render_jobs):
       if job in self.green_jobs:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["green"]))
@@ -596,8 +602,7 @@ class MainWindow(QWidget):
       elif not job.active:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_inactive"]))
       # Color the active job if a render process is active.
-      elif temp_active_job is None and self.window.stop_button.isEnabled():
-        temp_active_job = job
+      elif i == active_job_index and self.window.stop_button.isEnabled():
         table_utils.color_row_background(
             self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]))
       else:
