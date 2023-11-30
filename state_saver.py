@@ -9,7 +9,7 @@ from typing import Any
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
 from proto import state_pb2
-from utils import path_utils, table_utils, ui_utils
+from utils_rr import path_utils, table_utils, ui_utils
 
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:

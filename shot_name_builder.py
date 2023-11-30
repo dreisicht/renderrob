@@ -4,7 +4,7 @@ import os
 import pathlib
 
 from proto import state_pb2
-from utils import ui_utils
+from utils_rr import ui_utils
 
 
 def still_or_animation(start: str, end: str) -> str:

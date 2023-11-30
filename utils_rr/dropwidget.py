@@ -1,7 +1,7 @@
 """Helper class to be able to register events for drag and drop operations."""
 from PySide6.QtWidgets import QWidget
 
-from utils import table_utils
+from utils_rr import table_utils
 
 
 class DropWidget(QWidget):

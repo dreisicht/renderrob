@@ -5,7 +5,7 @@ from typing import Any, Optional
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
-from utils import ui_utils
+from utils_rr import ui_utils
 
 COLORS = {
     "red": 0x980030,

@@ -4,7 +4,7 @@ from typing import List
 
 import bpy  # pylint: disable=import-error
 
-from utils import print_utils, rr_c_image
+from utils_common import print_utils, rr_c_image
 
 
 class RenderSettingsSetter:

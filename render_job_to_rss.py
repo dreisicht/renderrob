@@ -3,8 +3,8 @@
 import os
 
 from proto import state_pb2
-from utils import ui_utils
-from utils.table_utils import normalize_drive_letter
+from utils_rr import ui_utils
+from utils_rr.table_utils import normalize_drive_letter
 
 
 def render_job_to_render_settings_setter(
@@ -33,7 +33,8 @@ def render_job_to_render_settings_setter(
 
   python_command = ['import sys',
                     f"sys.path.append(\'{cwd}\')",
-                    "import render_settings_setter",
+                    "from utils_bpy import render_settings_setter",
+                    "print('||||||||||||||||||||||||||')",
                     f"rss = render_settings_setter.RenderSettingsSetter(\'{render_job.scene}\', {render_job.view_layers})",  # pylint: disable=line-too-long
                     f"rss.activate_addons({addons})",
                     f"rss.set_camera(\'{render_job.camera}\')",

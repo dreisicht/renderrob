@@ -15,9 +15,10 @@ import shot_name_builder
 import state_saver
 from proto import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
-from utils import path_utils, placeholder_delegate, print_utils, table_utils, ui_utils
-from utils.dropwidget import DropWidget
-from utils.table_utils import normalize_drive_letter
+from utils_common import print_utils
+from utils_rr import path_utils, placeholder_delegate, table_utils, ui_utils
+from utils_rr.dropwidget import DropWidget
+from utils_rr.table_utils import normalize_drive_letter
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -275,7 +276,9 @@ class MainWindow(QWidget):
   def _handle_output(self):
     """Output the subprocess output to the textbrowser widget."""
     self.table.blockSignals(True)
-    data = self.process.readAllStandardOutput()
+    data = self.process.readAll()
+    print(data)
+    print(data.data().decode())
     output = data.data().decode()
     color_format = QTextCharFormat()
     if '\u001b' in output:
@@ -523,7 +526,7 @@ class MainWindow(QWidget):
     cwd = normalize_drive_letter(os.getcwd())
     python_command = ['import sys',
                       f"sys.path.append(\'{cwd}\')",
-                      "import settings_loader"]
+                      "from utils_bpy import settings_loader"]
     python_command = " ; ".join(python_command)
     blender_args = ["-b", filepath,
                     "-y",
@@ -680,7 +683,8 @@ class MainWindow(QWidget):
             ]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
-    self.process.readyReadStandardOutput.connect(self._handle_output)
+    # self.process.readyReadStandardOutput.connect(self._handle_output)
+    self.process.readyRead.connect(self._handle_output)
     self.process.start()
 
 

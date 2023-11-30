@@ -4,7 +4,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QStyledItemDelegate, QTableWidget
 
-from utils import ui_utils
+from utils_rr import ui_utils
 
 
 class PlaceholderDelegate(QStyledItemDelegate):

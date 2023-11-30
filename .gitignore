@@ -12,3 +12,4 @@ tmp/*
 appmap.yml
 .sync.json
 *~lock~*
+rr/*

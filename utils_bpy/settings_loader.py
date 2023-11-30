@@ -4,7 +4,7 @@ import json
 
 import bpy  # pylint: disable=import-error
 
-from utils import print_utils
+from utils_common import print_utils
 
 
 def save_settings():

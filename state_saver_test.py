@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QApplication
 import renderrob
 import state_saver
 from proto import state_pb2
-from utils import table_utils
+from utils_rr import table_utils
 
 
 class TestStateSaver(unittest.TestCase):

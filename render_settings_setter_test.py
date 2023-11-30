@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import bpy  # pylint: disable=import-error
 
-import render_settings_setter
+from utils_bpy import render_settings_setter
 
 
 def check_gpu():
@@ -57,7 +57,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
     new_scene = bpy.data.scenes.new("SceneAF")
     bpy.context.window.scene = new_scene
 
-    with patch("utils.print_utils.print_error") as mock_print_error:
+    with patch("utils_common.print_utils.print_error") as mock_print_error:
       self.rss.set_scene("NonexistentScene")
     mock_print_error.assert_called_with("Scene NonexistentScene not found!")
     self.assertEqual(new_scene.name, "SceneAF")
@@ -92,7 +92,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
     """Test the set_view_layer function with a nonexistent view layer."""
     scene = bpy.context.scene
     bpy.context.window.view_layer = scene.view_layers.new("View Layer")
-    with patch("utils.print_utils.print_error") as mock_print_error:
+    with patch("utils_common.print_utils.print_error") as mock_print_error:
       self.rss.set_view_layers(["NonexistentViewLayer"])
     mock_print_error.assert_called_with(
         "View Layer NonexistentViewLayer not found. Please check the name in the sheet!")
@@ -100,7 +100,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
   # def test_activate_addons(self):
   #   addon_name = "mesh_f2"
   #   bpy.ops.preferences.addon_enable = mock_enable_addon
-  #   with patch("utils.print_utils.print_info") as mock_print_info:
+  #   with patch("utils_common.print_utils.print_info") as mock_print_info:
   #     self.rss.activate_addons([addon_name])
 
   def test_set_camera_existing_camera(self):
@@ -113,7 +113,7 @@ class TestRenderSettingsSetter(unittest.TestCase):
   def test_set_camera_nonexistent_camera(self):
     """Test the set_camera function with a nonexistent camera."""
     bpy.data.objects.new("Camera2", bpy.data.cameras.new("Camera2"))
-    with patch("utils.print_utils.print_error") as mock_print_error:
+    with patch("utils_common.print_utils.print_error") as mock_print_error:
       self.rss.set_camera("NonexistentCamera")
     mock_print_error.assert_called_with(
         "I didn't find the camera called NonexistentCamera.")

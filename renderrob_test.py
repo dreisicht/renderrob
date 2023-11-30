@@ -4,7 +4,7 @@ import unittest
 from PySide6.QtWidgets import QApplication
 
 import renderrob  # type: ignore
-from utils import table_utils
+from utils_rr import table_utils
 
 # pylint: disable=protected-access
 
