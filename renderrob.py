@@ -277,8 +277,6 @@ class MainWindow(QWidget):
     """Output the subprocess output to the textbrowser widget."""
     self.table.blockSignals(True)
     data = self.process.readAll()
-    print(data)
-    print(data.data().decode())
     output = data.data().decode()
     color_format = QTextCharFormat()
     if '\u001b' in output:
@@ -665,10 +663,17 @@ class MainWindow(QWidget):
         render_frame_command = "-a"
 
     self.process = QProcess()
+    self.process.setProcessChannelMode(QProcess.MergedChannels)
+    # Because buffering added some issues with printing, not using it for now.
+    env = QProcess.systemEnvironment()
+    env += "PYTHONUNBUFFERED=1"
+    self.process.setEnvironment(env)
+
     if not self.state_saver.state.settings.blender_path:
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+
     self.process.setProgram(self.state_saver.state.settings.blender_path)
     self.process.finished.connect(self._continue_render)
 

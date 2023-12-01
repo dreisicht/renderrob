@@ -16,9 +16,9 @@ CACHEFILEPATH = "ERRORCACHE"
 def print_error(ipt_str):
   """Print an error message to the console and exit the program."""
   ipt_str = str(ipt_str)
-  print(BASH_COLORS["BACK_RED"], BASH_COLORS["FORE_WHITE"], end="")
-  print("[ERROR] " + ipt_str)
-  print(BASH_COLORS["RESET_ALL"], end="")
+  print(BASH_COLORS["BACK_RED"], BASH_COLORS["FORE_WHITE"], end="", flush=True)
+  print("[ERROR] " + ipt_str, flush=True)
+  print(BASH_COLORS["RESET_ALL"], end="", flush=True)
   write_cache("[ERROR]" + ipt_str)
   print_info("Blender quit")
   sys.exit(62097)
@@ -27,34 +27,34 @@ def print_error(ipt_str):
 def print_error_no_exit(ipt_str):
   """Print an error message to the console and exit the program."""
   ipt_str = str(ipt_str)
-  print(BASH_COLORS["BACK_RED"], BASH_COLORS["FORE_WHITE"], end="")
-  print("[ERROR] " + ipt_str)
-  print(BASH_COLORS["RESET_ALL"], end="")
+  print(BASH_COLORS["BACK_RED"], BASH_COLORS["FORE_WHITE"], end="", flush=True)
+  print("[ERROR] " + ipt_str, flush=True)
+  print(BASH_COLORS["RESET_ALL"], end="", flush=True)
   write_cache("[ERROR]" + ipt_str)
 
 
 def print_warning(ipt_str):
   """Print a warning message to the console."""
   ipt_str = str(ipt_str)
-  print(BASH_COLORS["BACK_YELLOW"], BASH_COLORS["FORE_BLACK"], end="")
-  print("[WARNING] " + ipt_str)
-  print(BASH_COLORS["RESET_ALL"], end="")
+  print(BASH_COLORS["BACK_YELLOW"], BASH_COLORS["FORE_BLACK"], end="", flush=True)
+  print("[WARNING] " + ipt_str, flush=True)
+  print(BASH_COLORS["RESET_ALL"], end="", flush=True)
   write_cache("[WARNING]" + ipt_str)
 
 
 def print_info_input(ipt_str):
   """Print an info message to the console and wait for user input."""
   ipt_str = str(ipt_str)
-  print(BASH_COLORS["BACK_CYAN"], BASH_COLORS["FORE_BLACK"], end="")
+  print(BASH_COLORS["BACK_CYAN"], BASH_COLORS["FORE_BLACK"], end="", flush=True)
   input("[INFO] " + ipt_str)
-  print(BASH_COLORS["RESET_ALL"], end="")
+  print(BASH_COLORS["RESET_ALL"], end="", flush=True)
 
 
 def print_info(ipt_str):
   """Print an info message to the console."""
   ipt_str = str(ipt_str)
   print(BASH_COLORS["BACK_CYAN"], BASH_COLORS["FORE_BLACK"] +
-        "[INFO] " + ipt_str + BASH_COLORS["RESET_ALL"])
+        "[INFO] " + ipt_str + BASH_COLORS["RESET_ALL"], flush=True)
 
 
 def write_cache(ipt_str):

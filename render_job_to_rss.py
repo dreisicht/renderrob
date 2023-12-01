@@ -34,7 +34,6 @@ def render_job_to_render_settings_setter(
   python_command = ['import sys',
                     f"sys.path.append(\'{cwd}\')",
                     "from utils_bpy import render_settings_setter",
-                    "print('||||||||||||||||||||||||||')",
                     f"rss = render_settings_setter.RenderSettingsSetter(\'{render_job.scene}\', {render_job.view_layers})",  # pylint: disable=line-too-long
                     f"rss.activate_addons({addons})",
                     f"rss.set_camera(\'{render_job.camera}\')",
