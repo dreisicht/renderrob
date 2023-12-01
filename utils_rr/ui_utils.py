@@ -46,9 +46,6 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = N
     else:
       print('Failed to read UI')
 
-  ui_loader = QUiLoader()
-  window = ui_loader.load(ui_file)
-
   if not window:
     print(ui_loader.errorString())
     sys.exit(-1)
