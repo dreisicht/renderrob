@@ -58,7 +58,6 @@ class MainWindow(QWidget):
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
-    self.window.setWindowTitle("RenderRob")
     self.table = self.window.tableWidget
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
@@ -163,7 +162,7 @@ class MainWindow(QWidget):
     """Save the state to a serialized proto file with a dialog."""
     self.state_saver.table_to_state(self.table)
     file_name, _ = QFileDialog.getSaveFileName(
-        self.window, "Save File", "", "RenderRob Files (*.rrp)")
+        self.window, "Save File", "", "Render Rob Files (*.rrp)")
     with open(file_name, "wb") as protobuf:
       protobuf.write(
           self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
@@ -171,7 +170,7 @@ class MainWindow(QWidget):
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
     self.is_saved = True
-    self.window.setWindowTitle("RenderRob " + self.cache.current_file)
+    self.window.parent().setWindowTitle("Render Rob " + self.cache.current_file)
 
   def save_file(self) -> None:
     """Save the state to a serialized proto file without a dialog."""
@@ -180,10 +179,11 @@ class MainWindow(QWidget):
       protobuf.write(
           self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
     self.is_saved = True
-    self.window.setWindowTitle("RenderRob " + self.cache.current_file)
+    self.window.parent().setWindowTitle("Render Rob " + self.cache.current_file)
 
   def new_file(self) -> None:
     """Create a new file."""
+    self.window.parent().setWindowTitle("* Render Rob")
     if not self.ask_for_save():
       return
     for _ in range(self.table.rowCount()):
@@ -249,6 +249,7 @@ class MainWindow(QWidget):
       self.state_saver.state.ParseFromString(pb_file.read())
     self.state_saver.state_to_table(self.table)
     self.cache.current_file = file_name
+    self.window.parent().setWindowTitle("Render Rob " + file_name)
     self.add_filepath_to_cache(file_name)
     self.cache.recent_files.remove(file_name)
     self.cache.recent_files.insert(0, file_name)
@@ -364,7 +365,7 @@ class MainWindow(QWidget):
     """Handle before table change."""
     print_utils.print_info("Before table changed.")
     self.is_saved = False
-    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
+    self.window.parent().setWindowTitle("* Render Rob" + self.cache.current_file)
 
     self.state_saver.table_to_state(self.table)
     state_string = self.state_saver.state.SerializeToString()
@@ -391,7 +392,7 @@ class MainWindow(QWidget):
   def open_settings_window(self) -> None:
     """Open the settings window."""
     self.is_saved = False
-    self.window.setWindowTitle("RenderRob * " + self.cache.current_file)
+    self.window.parent().setWindowTitle("* Render Rob" + self.cache.current_file)
     settings_window.SettingsWindow(self.state_saver.state)
 
   def start_render(self) -> None:
