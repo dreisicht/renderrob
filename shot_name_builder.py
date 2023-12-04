@@ -76,25 +76,39 @@ class ShotNameBuilder:
 
   def set_version_number(self, full_frame_path: str) -> str:
     """Get the version number of the shot."""
-    shot_iter_num = 1000
-    if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
-      if self.render_job.start == "":
-        start_frame = str(1).zfill(4)
-      else:
-        start_frame = self.render_job.start.zfill(4)
-    else:
-      start_frame = self.render_job.start.zfill(4)
+    # if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
+    #   if self.render_job.start == "":
+    #     start_frame = str(1).zfill(4)
+    #   else:
+    #     start_frame = self.render_job.start.zfill(4)
+    # else:
+    #   start_frame = self.render_job.start.zfill(4)
 
-    while not os.path.exists(full_frame_path.replace(
-            "v$$", "v" + str(
-                shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 1:
+    # while not os.path.exists(full_frame_path.replace(
+    #         "v$$", "v" + str(
+    #             shot_iter_num).zfill(2)).replace("####", start_frame)) and shot_iter_num > 0:
+    #   shot_iter_num -= 1
+    # shot_iter_num += 1
+
+    shot_iter_num = 1000
+    while True:
       shot_iter_num -= 1
+      folderpath = os.path.dirname(full_frame_path).replace(
+          "v$$", "v" + str(shot_iter_num).zfill(2))
+      # Check if the folder of the path is empty:
+      if os.path.exists(folderpath):
+        if any(os.listdir(folderpath)):
+          break
+      if shot_iter_num == 0:
+        break
     shot_iter_num += 1
 
-    if self.replay_mode:
-      shot_iter_num -= 1
-    elif self.render_job.overwrite and shot_iter_num > 1:
-      shot_iter_num -= 1
+    if shot_iter_num > 1:
+      if self.replay_mode:
+        shot_iter_num -= 1
+      elif self.render_job.overwrite:
+        shot_iter_num -= 1
+
     # Update full_frame_path with iteration number.
     return full_frame_path.replace(
         "v$$", f"v{str(shot_iter_num).zfill(2)}")
