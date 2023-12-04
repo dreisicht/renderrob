@@ -11,6 +11,14 @@ from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 from proto import state_pb2
 from utils_rr import path_utils, table_utils, ui_utils
 
+FILEMFORMAT_MAPPING = {
+    "png": "png",
+    "jpeg": "jpeg",
+    "open_exr_multilayer": "exr_mutli",
+    "open_exr": "exr_single",
+
+}
+
 
 def get_text(item: QTableWidgetItem, widget=None) -> str:
   """Get the text from a table item."""
@@ -130,5 +138,5 @@ class StateSaver:
     render_job.denoise = json_state["denoise"]
     render_job.scene = json_state["scene"]
     render_job.view_layers.extend(json_state["view_layers"])
-    render_job.file_format = json_state["file_format"]
+    render_job.file_format = FILEMFORMAT_MAPPING[json_state["file_format"].lower()]
     return render_job
