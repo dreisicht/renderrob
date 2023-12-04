@@ -220,7 +220,7 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
        "Device",
        "Motion\nBlur",
        "Continue\nJob",
-       "High\nQuality",
+       "Final\nMode",
        "Denoise",
        "Scene",
        "View\nLayers",
