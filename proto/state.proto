@@ -25,7 +25,7 @@ enum file_format{
     jpeg = 2;
     png = 3;
     tiff = 4;
-}
+    }
 enum render_engine{
     cycles = 0;
     eevee = 1;
