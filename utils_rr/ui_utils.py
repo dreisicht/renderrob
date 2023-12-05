@@ -12,15 +12,16 @@ TEXT_COLUMNS = [1, 2, 15, 16, 17]
 NUMBER_COLUMNS = [3, 4, 5, 6, 7]
 COMBOBOX_COLUMNS = [8, 9, 10]
 CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
-FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"]
-FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
-FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
+FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF", "FFMPEG"]
+FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff", "ffmpeg"]
+FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff", "ffmpeg"]
 FILEMFORMAT_MAPPING = {
     "png": "png",
     "jpeg": "jpeg",
     "tiff": "tiff",
     "open_exr_multilayer": "exr_mutli",
     "open_exr": "exr_single",
+    "ffmpeg": "ffmpeg"
 }
 
 RENDER_ENGINES = ["cycles", "eevee"]

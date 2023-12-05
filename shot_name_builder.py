@@ -110,7 +110,12 @@ class ShotNameBuilder:
     else:
       frame_render_folder = os.path.join(output_path, shotname)
 
-    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
+    if ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format] == "ffmpeg":
+      start_num = str(self.render_job.start).zfill(4)
+      end_num = str(self.render_job.end).zfill(4)
+      frame_name = f"{shotname}-{start_num}-{end_num}"
+    else:
+      frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
     full_frame_path = os.path.join(frame_render_folder, frame_name)
     full_frame_path = self.set_version_number(full_frame_path)
 
