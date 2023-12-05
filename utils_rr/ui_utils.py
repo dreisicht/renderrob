@@ -15,6 +15,14 @@ CHECKBOX_COLUMNS = [0, 11, 12, 13, 14]
 FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"]
 FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
 FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
+FILEMFORMAT_MAPPING = {
+    "png": "png",
+    "jpeg": "jpeg",
+    "tiff": "tiff",
+    "open_exr_multilayer": "exr_mutli",
+    "open_exr": "exr_single",
+}
+
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 PLACEHOLDER_TEXT = {
