@@ -4,6 +4,7 @@ import unittest
 
 import render_job_to_rss
 from proto import state_pb2
+from utils_rr import path_utils
 
 
 class TestRenderJobToRss(unittest.TestCase):
@@ -34,7 +35,7 @@ class TestRenderJobToRss(unittest.TestCase):
     settings = state_pb2.settings()  # pylint: disable=no-member
     rss = render_job_to_rss.render_job_to_render_settings_setter(
         render_job, settings)
-    cwd = render_job_to_rss.normalize_drive_letter(os.getcwd())
+    cwd = path_utils.normalize_drive_letter(os.getcwd())
     self.assertEqual(
         rss, (f"import sys ; sys.path.append('{cwd}') ; "
               "from utils_bpy import render_settings_setter ;"

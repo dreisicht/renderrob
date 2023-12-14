@@ -1,11 +1,10 @@
 """Utility functions for table operations."""
-import os
 from typing import Any, Optional
 
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
                                QTableWidgetItem, QWidget)
-from utils_rr import ui_utils
+from utils_rr import ui_utils, path_utils
 
 COLORS = {
     "red": 0x980030,
@@ -24,14 +23,14 @@ COLORS = {
 }
 
 
-def normalize_drive_letter(path: str) -> str:
-  """Normalize the drive letter to upper case."""
-  if len(path) < 2:
-    return path
-  path = os.path.normpath(path).replace("\\", "/")
-  if path[1] == ":":
-    return path[0].upper() + path[1:]
-  return path
+def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
+  """Fix the path of the currently selected row."""
+  path = item.text()
+  path = path_utils.normalize_drive_letter(path)
+  path = path.replace('"', "").replace("\\", "/")
+  if blend_folder:
+    path = path_utils.get_rel_blend_path(path, blend_folder)
+  item.setText(path)
 
 
 def make_editable(table_widget: QTableWidget) -> None:
@@ -235,24 +234,6 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
   # header.setSectionResizeMode(17, QHeaderView.Fixed)
   table_widget.resizeColumnsToContents()
   ui_utils.fill_row(table_widget, row)
-
-
-def get_blend_files_rel_path(blend_folder: str, path: str) -> str:
-  """Get the blender files path."""
-  if os.path.basename(path) == path:
-    return path
-  common = os.path.commonpath([blend_folder, path])
-  return os.path.relpath(path, common)
-
-
-def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
-  """Fix the path of the currently selected row."""
-  path = item.text()
-  path = normalize_drive_letter(path)
-  path = path.replace('"', "").replace("\\", "/")
-  if blend_folder:
-    path = get_blend_files_rel_path(blend_folder, path)
-  item.setText(path)
 
 
 def set_text_alignment(table_widget: QTableWidget, row: int) -> None:

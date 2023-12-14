@@ -4,7 +4,7 @@ import os
 
 from proto import state_pb2
 from utils_rr import ui_utils
-from utils_rr.table_utils import normalize_drive_letter
+from utils_rr.path_utils import normalize_drive_letter
 
 
 def render_job_to_render_settings_setter(
