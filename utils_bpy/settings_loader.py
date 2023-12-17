@@ -31,7 +31,7 @@ def save_settings():
     render_job['device'] = "cpu"
   render_job['engine'] = engine.lower()
   render_job['motion_blur'] = bpy.context.scene.render.use_motion_blur
-  render_job['overwrite'] = bpy.context.scene.render.use_overwrite
+  render_job['overwrite'] = False
   render_job['high_quality'] = not bpy.context.scene.render.use_stamp
   render_job['denoise'] = bpy.context.scene.cycles.use_denoising
   render_job['scene'] = bpy.context.scene.name

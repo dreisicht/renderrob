@@ -18,7 +18,6 @@ from render_job_to_rss import render_job_to_render_settings_setter
 from utils_common import print_utils
 from utils_rr import path_utils, placeholder_delegate, table_utils, ui_utils
 from utils_rr.dropwidget import DropWidget
-from utils_rr.table_utils import normalize_drive_letter
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -496,8 +495,8 @@ class MainWindow(QWidget):
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
       return
-    filepath = path_utils.get_blend_path(self.state_saver.state.render_jobs[current_row].file,
-                                         self.state_saver.state.settings.blender_files_path)
+    filepath = path_utils.get_abs_blend_path(self.state_saver.state.render_jobs[current_row].file,
+                                             self.state_saver.state.settings.blender_files_path)
     if not os.path.exists(filepath):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
@@ -516,13 +515,13 @@ class MainWindow(QWidget):
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
-    filepath = path_utils.get_blend_path(
+    filepath = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
     if filepath == "" or not os.path.exists(filepath):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
-    cwd = normalize_drive_letter(os.getcwd())
+    cwd = path_utils.normalize_drive_letter(os.getcwd())
     python_command = ['import sys',
                       f"sys.path.append(\'{cwd}\')",
                       "from utils_bpy import settings_loader"]
@@ -679,7 +678,7 @@ class MainWindow(QWidget):
     self.process.finished.connect(self._continue_render)
 
     # Check if the file was converted to a relative path.
-    file_path = path_utils.get_blend_path(
+    file_path = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
     args = ["-b", file_path,
             "-y",
