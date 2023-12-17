@@ -43,7 +43,8 @@ class TestPathUtils(unittest.TestCase):
     path = path_utils.get_abs_blend_path(
         'SH050\\SH050_render.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots')
     self.assertEqual(
-        path.replace("\\", "/"), 'C:/Users/peter/Nextcloud/20_prod/24_shots/SH050/SH050_render.blend')
+        path.replace("\\", "/"),
+        'C:/Users/peter/Nextcloud/20_prod/24_shots/SH050/SH050_render.blend')
 
     path = path_utils.get_abs_blend_path(
         'C:/something/completely/different.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots')
