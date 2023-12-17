@@ -25,23 +25,26 @@ class TestPathUtils(unittest.TestCase):
 
   def test_get_rel_blend_path(self):
     """Test that the relative path to the blend file is correct."""
-    self.assertEqual(path_utils.get_rel_blend_path(
+    path = path_utils.get_rel_blend_path(
         "C:/Users/peter/Nextcloud/20_prod/24_shots/SH050/SH050_render.blend",
-        "C:/Users/peter/Nextcloud/20_prod/24_shots"),
-        "SH050\\SH050_render.blend")
-    self.assertEqual(path_utils.get_rel_blend_path('C:/something/completely/different.blend',
-                                                   "C:/Users/peter/Nextcloud/20_prod/24_shots"
-                                                   ), 'C:/something/completely/different.blend')
-    self.assertEqual(path_utils.get_rel_blend_path('different.blend',
-                                                   "C:/Users/peter/Nextcloud/20_prod/24_shots"
-                                                   ), 'different.blend')
+        "C:/Users/peter/Nextcloud/20_prod/24_shots")
+    self.assertEqual(path, "SH050\\SH050_render.blend")
+
+    path = path_utils.get_rel_blend_path('C:/something/completely/different.blend',
+                                         "C:/Users/peter/Nextcloud/20_prod/24_shots")
+    self.assertEqual(path.replace("\\", "/"), 'C:/something/completely/different.blend')
+
+    path = path_utils.get_rel_blend_path(
+        'different.blend', "C:/Users/peter/Nextcloud/20_prod/24_shots")
+    self.assertEqual(path, 'different.blend')
 
   def test_get_abs_blend_path(self):
     """Test that the absolute path to the blend file is correct."""
-    self.assertEqual(path_utils.get_abs_blend_path(
-        'SH050\\SH050_render.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots'),
-        'C:\\Users\\peter\\Nextcloud\\20_prod\\24_shots\\SH050\\SH050_render.blend')
+    path = path_utils.get_abs_blend_path(
+        'SH050\\SH050_render.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots')
+    self.assertEqual(
+        path.replace("\\", "/"), 'C:/Users/peter/Nextcloud/20_prod/24_shots/SH050/SH050_render.blend')
 
-    self.assertEqual(path_utils.get_abs_blend_path(
-        'C:/something/completely/different.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots'),
-        'C:/something/completely/different.blend')
+    path = path_utils.get_abs_blend_path(
+        'C:/something/completely/different.blend', 'C:/Users/peter/Nextcloud/20_prod/24_shots')
+    self.assertEqual(path.replace("\\", "/"), 'C:/something/completely/different.blend')
