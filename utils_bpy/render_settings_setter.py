@@ -39,9 +39,12 @@ class RenderSettingsSetter:
     else:
       try:
         self.current_scene_data = bpy.data.scenes[scene_name]
+        bpy.context.window.scene = self.current_scene_data
       except KeyError:
         print_utils.print_error(f"Scene {scene_name} not found!")
+        self.current_scene_data = bpy.context.scene
     self.current_scene_render = self.current_scene_data.render
+    print_utils.print_info(f"Rendering scene {self.current_scene_data.name}.")
 
   def set_view_layers(self, view_layer_names: List[str]):
     """Set the view layer to be rendered."""
@@ -171,6 +174,7 @@ class RenderSettingsSetter:
     self.current_scene_data.frame_step = frame_step
     self.current_scene_data.render.use_stamp = not high_quality
     print_utils.print_info("Finished setting the rendering settings!")
+    print_utils.print_info(bpy.context.scene)
 
   def custom_commands(self) -> None:
     """Import user commands."""
