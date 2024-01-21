@@ -39,10 +39,12 @@ class TestRenderSettingsSetter(unittest.TestCase):
 
   def test_set_scene_multiple_scenes_with_scene_name(self):
     """Test the set_scene function with multiple scenes and a scene name."""
+    self.assertEqual(bpy.context.scene.name, "Scene")
     bpy.data.scenes.new("Scene1")
     bpy.data.scenes.new("Scene2")
     self.rss.set_scene("Scene2")
     self.assertEqual(self.rss.current_scene_data.name, "Scene2")
+    self.assertEqual(bpy.context.scene.name, "Scene2")
 
   def test_set_scene_multiple_scenes_without_scene_name(self):
     """Test the set_scene function with multiple scenes and no scene name."""
