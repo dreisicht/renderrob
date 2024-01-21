@@ -684,6 +684,7 @@ class MainWindow(QWidget):
             "-y",
             "-o", snb.frame_path,
             "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
+            "-S", job.scene,
             "--python-expr", inline_python,
             ]
     args.extend(render_frame_command.split(" "))
