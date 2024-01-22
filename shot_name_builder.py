@@ -17,7 +17,7 @@ def still_or_animation(start: str, end: str) -> str:
     return "STILL"
   if start == "" and end != "":
     raise ValueError("End frame is set, but start frame is not.")
-  raise ValueError("Could not determine of stil or animation.")
+  raise ValueError("Could not determine of still or animation.")
 
 
 class ShotNameBuilder:

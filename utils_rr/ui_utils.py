@@ -19,7 +19,7 @@ FILEMFORMAT_MAPPING = {
     "png": "png",
     "jpeg": "jpeg",
     "tiff": "tiff",
-    "open_exr_multilayer": "exr_mutli",
+    "open_exr_multilayer": "exr_multi",
     "open_exr": "exr_single",
 }
 
