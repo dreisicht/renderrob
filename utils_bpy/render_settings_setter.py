@@ -30,12 +30,15 @@ class RenderSettingsSetter:
   def set_scene(self, scene_name: str) -> None:
     """Set the scene to be rendered."""
     if scene_name not in bpy.data.scenes.keys():
-      print_utils.print_error(f"Scene {scene_name} not found!")
+      print_utils.print_warning(f"Scene {scene_name} not found!")
+    else:
+      bpy.context.window.scene = bpy.data.scenes[scene_name]
     if not scene_name and len(bpy.data.scenes) > 1:
       print_utils.print_warning(
           "There are more than one scenes, but you didn't tell me which scene to render! So I am"
           " rendering the last used scene.")
     self.current_scene_data = bpy.context.scene
+    self.current_scene_render = self.current_scene_data.render
 
   def set_view_layers(self, view_layer_names: List[str]):
     """Set the view layer to be rendered."""

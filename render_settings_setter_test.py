@@ -58,9 +58,9 @@ class TestRenderSettingsSetter(unittest.TestCase):
     new_scene = bpy.data.scenes.new("SceneAF")
     bpy.context.window.scene = new_scene
 
-    with patch("utils_common.print_utils.print_error") as mock_print_error:
+    with patch("utils_common.print_utils.print_warning") as mock_print_warning:
       self.rss.set_scene("NonexistentScene")
-    mock_print_error.assert_called_with("Scene NonexistentScene not found!")
+    mock_print_warning.assert_called_with("Scene NonexistentScene not found!")
     self.assertEqual(new_scene.name, "SceneAF")
 
   def test_set_view_layer_single_view_layer(self):
