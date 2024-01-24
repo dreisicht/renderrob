@@ -681,10 +681,10 @@ class MainWindow(QWidget):
     file_path = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
     args = ["-b", file_path,
-            "-y",
-            "-o", snb.frame_path,
-            "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "-S", job.scene,
+            "-o", snb.frame_path,
+            "-y",
+            "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "--python-expr", inline_python,
             ]
     args.extend(render_frame_command.split(" "))
