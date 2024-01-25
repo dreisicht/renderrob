@@ -362,7 +362,7 @@ class MainWindow(QWidget):
 
   def before_table_change(self) -> None:
     """Handle before table change."""
-    print_utils.print_info("Before table changed.")
+    # print_utils.print_info("Before table changed.")
     self.is_saved = False
     self.window.parent().setWindowTitle("* Render Rob" + self.cache.current_file)
 
@@ -373,7 +373,7 @@ class MainWindow(QWidget):
 
   def after_table_change(self, item: Optional[QTableWidgetItem] = None) -> None:
     """Handle after table change."""
-    print_utils.print_info("After table changed.")
+    # print_utils.print_info("After table changed.")
     self.state_saver.table_to_state(self.table)
     if item and isinstance(item, QTableWidgetItem):
       if item.column() == 1:
