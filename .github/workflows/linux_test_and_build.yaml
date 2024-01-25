@@ -11,7 +11,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v4
@@ -74,7 +74,7 @@ jobs:
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_linux.spec --force
           cp icons/icon.png icon.png
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: renderrob
           path: |
