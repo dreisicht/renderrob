@@ -22,16 +22,16 @@ jobs:
 
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python 3.10
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
           cache: "pip"
 
       - name: Cache MacOS nuitka build dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-nuitka
         id: cache-nuitka
@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
             ${{ runner.os }}-pip-
 
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ${{ matrix.pip_path }}
           key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -90,7 +90,7 @@ jobs:
           pip install imageio
           python ${{env.pythonLocation}}/lib/python3.10/site-packages/PySide6/scripts/deploy.py -c build/pysidedeploy_mac.spec --force --verbose --keep-deployment-files
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest'
         with:
           name: renderrob_win
@@ -102,7 +102,7 @@ jobs:
             renderrob.exe
             custom_commands.py
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         if: matrix.os == 'macos-latest'
         with:
           name: renderrob_mac
