@@ -322,7 +322,7 @@ class MainWindow(QWidget):
 
           # Only scroll down if user is at bottom.
         if self.window.textBrowser.verticalScrollBar().value() > (
-                self.window.textBrowser.verticalScrollBar().maximum()) - 200:
+                self.window.textBrowser.verticalScrollBar().maximum()) - 1500:
           self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
         self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
@@ -334,7 +334,7 @@ class MainWindow(QWidget):
     else:
       # Only scroll down if user is at bottom.
       if self.window.textBrowser.verticalScrollBar().value() > (
-              self.window.textBrowser.verticalScrollBar().maximum()) - 500:
+              self.window.textBrowser.verticalScrollBar().maximum()) - 1500:
         self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
       self.window.textBrowser.insertPlainText(output)

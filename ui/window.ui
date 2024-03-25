@@ -752,7 +752,7 @@
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>Open Settings</string>
+    <string>Preferences</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+,</string>
