@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QApplication
 
 import renderrob
 import state_saver
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import table_utils
 
 

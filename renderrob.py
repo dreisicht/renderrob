@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedL
 import settings_window
 import shot_name_builder
 import state_saver
-from proto import cache_pb2, state_pb2
+from protos import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from utils_common import print_utils
 from utils_rr import path_utils, placeholder_delegate, table_utils, ui_utils

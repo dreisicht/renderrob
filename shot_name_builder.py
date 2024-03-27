@@ -3,7 +3,7 @@
 import os
 import pathlib
 
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import ui_utils
 
 

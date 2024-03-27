@@ -2,7 +2,7 @@
 
 import os
 
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import ui_utils
 from utils_rr.path_utils import normalize_drive_letter
 

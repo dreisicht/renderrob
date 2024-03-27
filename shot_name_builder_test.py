@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 import shot_name_builder
-from proto import state_pb2
+from protos import state_pb2
 
 
 class TestShotNameBuilder(unittest.TestCase):
