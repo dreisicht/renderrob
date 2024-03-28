@@ -50,8 +50,8 @@ jobs:
           wget ${{ env.PROTOC_URL }}v${{ env.PROTOC_VERSION }}/protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
           unzip protoc-${{ env.PROTOC_VERSION }}-linux-x86_64.zip
           sudo cp bin/protoc /usr/local/bin/protoc
-          protoc --proto_path=proto/ --python_out=proto/ proto/state.proto
-          protoc --proto_path=proto/ --python_out=proto/ proto/cache.proto
+          protoc --proto_path=protos/ --python_out=protos/ protos/state.proto
+          protoc --proto_path=protos/ --python_out=protos/ protos/cache.proto
 
       - name: Analysing the code with pylint
         run: |
