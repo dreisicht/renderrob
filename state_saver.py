@@ -8,7 +8,7 @@ from typing import Any
 
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
 
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import path_utils, table_utils, ui_utils
 
 

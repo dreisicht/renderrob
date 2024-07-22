@@ -3,7 +3,7 @@ import os
 import unittest
 
 import render_job_to_rss
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import path_utils
 
 

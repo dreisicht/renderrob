@@ -1,10 +1,11 @@
 """Unit tests for shot_name_builder.py."""
 import os
+import pathlib
 import tempfile
 import unittest
 
 import shot_name_builder
-from proto import state_pb2
+from protos import state_pb2
 
 
 class TestShotNameBuilder(unittest.TestCase):
@@ -205,6 +206,44 @@ class TestShotNameBuilder(unittest.TestCase):
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
       self.assertEqual(snb.set_version_number(versionless_frame), os.path.join(
           tempdir, "rr_test-hq-v02/rr_test-hq-v02-f####.png").replace("\\", "/"))
+
+      # Still output folder is empty.
+      render_job.overwrite = False
+      render_job.start = "1"
+      render_job.end = ""
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
+                                    ).replace("\\", "/"))
+
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
+                                    ).replace("\\", "/"))
+
+      # One image in still output folder.
+      new_image = pathlib.Path(tempdir) / "stills/rr_test-hq-v01-f####.png"
+      new_image.parent.mkdir(parents=True)
+      new_image.touch()
+      render_job.start = "1"
+      render_job.end = ""
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v02-f####.png"
+                                    ).replace("\\", "/"))
+
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
+                                    ).replace("\\", "/"))
 
 
 if __name__ == "__main__":

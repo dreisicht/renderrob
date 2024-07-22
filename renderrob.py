@@ -13,7 +13,7 @@ from PySide6.QtWidgets import (QApplication, QFileDialog, QMessageBox, QStackedL
 import settings_window
 import shot_name_builder
 import state_saver
-from proto import cache_pb2, state_pb2
+from protos import cache_pb2, state_pb2
 from render_job_to_rss import render_job_to_render_settings_setter
 from utils_common import print_utils
 from utils_rr import path_utils, placeholder_delegate, table_utils, ui_utils
@@ -440,6 +440,7 @@ class MainWindow(QWidget):
             self.state_saver.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
+        return
       if platform.system() == 'Darwin':       # macOS
         subprocess.call(('open', filepath))
       elif platform.system() == 'Windows':    # Windows
@@ -680,13 +681,15 @@ class MainWindow(QWidget):
     # Check if the file was converted to a relative path.
     file_path = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
+    scene_command = f"-S {job.scene}" if job.scene else ""
     args = ["-b", file_path,
-            "-S", job.scene,
+            scene_command,
             "-o", snb.frame_path,
             "-y",
             "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "--python-expr", inline_python,
             ]
+    args = [i for i in args if i]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
     # self.process.readyReadStandardOutput.connect(self._handle_output)

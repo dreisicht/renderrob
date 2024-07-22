@@ -6,7 +6,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QFileDialog
 
-from proto import state_pb2
+from protos import state_pb2
 from utils_rr import ui_utils
 
 
