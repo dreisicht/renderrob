@@ -1,7 +1,7 @@
 """Util functions for helping build the render rob UI."""
 import sys
 from contextlib import closing
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Generator
 
 from PySide6.QtCore import QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
@@ -61,7 +61,7 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = N
   return window
 
 
-def get_combobox_indexes(table: QTableWidget, row: int) -> list:
+def get_combobox_indexes(table: QTableWidget, row: int) -> Generator:
   """Get all values of combo boxes in a row."""
   for i in COMBOBOX_COLUMNS:
     yield table.cellWidget(row, i).currentIndex()
@@ -76,7 +76,7 @@ def set_combobox_indexes(table: QTableWidget, row: int, values: list[int]) -> No
     widget.blockSignals(False)
 
 
-def get_checkbox_values(table: QTableWidget, row: int) -> list:
+def get_checkbox_values(table: QTableWidget, row: int) -> Generator:
   """Get all values of checkboxes in a row."""
   for i in CHECKBOX_COLUMNS:
     widget = table.cellWidget(row, i)
