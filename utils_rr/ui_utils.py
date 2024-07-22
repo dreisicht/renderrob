@@ -54,7 +54,7 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = N
     else:
       print('Failed to read UI')
 
-  if not window:
+  if not window:  # pylint:disable=possibly-used-before-assignment
     print(ui_loader.errorString())
     sys.exit(-1)
   QMetaObject.connectSlotsByName(window)
