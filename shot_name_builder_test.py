@@ -212,11 +212,13 @@ class TestShotNameBuilder(unittest.TestCase):
       render_job.start = "1"
       render_job.end = ""
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
-      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
 
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
-      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
 
       # One image in still output folder.
@@ -226,11 +228,13 @@ class TestShotNameBuilder(unittest.TestCase):
       render_job.start = "1"
       render_job.end = ""
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
-      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v02-f####.png"))
 
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
-      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir,
+                                                           "stills\\rr_test-hq-v$$-f####.png")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
 
 
