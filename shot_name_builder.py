@@ -111,13 +111,17 @@ class ShotNameBuilder:
       output_path = str(pathlib.Path(self.render_job.file).parent)
     output_path = output_path.replace("\\", "/")
 
+    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
     if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
       frame_render_folder = os.path.join(output_path, "stills")
+      frame_name = frame_name.replace("f####", f"f{str(self.render_job.start).zfill(4)}")
     else:
       frame_render_folder = os.path.join(output_path, shotname)
 
-    frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
     full_frame_path = os.path.join(frame_render_folder, frame_name)
     full_frame_path = self.set_version_number(full_frame_path)
+
+    if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
+      full_frame_path = full_frame_path.replace(f"f{str(self.render_job.start).zfill(4)}", "f####")
 
     return full_frame_path.replace("\\", "/")

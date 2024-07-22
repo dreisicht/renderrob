@@ -681,13 +681,15 @@ class MainWindow(QWidget):
     # Check if the file was converted to a relative path.
     file_path = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
+    scene_command = f"-S {job.scene}" if job.scene else ""
     args = ["-b", file_path,
-            "-S", job.scene,
+            scene_command,
             "-o", snb.frame_path,
             "-y",
             "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "--python-expr", inline_python,
             ]
+    args = [i for i in args if i]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
     # self.process.readyReadStandardOutput.connect(self._handle_output)
