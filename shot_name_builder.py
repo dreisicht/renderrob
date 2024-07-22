@@ -23,7 +23,7 @@ def still_or_animation(start: str, end: str) -> str:
 class ShotNameBuilder:
   """Class to build a shot name from the render job."""
 
-  def __init__(self, render_job: state_pb2.render_job(),  # pylint: disable=no-member
+  def __init__(self, render_job: state_pb2.render_job,  # pylint: disable=no-member
                output_path: str, is_replay_mode: bool = False) -> None:
     """Initialize the shot name builder.
 
@@ -76,19 +76,25 @@ class ShotNameBuilder:
 
   def set_version_number(self, full_frame_path: str) -> str:
     """Get the version number of the shot."""
-    shot_iter_num = 1000
-    while True:
-      shot_iter_num -= 1
-      folderpath = os.path.dirname(full_frame_path).replace(
-          "v$$", "v" + str(shot_iter_num).zfill(2))
-      # Check if the folder of the path is empty:
-      if os.path.exists(folderpath):
-        if any(os.listdir(folderpath)):
+    _full_frame_path = pathlib.Path(full_frame_path)
+    for shot_iter_num in range(1000, -1, -1):
+      # STILL
+      if "v$$" not in _full_frame_path.parent.parts[-1]:
+        still_path = full_frame_path.replace("v$$", "v" + str(shot_iter_num).zfill(2))
+        if pathlib.Path(still_path).exists():
           break
-      if shot_iter_num == 0:
+        continue
+      # ANIMATION
+      folderpath_str = str(_full_frame_path.parent).replace(
+          "v$$", "v" + str(shot_iter_num).zfill(2))
+      folderpath = pathlib.Path(folderpath_str)
+      if folderpath.exists():
+        if any(folderpath.iterdir()):
+          break
+        shot_iter_num -= 1
         break
-    shot_iter_num += 1
 
+    shot_iter_num += 1
     if shot_iter_num > 1:
       if self.replay_mode:
         shot_iter_num -= 1

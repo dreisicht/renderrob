@@ -440,6 +440,7 @@ class MainWindow(QWidget):
             self.state_saver.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
+        return
       if platform.system() == 'Darwin':       # macOS
         subprocess.call(('open', filepath))
       elif platform.system() == 'Windows':    # Windows

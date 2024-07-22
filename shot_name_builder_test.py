@@ -1,5 +1,6 @@
 """Unit tests for shot_name_builder.py."""
 import os
+import pathlib
 import tempfile
 import unittest
 
@@ -205,6 +206,32 @@ class TestShotNameBuilder(unittest.TestCase):
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
       self.assertEqual(snb.set_version_number(versionless_frame), os.path.join(
           tempdir, "rr_test-hq-v02/rr_test-hq-v02-f####.png").replace("\\", "/"))
+
+      # Still output folder is empty.
+      render_job.overwrite = False
+      render_job.start = "1"
+      render_job.end = ""
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
+
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
+
+      # One image in still output folder.
+      new_image = pathlib.Path(tempdir) / "stills/rr_test-hq-v01-f####.png"
+      new_image.parent.mkdir(parents=True)
+      new_image.touch()
+      render_job.start = "1"
+      render_job.end = ""
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v02-f####.png"))
+
+      snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
+      self.assertEqual(snb.set_version_number(os.path.join(tempdir, "stills\\rr_test-hq-v$$-f####.png")),
+                       os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"))
 
 
 if __name__ == "__main__":

@@ -19,7 +19,7 @@ def main():
   setup(
       name="renderrob",
       version="0.1",
-      description="My GUI application!",
+      description="RenderRob",
       options={"build_exe": build_exe_options},
       executables=[Executable("renderrob.py", base=base, icon=icon)],
   )
