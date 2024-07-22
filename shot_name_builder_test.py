@@ -213,13 +213,15 @@ class TestShotNameBuilder(unittest.TestCase):
       render_job.end = ""
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
       self.assertEqual(snb.set_version_number(os.path.join(tempdir,
-                                                           "stills\\rr_test-hq-v$$-f####.png")),
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
                                     ).replace("\\", "/"))
 
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
       self.assertEqual(snb.set_version_number(os.path.join(tempdir,
-                                                           "stills\\rr_test-hq-v$$-f####.png")),
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
                                     ).replace("\\", "/"))
 
@@ -231,13 +233,15 @@ class TestShotNameBuilder(unittest.TestCase):
       render_job.end = ""
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=False)
       self.assertEqual(snb.set_version_number(os.path.join(tempdir,
-                                                           "stills\\rr_test-hq-v$$-f####.png")),
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v02-f####.png"
                                     ).replace("\\", "/"))
 
       snb = shot_name_builder.ShotNameBuilder(render_job, tempdir, is_replay_mode=True)
       self.assertEqual(snb.set_version_number(os.path.join(tempdir,
-                                                           "stills\\rr_test-hq-v$$-f####.png")),
+                                                           "stills\\rr_test-hq-v$$-f####.png"
+                                                           ).replace("\\", "/")),
                        os.path.join(tempdir, "stills", "rr_test-hq-v01-f####.png"
                                     ).replace("\\", "/"))
 
