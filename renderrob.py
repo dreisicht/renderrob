@@ -46,6 +46,12 @@ class MainWindow(QWidget):
     self.yellow_jobs = []
     self.red_jobs = []
 
+    # TODO: Avoid global state with theme colors.
+    if self.app.styleHints().colorScheme().value == 1:
+      table_utils.COLORS = table_utils.COLORS_LIGHT
+    elif self.app.styleHints().colorScheme().value == 2:
+      table_utils.COLORS = table_utils.COLORS_DARK
+
   def setup(self) -> None:
     """Provide main function."""
     self.app.setStyle("Breeze")
@@ -58,6 +64,8 @@ class MainWindow(QWidget):
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     self.app.setWindowIcon(QIcon("icons/icon.ico"))
     self.table = self.window.tableWidget
+    self.table.setStyleSheet(
+        "QTableWidget {background-color: " + str(table_utils.COLORS["grey_light"]) + "}")
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -323,7 +331,7 @@ class MainWindow(QWidget):
           # Only scroll down if user is at bottom.
         if self.window.textBrowser.verticalScrollBar().value() > (
                 self.window.textBrowser.verticalScrollBar().maximum()) - 1500:
-          self.window.textBrowser.moveCursor(QTextCursor.End)
+          self.window.textBrowser.moveCursor(QTextCursor.End + 1)
         self.window.textBrowser.setCurrentCharFormat(color_format)
         self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
 
