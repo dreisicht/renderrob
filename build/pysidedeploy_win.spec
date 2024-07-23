@@ -9,8 +9,7 @@ input_file = renderrob.py
 # directory where exec is stored
 exec_directory = .
 # path to .pyproject project file
-; project_file =
-
+# project_file =
 [python]
 # python path
 python_path = C:\Users\peter\AppData\Local\Programs\Python\Python310\python.exe
@@ -35,7 +34,7 @@ wheel_shiboken =
 [nuitka]
 # (str) specify any extra nuitka arguments
 # eg = extra_args = --show-modules --follow-stdlib
-extra_args = --quiet --noinclude-qt-translations --windows-icon-from-ico=icons/icon.ico --enable-console
+extra_args = --quiet --noinclude-qt-translations =True --windows-icon-from-ico=icons/icon.ico --enable-console
 
 [buildozer]
 # build mode

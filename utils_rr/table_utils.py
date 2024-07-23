@@ -6,7 +6,7 @@ from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDel
                                QTableWidgetItem, QWidget)
 from utils_rr import ui_utils, path_utils
 
-COLORS = {
+COLORS_LIGHT = {
     "red": 0x980030,
     "yellow": 0xffd966,
     "green": 0x9fd3b6,
@@ -15,12 +15,31 @@ COLORS = {
     "blue_grey": 0x4f7997,
     "blue_grey_darker": 0x345064,
     "grey_light": 0xebebeb,
-    "grey_inactive": 0xf8f8f8,
+    "grey_inactive": 0xfefefe,
     "grey_neutral": 0x999999,
     "black_light": 0x22282b,
     "black_dark": 0x242a2d,
     "white": 0xffffff,
 }
+
+COLORS_DARK = {
+    "red": 0x980030,
+    "yellow": 0xffd966,
+    "green": 0x9fd3b6,
+    "blue": 0x57a3b4,
+    "blue_grey_lighter": 0x6397bd,
+    "blue_grey": 0x4f7997,
+    "blue_grey_darker": 0x345064,
+    "grey_light": 0x323639,
+    "grey_inactive": 0x2d2d2d,
+    "grey_neutral": 0x222222,
+    "black_light": 0x22282b,
+    "black_dark": 0x242a2d,
+    "white": 0x232323,
+}
+# NOTE: This variable is being set from renderrob.py since we only know there if a dark or a
+# light theme is requested.
+COLORS = COLORS_DARK
 
 
 def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
