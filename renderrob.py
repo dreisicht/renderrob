@@ -46,7 +46,7 @@ class MainWindow(QWidget):
     self.yellow_jobs = []
     self.red_jobs = []
 
-    # TODO: Avoid global state with theme colors.
+    # NOTE: Avoid global state with theme colors.
     if self.app.styleHints().colorScheme().value == 1:
       table_utils.COLORS = table_utils.COLORS_LIGHT
     elif self.app.styleHints().colorScheme().value == 2:
