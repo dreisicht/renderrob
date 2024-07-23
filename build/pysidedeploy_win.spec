@@ -10,7 +10,6 @@ input_file = renderrob.py
 exec_directory = .
 # path to .pyproject project file
 ; project_file =
-icon = icons\icon.ico
 [python]
 # python path
 python_path = C:\Users\peter\AppData\Local\Programs\Python\Python310\python.exe
