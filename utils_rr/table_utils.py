@@ -39,7 +39,7 @@ COLORS_DARK = {
 }
 # NOTE: This variable is being set from renderrob.py since we only know there if a dark or a
 # light theme is requested.
-COLORS = {}
+COLORS = COLORS_DARK
 
 
 def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
