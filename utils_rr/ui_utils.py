@@ -94,13 +94,12 @@ def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> No
     checkbox_item.blockSignals(False)
 
 
-def set_combobox_background_color(table: QTableWidget, row: int, color: QColor) -> None:
+def set_combobox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
   """Set color of comboboxes."""
-  for i in COMBOBOX_COLUMNS:
-    widget = table.cellWidget(row, i)
-    if widget:
-      widget.setStyleSheet(
-          f"QComboBox:drop-down {{background-color: {color.name()};}}")
+  widget = table.cellWidget(row, col)
+  if widget:
+    widget.setStyleSheet(
+        f"QComboBox:drop-down {{background-color: {color.name()};}}")
 
 
 def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
