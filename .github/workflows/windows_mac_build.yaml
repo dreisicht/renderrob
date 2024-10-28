@@ -111,6 +111,7 @@ jobs:
         with:
           name: renderrob_mac
           path: |
+            build/
             icons/
             ui/
             utils_bpy/
