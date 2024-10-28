@@ -91,13 +91,14 @@ jobs:
           pip install imageio
           pip install cx-Freeze
           python build/setup.py build
-          ls
+          ls build
 
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest'
         with:
           name: renderrob_win
           path: |
+            build/
             icons/
             ui/
             utils_bpy/
