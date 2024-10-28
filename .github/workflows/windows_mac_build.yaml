@@ -82,13 +82,16 @@ jobs:
         if: matrix.os == 'windows-latest'
         run: |
           .\venv\Scripts\activate
+          pip install cx_Freeze
           python build\setup.py build
 
       - name: Build Mac OS
         if: matrix.os == 'macos-latest'
         run: |
           pip install imageio
+          pip install cx-Freeze
           python build/setup.py build
+          ls
 
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest'
