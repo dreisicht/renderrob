@@ -56,6 +56,8 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 
 ## Developer area
 
+Python version required due to bpy: **3.11**
+
 Install QtDesigner:
 
 ```
