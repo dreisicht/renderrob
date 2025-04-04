@@ -101,3 +101,10 @@ Remove stale origin branches
 ```
 git remote prune origin
 ```
+
+Manual installation and signing on Mac
+
+```
+pyside6-deploy -c build/pysidedeploy_mac.spec --force --verbose --keep-deployment-files
+codesign -s "Peter Baintner" -f --timestamp -i "com.dreisicht.renderrob" --deep RenderRob.app
+```

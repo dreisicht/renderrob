@@ -15,7 +15,7 @@ exec_directory = .
 
 # path to .pyproject project file
 # project_file = 
-icon = /opt/homebrew/lib/python3.11/site-packages/PySide6/scripts/deploy_lib/pyside_icon.icns
+icon = icons/icon-256.png
 
 [python]
 
@@ -44,14 +44,14 @@ wheel_pyside =
 
 # path to shiboken wheel
 wheel_shiboken = 
-modules = UiTools,OpenGL,Core,OpenGLWidgets,DBus,Gui,Widgets
+modules = DBus,Widgets,OpenGL,OpenGLWidgets,Core,UiTools,Gui
 plugins = accessiblebridge,platformthemes,generic,styles,xcbglintegrations,platforminputcontexts,iconengines,egldeviceintegrations,imageformats,platforms/darwin,platforms
 
 [nuitka]
 
 # (str) specify any extra nuitka arguments
 # eg = extra_args = --show-modules --follow-stdlib
-extra_args = --disable-console --macos-create-app-bundle --macos-app-icon=icons/icon.png
+extra_args = --disable-console --macos-create-app-bundle
 macos.permissions = 
 
 [buildozer]

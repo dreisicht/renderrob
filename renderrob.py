@@ -58,7 +58,8 @@ class MainWindow(QWidget):
     if os.path.exists(".rr_cache"):
       self.load_cache()
     self.resize(1800, self.app.primaryScreen().size().height())
-    self.window = ui_utils.load_ui_from_file("ui/window.ui", custom_widgets=[DropWidget])
+    self.window = ui_utils.load_ui_from_file(
+        "ui/window.ui", custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
@@ -385,7 +386,8 @@ class MainWindow(QWidget):
     self.state_saver.table_to_state(self.table)
     if item and isinstance(item, QTableWidgetItem):
       if item.column() == 1:
-        table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
+        table_utils.fix_active_row_path(
+            item, self.state_saver.state.settings.blender_files_path)
     self.table.blockSignals(True)
     self.set_table_colors()
     self.table.blockSignals(False)
@@ -447,7 +449,8 @@ class MainWindow(QWidget):
             self.state_saver.state.render_jobs[current_row].start,
             self.state_saver.state.render_jobs[current_row].end):
       if not os.path.exists(filepath):
-        QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
+        QMessageBox.warning(
+            self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
         return
       if platform.system() == 'Darwin':       # macOS
         subprocess.call(('open', filepath))
@@ -457,7 +460,8 @@ class MainWindow(QWidget):
         subprocess.call(('xdg-open', filepath))
     else:
       if not os.path.exists(filepath):
-        QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
+        QMessageBox.warning(
+            self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
       if self.state_saver.state.settings.preview.frame_step_use:
         frame_step = self.state_saver.state.settings.preview.frame_step
       else:
@@ -486,7 +490,8 @@ class MainWindow(QWidget):
           self.state_saver.state.render_jobs[current_row].start.zfill(4))
     folder_path = os.path.dirname(filepath)
     if not os.path.exists(folder_path):
-      QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
+      QMessageBox.warning(
+          self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
       return
     if platform.system() == 'Darwin':       # macOS
       subprocess.call(('open', folder_path))
@@ -507,7 +512,8 @@ class MainWindow(QWidget):
     filepath = path_utils.get_abs_blend_path(self.state_saver.state.render_jobs[current_row].file,
                                              self.state_saver.state.settings.blender_files_path)
     if not os.path.exists(filepath):
-      QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      QMessageBox.warning(
+          self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
     # Launch Blender with the file.
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
@@ -527,7 +533,8 @@ class MainWindow(QWidget):
     filepath = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
     if filepath == "" or not os.path.exists(filepath):
-      QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
+      QMessageBox.warning(
+          self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
     cwd = path_utils.normalize_drive_letter(os.getcwd())
@@ -540,7 +547,8 @@ class MainWindow(QWidget):
                     "--factory-startup",
                     "--python-expr", python_command]
     QApplication.setOverrideCursor(Qt.WaitCursor)
-    subprocess.run([self.state_saver.state.settings.blender_path] + blender_args, check=True)
+    subprocess.run(
+        [self.state_saver.state.settings.blender_path] + blender_args, check=True)
     QApplication.restoreOverrideCursor()
     loaded_job = self.state_saver.load_job_from_json(".sync.json")
     print_utils.print_info("Settings loaded from Blender.")
@@ -589,8 +597,10 @@ class MainWindow(QWidget):
       self.window.render_button.setEnabled(True)
       self.window.stop_button.setEnabled(False)
     else:
-      all_jobs_count = len([x for x in self.state_saver.state.render_jobs if x.active])
-      done_jobs_count = len(self.green_jobs) + len(self.yellow_jobs) + len(self.red_jobs)
+      all_jobs_count = len(
+          [x for x in self.state_saver.state.render_jobs if x.active])
+      done_jobs_count = len(self.green_jobs) + \
+          len(self.yellow_jobs) + len(self.red_jobs)
       self.window.progressBar.setValue(100 * done_jobs_count / all_jobs_count)
       if self.active_render_job.active:
         self.render_job(self.active_render_job)
@@ -604,19 +614,24 @@ class MainWindow(QWidget):
         self.state_saver.state.render_jobs, self.active_render_job)
     for i, job in enumerate(self.state_saver.state.render_jobs):
       if job in self.green_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["green"]))
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["green"]))
       elif job in self.yellow_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["yellow"]))
       elif job in self.red_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["red"]))
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["red"]))
       elif not job.active:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_inactive"]))
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["grey_inactive"]))
       # Color the active job if a render process is active.
       elif i == active_job_index and self.window.stop_button.isEnabled():
         table_utils.color_row_background(
             self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]))
       else:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+        table_utils.color_row_background(
+            self.table, i, QColor(table_utils.COLORS["grey_light"]))
 
     # Check for duplicates.
     for row_index in range(self.table.rowCount()):
@@ -706,5 +721,8 @@ class MainWindow(QWidget):
 
 
 if __name__ == "__main__":
+  executable_dir = os.path.dirname(sys.executable)
+  os.chdir(executable_dir)
+  print("DEBUG: Current Working Directory:", os.getcwd())
   main_window = MainWindow()
   sys.exit(main_window.execute())

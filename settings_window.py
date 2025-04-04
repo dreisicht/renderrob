@@ -63,13 +63,15 @@ class SettingsWindow():
 
   def open_blender_files_path(self) -> None:
     """Open a file dialog to select the path to Blender files."""
-    path = QFileDialog.getExistingDirectory(self.window, caption="Select Blender Files Path")
+    path = QFileDialog.getExistingDirectory(
+        self.window, caption="Select Blender Files Path")
     if path:
       self.window.lineEdit.setText(path)
 
   def open_output_path(self) -> None:
     """Open a file dialog to select the output path."""
-    path = QFileDialog.getExistingDirectory(self.window, caption="Select Output Path")
+    path = QFileDialog.getExistingDirectory(
+        self.window, caption="Select Output Path")
     if path:
       self.window.lineEdit_2.setText(path)
 
