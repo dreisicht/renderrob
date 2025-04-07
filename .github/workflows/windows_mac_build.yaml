@@ -89,9 +89,7 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: |
           pip install imageio
-          pip install cx-Freeze
-          python build/setup.py build
-          ls build
+          pyside6-deploy -c build/pysidedeploy_mac.spec --force --verbose --keep-deployment-files
 
       - uses: actions/upload-artifact@v4
         if: matrix.os == 'windows-latest'
