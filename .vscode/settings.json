@@ -1,6 +1,6 @@
 {
   "[python]": {
-    "editor.defaultFormatter": "ms-python.autopep8"
+    "editor.defaultFormatter": "charliermarsh.ruff"
   },
   "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "*_test.py"],
   "python.testing.pytestEnabled": false,

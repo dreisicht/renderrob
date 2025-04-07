@@ -44,7 +44,7 @@ wheel_pyside =
 
 # path to shiboken wheel
 wheel_shiboken = 
-modules = DBus,Widgets,OpenGL,OpenGLWidgets,Core,UiTools,Gui
+modules = Core,OpenGL,UiTools,DBus,Widgets,Gui,OpenGLWidgets
 plugins = accessiblebridge,platformthemes,generic,styles,xcbglintegrations,platforminputcontexts,iconengines,egldeviceintegrations,imageformats,platforms/darwin,platforms
 
 [nuitka]
