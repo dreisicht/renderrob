@@ -29,7 +29,7 @@ class RenderSettingsSetter:
 
   def set_scene(self, scene_name: str) -> None:
     """Set the scene to be rendered."""
-    if scene_name:
+    if scene_name or scene_name != "":
       if scene_name not in bpy.data.scenes.keys():
         print_utils.print_warning(f"Scene {scene_name} not found!")
       else:
