@@ -31,7 +31,7 @@ COLORS_DARK = {
     "blue_grey": 0x4f7997,
     "blue_grey_darker": 0x345064,
     "grey_light": 0x323639,
-    "grey_inactive": 0x2d2d2d,
+    "grey_inactive": 0x2b2b2b,
     "grey_neutral": 0x222222,
     "black_light": 0x22282b,
     "black_dark": 0x242a2d,
@@ -295,6 +295,9 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
     if column_index in ui_utils.CHECKBOX_COLUMNS:
       ui_utils.set_checkbox_background_color(
           table_widget, row_index, column_index, color)
+    # if column_index in ui_utils.COMBOBOX_COLUMNS:
+    #   ui_utils.set_combobox_background_color(
+    #       table_widget, row_index, column_index, color)
 
     # Check if the value in the numbers columns is valid.
     if item and item.text() and (
