@@ -1,8 +1,9 @@
 """Main file to open RenderRob."""
+from utils_rr import mac_helper
+import sys
 import os
 import platform
 import subprocess
-import sys
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
@@ -695,6 +696,8 @@ class MainWindow(QWidget):
     # self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.readyRead.connect(self._handle_output)
     self.process.start()
+
+
 
 
 if __name__ == "__main__":
