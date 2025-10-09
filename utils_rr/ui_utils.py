@@ -1,4 +1,6 @@
 """Util functions for helping build the render rob UI."""
+import os
+from pathlib import Path
 import sys
 from contextlib import closing
 from typing import Any, List, Optional, Generator
@@ -39,14 +41,26 @@ PLACEHOLDER_TEXT = {
 }
 TABLE_CHANGED_FUNCTION = None
 
+def find_ui_file(filepath: Path) -> Optional[str]:
+  """Find the UI file in the current directory or the parent directory."""
+  if filepath.exists():
+    return filepath.as_posix()
+
+  filepath_subdir = "ui" / filepath
+  if filepath_subdir.exists():
+    return (filepath_subdir).as_posix()
+
+  raise FileNotFoundError(f"UI file {filepath} not found.")
+
 
 def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
   """Load a UI file from the given path and return the widget."""
   ui_loader = QUiLoader()
+  ui_file_path = find_ui_file(Path(ui_file_name))
   if custom_widgets:
     for custom_widget in custom_widgets:
       ui_loader.registerCustomWidget(custom_widget)
-  ui_file = QFile(ui_file_name)
+  ui_file = QFile(ui_file_path)
 
   with closing(ui_file) as qt_file:
     if qt_file.open(QFile.ReadOnly):
@@ -54,7 +68,7 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = N
     else:
       print('Failed to read UI')
 
-  if not window:  # pylint:disable=possibly-used-before-assignment
+  if not window:
     print(ui_loader.errorString())
     sys.exit(-1)
   QMetaObject.connectSlotsByName(window)

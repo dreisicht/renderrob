@@ -1,0 +1,18 @@
+[project]
+name = "renderrob"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "shiboken6",
+    "pylint",
+    "pyside6",
+    "protobuf",
+    "PySide6-Essentials",
+    "PySide6-Addons",
+    "bpy",
+    "nuitka",
+    "setuptools",
+    "py2app>=0.28.8",
+]

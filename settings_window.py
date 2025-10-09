@@ -21,7 +21,7 @@ class SettingsWindow():
   def __init__(self, state: state_pb2.render_rob_state) -> None:  # pylint: disable=no-member
     """Open the settings dialog."""
     self.state = state.settings
-    self.window = ui_utils.load_ui_from_file("ui/settings.ui")
+    self.window = ui_utils.load_ui_from_file("settings.ui")
     self.window.setWindowTitle("RenderRob Settings")
     self.window.setWindowIcon(QIcon("icons/icon.ico"))
     # Load state into the settings dialog.

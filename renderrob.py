@@ -25,6 +25,8 @@ from utils_rr.dropwidget import DropWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
+UI_FILE_NAME = "window.ui"
+
 
 class MainWindow(QWidget):
   """Main window for RenderRob."""
@@ -63,7 +65,7 @@ class MainWindow(QWidget):
       self.load_cache()
     self.resize(1800, self.app.primaryScreen().size().height())
     self.window = ui_utils.load_ui_from_file(
-        "ui/window.ui", custom_widgets=[DropWidget])
+        UI_FILE_NAME, custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
     self.window.setWindowIcon(QIcon("icons/icon.ico"))

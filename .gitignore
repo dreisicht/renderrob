@@ -20,3 +20,6 @@ RenderRob.app
 .eggs/
 dist/
 build/
+*.log
+*.zip
+tools/py2appsigner_settings.sh
