@@ -3,6 +3,10 @@ import os
 import platform
 import subprocess
 import sys
+from pathlib import Path
+sys.path.append(Path(__file__).parent.parent.as_posix())
+sys.path.append(Path(__file__).parent.parent.as_posix())
+
 from typing import Optional
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
@@ -713,8 +717,5 @@ class MainWindow(QWidget):
 
 
 if __name__ == "__main__":
-  executable_dir = os.path.dirname(sys.executable)
-  os.chdir(executable_dir)
-  print("DEBUG: Current Working Directory:", os.getcwd())
   main_window = MainWindow()
   sys.exit(main_window.execute())

@@ -1,0 +1,36 @@
+import subprocess
+from pathlib import Path
+
+APP_PATH = Path("dist/myapp.app")
+# Developer ID anonyomized here.
+CODESIGN_ARGS = ["codesign", "-s", "XXXXXXXXXX", "-f", "--timestamp", "-o", "runtime", "-i", "com.dreisicht.myapp"]
+SIGNABLE_EXTENSIONS = {".dylib", ".so", ".node", ".app", ".framework", ".a", ".xpc", ".appex", ""}
+
+def sign_filepath(filepath):
+  if isinstance(filepath, str):
+    filepath = Path(filepath)
+  print(f"Signing {filepath}")
+  try:
+    subprocess.run(CODESIGN_ARGS + [str(filepath)], check=True)
+  except subprocess.CalledProcessError as e:
+    print(f"Error signing {filepath}: {e}")
+
+def main():
+  for filepath in APP_PATH.rglob("*"):
+    if filepath.is_dir():
+      continue
+    if filepath.suffix not in SIGNABLE_EXTENSIONS:
+      continue
+    sign_filepath(filepath)
+
+  sign_filepath(APP_PATH)
+  sign_filepath(APP_PATH / "Contents/MacOS/myapp")
+
+  print("Finished signing.")
+
+  subprocess.run(["ditto", "-c", "-k", "--keepParent", str(APP_PATH), "myapp.zip"])
+  subprocess.run('xcrun notarytool submit myapp.zip --wait --keychain-profile "dev"', shell=True)
+
+if __name__ == "__main__":
+  main()
+
