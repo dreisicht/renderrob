@@ -1,6 +1,11 @@
 rm -rf build dist renderrob.app
-python3.11 tools/py2app_setup.py py2app
+uv run setup.py py2app
+
+rm -rf dist/renderrob.app/Contents/Resources/lib/python3.11/PySide6/Linguist.app
+rm -rf dist/renderrob.app/Contents/Resources/lib/python3.11/PySide6/Designer.app
+rm -rf dist/renderrob.app/Contents/Resources/lib/python3.11/PySide6/Assistant.app
 
 source tools/py2appsigner_settings.sh
-py2appSign -p 3.11 -d "" -a renderrob --verbose zipsign
-py2appSign -p 3.11 -d "" -a renderrob --verbose appsign
+uv run py2appSign -p 3.11 -a renderrob --verbose zipsign
+uv run py2appSign -p 3.11 -a renderrob --verbose appsign
+uv run appNotarize -a renderrob --verbose

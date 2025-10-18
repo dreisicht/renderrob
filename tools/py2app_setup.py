@@ -21,7 +21,6 @@ setup(
                     'pyside6',
                     'protobuf',
                     'PySide6-Essentials',
-                    'PySide6-Addons',
                     'bpy',
                     'nuitka'],
 )
