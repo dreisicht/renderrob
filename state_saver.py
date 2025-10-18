@@ -94,9 +94,15 @@ class StateSaver:
       render_job.y_res = get_text(table.item(i, 6))
       render_job.samples = get_text(table.item(i, 7))
 
-      render_job.file_format = get_text(table.cellWidget(i, 8), widget="dropdown")
-      render_job.engine = get_text(table.cellWidget(i, 9), widget="dropdown")
-      render_job.device = get_text(table.cellWidget(i, 10), widget="dropdown")
+      file_format_str = get_text(table.cellWidget(i, 8), widget="dropdown")
+      render_job.file_format = state_pb2.file_format.Value(file_format_str)
+
+      engine_str = get_text(table.cellWidget(i, 9), widget="dropdown")
+      render_job.engine = state_pb2.render_engine.Value(engine_str)
+
+      device_str = get_text(table.cellWidget(i, 10), widget="dropdown")
+      render_job.device = state_pb2.device.Value(device_str)
+
       render_job.motion_blur = get_text(table.cellWidget(i, 11), widget="checkbox")
       render_job.overwrite = get_text(table.cellWidget(i, 12), widget="checkbox")
       render_job.high_quality = get_text(table.cellWidget(i, 13), widget="checkbox")

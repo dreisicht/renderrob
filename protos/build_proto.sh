@@ -1,2 +1,2 @@
-protoc --proto_path=protos/ --python_out=protos/ protos/state.proto
-protoc --proto_path=protos/ --python_out=protos/ protos/cache.proto
+uv run protoc --proto_path=protos/ --python_out=protos/ protos/state.proto
+uv run protoc --proto_path=protos/ --python_out=protos/ protos/cache.proto
