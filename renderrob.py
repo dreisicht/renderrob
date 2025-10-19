@@ -32,6 +32,16 @@ class MainWindow(QWidget):
   """Main window for RenderRob."""
   ########### SETUP ############
 
+  def get_temp_dir(self) -> Path:
+    """Get the temporary directory for cache files."""
+    if sys.platform =="darwin":
+        temp_dir = Path(os.getenv("TMPDIR"))
+    else:
+        temp_dir = Path.cwd()
+    if not temp_dir.exists():
+        temp_dir.mkdir(parents=True, exist_ok=True)
+    return temp_dir
+
   def __init__(self) -> None:
     """Initialize the main window."""
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
@@ -52,6 +62,8 @@ class MainWindow(QWidget):
     self.yellow_jobs = []
     self.red_jobs = []
 
+    self.cache_path = self.get_temp_dir() / ".rr_cache"
+
     # NOTE: Avoid global state with theme colors.
     if self.app.styleHints().colorScheme().value == 1:
       table_utils.COLORS = table_utils.COLORS_LIGHT
@@ -61,7 +73,7 @@ class MainWindow(QWidget):
   def setup(self) -> None:
     """Provide main function."""
     self.app.setStyle("Breeze")
-    if os.path.exists(".rr_cache"):
+    if os.path.exists(self.cache_path):
       self.load_cache()
     self.resize(1800, self.app.primaryScreen().size().height())
     self.window = ui_utils.load_ui_from_file(
@@ -155,12 +167,12 @@ class MainWindow(QWidget):
   def save_cache(self) -> None:
     """Store the cache to a file."""
     cache_str = self.cache.SerializeToString()
-    with open(".rr_cache", "wb") as cache_file:
+    with open(self.cache_path, "wb") as cache_file:
       cache_file.write(cache_str)
 
   def load_cache(self) -> None:
     """Load the cache from a file."""
-    with open(".rr_cache", "rb") as cache_file:
+    with open(self.cache_path, "rb") as cache_file:
       cache_str = cache_file.read()
     self.cache.current_file = ""
     self.cache.ParseFromString(cache_str)

@@ -8,7 +8,7 @@ Usage:
 from setuptools import setup
 
 APP = ['renderrob.py']
-DATA_FILES = []
+DATA_FILES = ["ui/", "icons/"]
 OPTIONS = {}
 
 setup(
