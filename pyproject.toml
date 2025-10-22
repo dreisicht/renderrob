@@ -1,8 +1,9 @@
 [project]
 name = "renderrob"
-version = "0.1.0"
-description = "Add your description here"
+version = "3.5.12"
+description = "Render Manager"
 readme = "README.md"
+authors = [{ name = "Peter Baintner", email = "pip@dreisicht.net" }]
 requires-python = ">=3.11"
 dependencies = [
     "bpy",
@@ -12,3 +13,180 @@ dependencies = [
     "py2appsigner>=0.6.95",
     "pyside6-essentials>=6.10.0",
 ]
+
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["proj*"]
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+
+# Same as Black.
+line-length = 100
+indent-width = 2
+
+target-version = "py311"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`) codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = [
+    "PLE",
+    "EM",
+    "LOG",
+    "PLR",
+    "TRY",
+    "ASYNC",
+    "PIE",
+    "N",
+    "BLE",
+    "SIM",
+    "PYI",
+    "W",
+    "RSE",
+    "ERA",
+    "SLOT",
+    "D",
+    "YTT",
+    "DJ",
+    "S",
+    "T10",
+    "INT",
+    "ICN",
+    "ISC",
+    "FLY",
+    "PERF",
+    "TC",
+    "PTH",
+    "EXE",
+    "COM",
+    "SLF",
+    "F",
+    "FAST",
+    "UP",
+    "ANN",
+    "DTZ",
+    "TD",
+    "FA",
+    "ARG",
+    "E",
+    "T20",
+    "TID",
+    "FIX",
+    "RET",
+    "NPY",
+    "PD",
+    "PLC",
+    "C4",
+    "FBT",
+    "C90",
+    "DOC",
+    "Q",
+    "G",
+    "I",
+    "AIR",
+    "PGH",
+    "PL",
+    "PLW",
+    "FURB",
+    "B",
+    "PT",
+    "RUF",
+    "INP",
+    "A",
+    "CPY",
+]
+ignore = [
+    "D10",    # Missing docstring in publics.
+    "PT009",  # Don't use assert functions of testing class.
+    "FIX002", #
+    "TD003",  # Missing link in todo.
+]
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# Since there are some issues with gdal needing to be compiled using C++, it can be
+# worked around by installing it from sources where pre-built binaries are existent.
+[tool.uv.sources]
+gdal = [
+    { index = "gdal-wheels", marker = "sys_platform == 'linux'" },
+    { index = "geospatial_wheels", marker = "sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "geospatial_wheels"
+url = "https://nathanjmcdougall.github.io/geospatial-wheels-index/"
+explicit = true
+
+[[tool.uv.index]]
+name = "gdal-wheels"
+url = "https://gitlab.com/api/v4/projects/61637378/packages/pypi/simple"
+explicit = true

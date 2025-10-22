@@ -16,5 +16,6 @@
     "STATESAVER",
     "steamapps"
   ],
-  "python.analysis.typeCheckingMode": "off"
+  "python.analysis.typeCheckingMode": "off",
+  "editor.formatOnSave": false
 }

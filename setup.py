@@ -7,13 +7,13 @@ Usage:
 
 from setuptools import setup
 
-APP = ['renderrob.py']
-DATA_FILES = ["ui/", "icons/"]
+APP = ["renderrob.py"]
+DATA_FILES = ["ui/", "icons/", "utils_bpy/", "utils_common/", "utils_rr/"]
 OPTIONS = {}
 
 setup(
     app=APP,
     data_files=DATA_FILES,
-    options={'py2app': OPTIONS},
-    setup_requires=['py2app'],
+    options={"py2app": OPTIONS},
+    setup_requires=["py2app"],
 )

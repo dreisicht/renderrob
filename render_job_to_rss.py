@@ -1,6 +1,8 @@
 """Build a Python command to execute the render_settings_setter."""
 
 import os
+from pathlib import Path
+import sys
 
 from protos import state_pb2
 from utils_rr import ui_utils
@@ -20,7 +22,11 @@ def render_job_to_render_settings_setter(
     frame_step = settings.preview.frame_step if settings.preview.frame_step_use else 1
     samples = settings.preview.samples if settings.preview.samples_use else render_job.samples
 
-  cwd = normalize_drive_letter(os.getcwd())
+  if sys.platform == 'darwin':
+    cwd = Path.cwd() / "../Resources/"
+  else:
+    cwd = normalize_drive_letter(os.getcwd())
+
   addons = []
   for addon in settings.addons:
     if addon:

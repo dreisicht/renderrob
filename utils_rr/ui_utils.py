@@ -62,6 +62,8 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = N
       ui_loader.registerCustomWidget(custom_widget)
   ui_file = QFile(ui_file_path)
 
+  window = None
+
   with closing(ui_file) as qt_file:
     if qt_file.open(QFile.ReadOnly):
       window = ui_loader.load(qt_file)

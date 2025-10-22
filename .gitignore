@@ -23,3 +23,4 @@ build/
 *.log
 *.zip
 tools/py2appsigner_settings.sh
+*.dmg
