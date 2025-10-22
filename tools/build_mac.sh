@@ -1,4 +1,4 @@
-rm -rf build dist renderrob.app renderrob.zip
+rm -rf build dist renderrob.app renderrob.zip Renderrob.dmg
 uv run setup.py py2app
 
 uv run tools/sign_all.py

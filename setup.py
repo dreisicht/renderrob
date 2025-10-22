@@ -13,7 +13,7 @@ DATA_FILES = [
   "src/utils_common/",
   "src/utils_rr/",
 ]
-OPTIONS = {"iconfile": "src/icon/icon.ico"}
+OPTIONS = {"iconfile": "src/icon/icon-256.png"}
 
 setup(
   app=APP,
