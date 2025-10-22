@@ -13,3 +13,8 @@ uv run appVerify -d renderrob -a renderrob
 # ditto -c -k --keepParent "dist/renderrob.app" "renderrob.zip"
 
 hdiutil create -fs HFS+ -srcfolder "dist/renderrob.app" -volname "Renderrob Installer" "Renderrob.dmg"
+
+codesign -f --timestamp -s 5K24F4J2M5 Renderrob.dmg
+xcrun notarytool submit "Renderrob.dmg" --keychain-profile "dev" --wait
+xcrun stapler staple "Renderrob.dmg"
+xcrun stapler validate "Renderrob.dmg"
