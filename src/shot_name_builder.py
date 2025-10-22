@@ -16,8 +16,10 @@ def still_or_animation(start: str, end: str) -> str:
   if start != "" and end == "":
     return "STILL"
   if start == "" and end != "":
-    raise ValueError("End frame is set, but start frame is not.")
-  raise ValueError("Could not determine of still or animation.")
+    msg = "End frame is set, but start frame is not."
+    raise ValueError(msg)
+  msg = "Could not determine of still or animation."
+  raise ValueError(msg)
 
 
 class ShotNameBuilder:
@@ -40,13 +42,11 @@ class ShotNameBuilder:
 
   def get_shotname(self) -> str:
     """Build the shot name from the render job."""
-    if self.render_job.high_quality:
-      quality_state_string = "hq"
-    else:
-      quality_state_string = "pv"
+    quality_state_string = "hq" if self.render_job.high_quality else "pv"
 
     if isinstance(self.render_job.view_layers, str):
-      raise ValueError("View layer is not a list.")
+      msg = "View layer is not a list."
+      raise ValueError(msg)
 
     # The default view layer does not need to be in the shot name.
     if self.render_job.view_layers == ["View Layer"]:

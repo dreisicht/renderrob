@@ -134,6 +134,7 @@ ignore = [
     "PT009",  # Don't use assert functions of testing class.
     "FIX002", #
     "TD003",  # Missing link in todo.
+    "S603", # Check subprocess.run input
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.

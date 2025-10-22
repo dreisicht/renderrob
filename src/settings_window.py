@@ -23,7 +23,7 @@ class SettingsWindow():
     self.state = state.settings
     self.window = ui_utils.load_ui_from_file("settings.ui")
     self.window.setWindowTitle("RenderRob Settings")
-    self.window.setWindowIcon(QIcon("icons/icon.ico"))
+    self.window.setWindowIcon(QIcon("icon/icon.ico"))
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
 

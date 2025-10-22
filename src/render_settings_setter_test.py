@@ -1,7 +1,7 @@
 """Tests for render_settings_setter.py."""
 
-import unittest
 import subprocess
+import unittest
 from unittest.mock import patch
 
 import bpy  # pylint: disable=import-error
@@ -9,7 +9,7 @@ import bpy  # pylint: disable=import-error
 from utils_bpy import render_settings_setter
 
 
-def check_gpu():
+def check_gpu() -> bool:
   """Check if GPU rendering is available."""
   try:
     result = subprocess.run(["nvidia-smi", "-L"], stdout=subprocess.PIPE, check=False)
