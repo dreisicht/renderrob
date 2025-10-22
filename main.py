@@ -288,58 +288,65 @@ class MainWindow(QWidget):
     data = self.process.readAll()
     output = data.data().decode()
     color_format = QTextCharFormat()
-    back_color = print_utils.BASH_COLORS
-    info = back_color["BACK_CYAN"] + " " + back_color["FORE_BLACK"]
-    warning = back_color["BACK_YELLOW"] + " " + back_color["FORE_BLACK"]
-    error = back_color["BACK_RED"] + " " + back_color["FORE_WHITE"]
-    reset = back_color["RESET_ALL"]
-    for line in output.splitlines():
+    if '\u001b' in output:
+      for line in output.splitlines():
+        back_color = print_utils.BASH_COLORS
+        info = back_color["BACK_CYAN"] + " " + back_color["FORE_BLACK"]
+        warning = back_color["BACK_YELLOW"] + " " + back_color["FORE_BLACK"]
+        error = back_color["BACK_RED"] + " " + back_color["FORE_WHITE"]
+        reset = back_color["RESET_ALL"]
+        if line.startswith(reset):
+          line = line.replace(reset, '')
+          color_format.setBackground(QColor(table_utils.COLORS["grey_light"]))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
+        if line.startswith(info):
+          line = line.replace(info, '')
+          color_format.setBackground(
+              QColor(table_utils.COLORS["blue_grey_lighter"]))
+          color_format.setForeground(QColor(Qt.black))
+        if line.startswith(warning):
+          line = line.replace(warning, '')
+          color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
+          color_format.setForeground(QColor(Qt.black))
 
-      if line.startswith(reset):
-        line = line.replace(reset, '')
-        color_format.setBackground(QColor(table_utils.COLORS["grey_light"]))
-        color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
-      if line.startswith(info):
-        line = line.replace(info, '')
-        color_format.setBackground(
-            QColor(table_utils.COLORS["blue_grey_lighter"]))
-        color_format.setForeground(QColor(Qt.black))
-      if line.startswith(warning):
-        line = line.replace(warning, '')
-        color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
-        color_format.setForeground(QColor(Qt.black))
+          self.state_saver.table_to_state(self.table)
+          row_number = state_saver.find_job(
+              self.state_saver.state.render_jobs, self.active_render_job)
 
-        self.state_saver.table_to_state(self.table)
-        row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs, self.active_render_job)
+          table_utils.color_row_background(self.table,
+                                           row_number,
+                                           QColor(table_utils.COLORS["yellow"]))
+        if line.startswith(error) or "blender.crash.txt" in line:
+          line = line.replace(error, '')
+          color_format.setBackground(QColor(table_utils.COLORS["red"]))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
 
-        table_utils.color_row_background(self.table,
-                                         row_number,
-                                         QColor(table_utils.COLORS["yellow"]))
-      if line.startswith(error) or "blender.crash.txt" in line or line.startswith("Error:"):
-        line = line.replace(error, '')
-        color_format.setBackground(QColor(table_utils.COLORS["red"]))
-        color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
+          self.state_saver.table_to_state(self.table)
+          row_number = state_saver.find_job(
+              self.state_saver.state.render_jobs, self.active_render_job)
 
-        self.state_saver.table_to_state(self.table)
-        row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs, self.active_render_job)
+          table_utils.color_row_background(self.table,
+                                           row_number,
+                                           QColor(table_utils.COLORS["red"]))
 
-        table_utils.color_row_background(self.table,
-                                         row_number,
-                                         QColor(table_utils.COLORS["red"]))
+          # Only scroll down if user is at bottom.
+        if self.window.textBrowser.verticalScrollBar().value() > (
+                self.window.textBrowser.verticalScrollBar().maximum()) - 1500:
+          self.window.textBrowser.moveCursor(QTextCursor.End + 1)
+        self.window.textBrowser.setCurrentCharFormat(color_format)
+        self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
 
+        if line.endswith(reset):
+          line = line.replace(reset, '')
+          color_format.setBackground(QColor(52, 80, 100))
+          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
+    else:
       # Only scroll down if user is at bottom.
       if self.window.textBrowser.verticalScrollBar().value() > (
-              self.window.textBrowser.verticalScrollBar().maximum()) - 1000:
+              self.window.textBrowser.verticalScrollBar().maximum()) - 1500:
         self.window.textBrowser.moveCursor(QTextCursor.End)
       self.window.textBrowser.setCurrentCharFormat(color_format)
-      self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
-
-      if line.endswith(reset):
-        line = line.replace(reset, '')
-        color_format.setBackground(QColor(52, 80, 100))
-        color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
+      self.window.textBrowser.insertPlainText(output)
 
     # Find a more elegant way to do this.
     if "Blender quit" in output:
@@ -697,14 +704,15 @@ class MainWindow(QWidget):
     # Check if the file was converted to a relative path.
     file_path = path_utils.get_abs_blend_path(
         job.file, self.state_saver.state.settings.blender_files_path)
-    scene_command = ["-S", job.scene] if job.scene else []
+    scene_command = f"-S {job.scene}" if job.scene else ""
     args = ["-b", file_path,
-            *scene_command,
+            scene_command,
             "-o", snb.frame_path,
             "-y",
             "-F", ui_utils.FILE_FORMATS_COMMAND[job.file_format],
             "--python-expr", inline_python,
             ]
+    args = [i for i in args if i]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
     # self.process.readyReadStandardOutput.connect(self._handle_output)

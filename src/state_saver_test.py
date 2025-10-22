@@ -3,7 +3,7 @@ import unittest
 
 from PySide6.QtWidgets import QApplication
 
-import renderrob
+import main
 import state_saver
 from protos import state_pb2
 from utils_rr import table_utils
@@ -14,7 +14,7 @@ class TestStateSaver(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up the unit tests."""
-    self.main_window = renderrob.MainWindow()  # pylint:disable=no-member
+    self.main_window = main.MainWindow()  # pylint:disable=no-member
     self.main_window.setup()
     table_utils.add_row_below(self.main_window.table)
     return super().setUp()

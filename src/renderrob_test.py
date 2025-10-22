@@ -3,7 +3,7 @@ import unittest
 
 from PySide6.QtWidgets import QApplication
 
-import renderrob  # type: ignore
+import main  # type: ignore
 from utils_rr import table_utils
 
 # pylint: disable=protected-access
@@ -14,7 +14,7 @@ class TestMainWindow(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up the unit tests."""
-    self.main_window = renderrob.MainWindow()  # pylint:disable=no-member
+    self.main_window = main.MainWindow()  # pylint:disable=no-member
     self.main_window.setup()
     table_utils.add_row_below(self.main_window.table)
     return super().setUp()
