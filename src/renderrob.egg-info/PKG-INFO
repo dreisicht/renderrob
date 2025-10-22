@@ -1,3 +1,20 @@
+Metadata-Version: 2.4
+Name: renderrob
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: ~=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: shiboken6
+Requires-Dist: pylint
+Requires-Dist: pyside6
+Requires-Dist: protobuf
+Requires-Dist: PySide6-Essentials
+Requires-Dist: PySide6-Addons
+Requires-Dist: bpy
+Requires-Dist: nuitka
+Dynamic: license-file
+
 # Render Rob
 
 [![LinuxTestAndBuild](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml)
