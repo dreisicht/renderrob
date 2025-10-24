@@ -6,6 +6,8 @@ Usage:
 
 from setuptools import setup
 
+__version__ = "3.5.12"
+
 APP = ["src/main.py"]
 DATA_FILES = [
   "src/ui/",
@@ -13,10 +15,26 @@ DATA_FILES = [
   "src/utils_common/",
   "src/utils_rr/",
 ]
-OPTIONS = {"iconfile": "src/icon/icon-256.png"}
+OPTIONS = {
+  "iconfile": "src/icon/icon-256.png",
+  "plist": {
+    "CFBundleShortVersionString": "3.5.12",
+    "CFBundleIdentifier": "RenderRob.com.dreisicht.renderrob",
+    "LSEnvironment": {"APP_MODE": "True", "PYTHONOPTIMIZE": "1"},
+    "com.apple.security.app-sandbox": True,
+    "com.apple.security.cs.allow-jit": False,
+    "com.apple.security.cs.allow-unsigned-executable-memory": False,
+    "com.apple.security.cs.disable-library-validation": True,
+    "com.apple.security.device.audio-input": False,
+    "com.apple.security.files.bookmarks.app-scope": True,
+    "com.apple.security.files.downloads.read-write": True,
+    "com.apple.security.files.user-selected.read-write": True,
+  },
+}
 
 setup(
   app=APP,
+  version=__version__,
   data_files=DATA_FILES,
   options={"py2app": OPTIONS},
   setup_requires=["py2app"],

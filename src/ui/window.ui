@@ -42,11 +42,6 @@
                 <property name="toolTip">
                  <string>Add row</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
-                </property>
                 <property name="text">
                  <string> Add</string>
                 </property>
@@ -64,11 +59,6 @@
                 <property name="toolTip">
                  <string>Delete row</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
-                </property>
                 <property name="text">
                  <string>Delete</string>
                 </property>
@@ -85,11 +75,6 @@
                <widget class="QPushButton" name="duplicate_button">
                 <property name="toolTip">
                  <string>Duplicate row</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                     min-width: 40px;
-                                     icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string>Duplicate</string>
@@ -121,11 +106,6 @@
                 <property name="toolTip">
                  <string>Move row up</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
-                </property>
                 <property name="text">
                  <string>    Up </string>
                 </property>
@@ -139,11 +119,6 @@
                <widget class="QPushButton" name="down_button">
                 <property name="toolTip">
                  <string>Move row down</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string>Down</string>
@@ -171,11 +146,6 @@
                <widget class="QPushButton" name="blender_button">
                 <property name="toolTip">
                  <string>Open job in Blender</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                     min-width: 40px;
-                                     icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string>Blender</string>
@@ -209,11 +179,6 @@
                 <property name="toolTip">
                  <string>Load settings from Blender</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                     min-width: 40px;
-                                     icon-size: 25px;</string>
-                </property>
                 <property name="text">
                  <string>Sync</string>
                 </property>
@@ -227,11 +192,6 @@
                <widget class="QPushButton" name="play_button">
                 <property name="toolTip">
                  <string>Show output</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string> Play</string>
@@ -249,11 +209,6 @@
                <widget class="QPushButton" name="open_button">
                 <property name="toolTip">
                  <string>Show output folder</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string> Output</string>
@@ -288,11 +243,6 @@
                 <property name="toolTip">
                  <string>Start rendering</string>
                 </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 90px;
-                                    icon-size: 20px;</string>
-                </property>
                 <property name="text">
                  <string>Render</string>
                 </property>
@@ -309,11 +259,6 @@
                <widget class="QPushButton" name="stop_button">
                 <property name="toolTip">
                  <string>Stop rendering</string>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">min-height: 30px;
-                                    min-width: 40px;
-                                    icon-size: 25px;</string>
                 </property>
                 <property name="text">
                  <string>    Stop</string>

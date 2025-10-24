@@ -145,22 +145,30 @@ class MainWindow(QWidget):
     """Make connections for buttons."""
     self.window.add_button.clicked.connect(
       lambda: table_utils.add_row_below(
-        self.table, self.before_table_change, self.after_table_change,
+        self.table,
+        self.before_table_change,
+        self.after_table_change,
       ),
     )
     self.window.delete_button.clicked.connect(
       lambda: table_utils.remove_active_row(
-        self.table, self.before_table_change, self.after_table_change,
+        self.table,
+        self.before_table_change,
+        self.after_table_change,
       ),
     )
     self.window.play_button.clicked.connect(self.play_job)
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(
-      lambda: table_utils.move_row_up(self.table, self.before_table_change, self.after_table_change),
+      lambda: table_utils.move_row_up(
+        self.table, self.before_table_change, self.after_table_change
+      ),
     )
     self.window.down_button.clicked.connect(
       lambda: table_utils.move_row_down(
-        self.table, self.before_table_change, self.after_table_change,
+        self.table,
+        self.before_table_change,
+        self.after_table_change,
       ),
     )
 
@@ -179,7 +187,10 @@ class MainWindow(QWidget):
     self.window.blender_button.clicked.connect(self.open_blender_file)
     self.window.duplicate_button.clicked.connect(
       lambda: table_utils.duplicate_row(
-        self.table, self.state_saver, self.before_table_change, self.after_table_change,
+        self.table,
+        self.state_saver,
+        self.before_table_change,
+        self.after_table_change,
       ),
     )
     self.window.actionUndo.triggered.connect(self.undo)
@@ -211,10 +222,12 @@ class MainWindow(QWidget):
     """Save the state to a serialized proto file with a dialog."""
     self.state_saver.table_to_state(self.table)
     file_name, _ = QFileDialog.getSaveFileName(
-      self.window, "Save File", "", "Render Rob Files (*.rrp)",
+      self.window,
+      "Save File",
+      "",
+      "Render Rob Files (*.rrp)",
     )
-    with open(file_name, "wb") as protobuf:
-      protobuf.write(self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
+    Path(file_name).write_bytes(self.state_saver.state.SerializeToString())
     self.cache.current_file = file_name
     self.add_filepath_to_cache(file_name)
     self.refresh_recent_files_menu()
@@ -224,8 +237,7 @@ class MainWindow(QWidget):
   def save_file(self) -> None:
     """Save the state to a serialized proto file without a dialog."""
     self.state_saver.table_to_state(self.table)
-    with open(self.cache.current_file, "wb") as protobuf:
-      protobuf.write(self.state_saver.state.SerializeToString(protobuf))  # pylint:disable=too-many-function-args
+    Path(self.cache.current_file).write_bytes(self.state_saver.state.SerializeToString())
     self.is_saved = True
     self.window.parent().setWindowTitle("Render Rob " + self.cache.current_file)
 
@@ -262,7 +274,7 @@ class MainWindow(QWidget):
       lambda: self.open_file(self.cache.recent_files[4]),
     ]
     for i, file_path in enumerate(self.cache.recent_files):
-      action_recent = QAction(os.path.basename(file_path), self.window.menuOpen_Recent)
+      action_recent = QAction(Path(file_path).name, self.window.menuOpen_Recent)
       action_recent.triggered.connect(open_recent_functions[i])
       self.window.menuOpen_Recent.addAction(action_recent)
 
@@ -278,7 +290,10 @@ class MainWindow(QWidget):
     if not self.ask_for_save():
       return
     file_name, _ = QFileDialog.getOpenFileName(
-      self.window, "Open File", "", "RenderRob Files (*.rrp)",
+      self.window,
+      "Open File",
+      "",
+      "RenderRob Files (*.rrp)",
     )
     self.open_file(file_name, ask_for_save=False)
 
@@ -292,8 +307,7 @@ class MainWindow(QWidget):
     if file_name == "":
       return
     self.table.blockSignals(True)
-    with open(file_name, "rb") as pb_file:
-      self.state_saver.state.ParseFromString(pb_file.read())
+    self.state_saver.state.ParseFromString(Path(file_name).read_bytes())
     self.state_saver.state_to_table(self.table)
     self.cache.current_file = file_name
     self.window.parent().setWindowTitle("Render Rob " + file_name)
@@ -354,11 +368,14 @@ class MainWindow(QWidget):
 
           self.state_saver.table_to_state(self.table)
           row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs, self.active_render_job,
+            self.state_saver.state.render_jobs,
+            self.active_render_job,
           )
 
           table_utils.color_row_background(
-            self.table, row_number, QColor(table_utils.COLORS["yellow"]),
+            self.table,
+            row_number,
+            QColor(table_utils.COLORS["yellow"]),
           )
         if line.startswith(error) or "blender.crash.txt" in line:
           line = line.replace(error, "")
@@ -367,11 +384,14 @@ class MainWindow(QWidget):
 
           self.state_saver.table_to_state(self.table)
           row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs, self.active_render_job,
+            self.state_saver.state.render_jobs,
+            self.active_render_job,
           )
 
           table_utils.color_row_background(
-            self.table, row_number, QColor(table_utils.COLORS["red"]),
+            self.table,
+            row_number,
+            QColor(table_utils.COLORS["red"]),
           )
 
           # Only scroll down if user is at bottom.
@@ -420,7 +440,6 @@ class MainWindow(QWidget):
 
   def before_table_change(self) -> None:
     """Handle before table change."""
-    # print_utils.print_info("Before table changed.")
     self.is_saved = False
     self.window.parent().setWindowTitle("* Render Rob" + self.cache.current_file)
 
@@ -431,11 +450,9 @@ class MainWindow(QWidget):
 
   def after_table_change(self, item: QTableWidgetItem | None = None) -> None:
     """Handle after table change."""
-    # print_utils.print_info("After table changed.")
     self.state_saver.table_to_state(self.table)
-    if item and isinstance(item, QTableWidgetItem):
-      if item.column() == 1:
-        table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
+    if item and isinstance(item, QTableWidgetItem) and item.column() == 1:
+      table_utils.fix_active_row_path(item, self.state_saver.state.settings.blender_files_path)
     self.table.blockSignals(True)
     self.set_table_colors()
     self.table.blockSignals(False)
@@ -492,13 +509,17 @@ class MainWindow(QWidget):
       filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
     else:
       filepath = snb.frame_path.replace(
-        "####", self.state_saver.state.render_jobs[current_row].start.zfill(4),
+        "####",
+        self.state_saver.state.render_jobs[current_row].start.zfill(4),
       )
-    if shot_name_builder.still_or_animation(
-      self.state_saver.state.render_jobs[current_row].start,
-      self.state_saver.state.render_jobs[current_row].end,
-    ) == "STILL":
-      if not os.path.exists(filepath):
+    if (
+      shot_name_builder.still_or_animation(
+        self.state_saver.state.render_jobs[current_row].start,
+        self.state_saver.state.render_jobs[current_row].end,
+      )
+      == "STILL"
+    ):
+      if not Path(filepath).exists():
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
         return
       if platform.system() == "Darwin":  # macOS
@@ -544,16 +565,17 @@ class MainWindow(QWidget):
       filepath = snb.frame_path.replace("####", "0001").replace("v$$", "v01")
     else:
       filepath = snb.frame_path.replace(
-        "####", self.state_saver.state.render_jobs[current_row].start.zfill(4),
+        "####",
+        self.state_saver.state.render_jobs[current_row].start.zfill(4),
       )
-    folder_path = os.path.dirname(filepath)
-    if not os.path.exists(folder_path):
+    folder_path = Path(filepath).parent
+    if not folder_path.exists():
       QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
       return
     if platform.system() == "Darwin":  # macOS
       subprocess.call(("open", folder_path))
     elif platform.system() == "Windows":  # Windows
-      os.startfile(folder_path)
+      os.startfile(folder_path)  # noqa: S606
     else:  # Linux variants
       subprocess.call(("xdg-open", folder_path))
 
@@ -570,7 +592,7 @@ class MainWindow(QWidget):
       self.state_saver.state.render_jobs[current_row].file,
       self.state_saver.state.settings.blender_files_path,
     )
-    if not os.path.exists(filepath):
+    if not Path(filepath).exists():
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
     # Launch Blender with the file.
@@ -589,13 +611,14 @@ class MainWindow(QWidget):
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
     filepath = path_utils.get_abs_blend_path(
-      job.file, self.state_saver.state.settings.blender_files_path,
+      job.file,
+      self.state_saver.state.settings.blender_files_path,
     )
-    if filepath == "" or not os.path.exists(filepath):
+    if filepath == "" or not Path(filepath).exists():
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
-    cwd = path_utils.normalize_drive_letter(os.getcwd())
+    cwd = path_utils.normalize_drive_letter(Path.cwd())
     python_command = [
       "import sys",
       f"sys.path.append('{cwd}')",
@@ -666,7 +689,8 @@ class MainWindow(QWidget):
     """Set the colors of the table."""
     self.table.blockSignals(True)
     active_job_index = state_saver.find_job(
-      self.state_saver.state.render_jobs, self.active_render_job,
+      self.state_saver.state.render_jobs,
+      self.active_render_job,
     )
     for i, job in enumerate(self.state_saver.state.render_jobs):
       if job in self.green_jobs:
@@ -680,7 +704,9 @@ class MainWindow(QWidget):
       # Color the active job if a render process is active.
       elif i == active_job_index and self.window.stop_button.isEnabled():
         table_utils.color_row_background(
-          self.table, i, QColor(table_utils.COLORS["blue_grey_lighter"]),
+          self.table,
+          i,
+          QColor(table_utils.COLORS["blue_grey_lighter"]),
         )
       else:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
@@ -694,14 +720,17 @@ class MainWindow(QWidget):
         > 1
       ):
         table_utils.color_row_background(
-          self.table, row_index, QColor(table_utils.COLORS["yellow"]),
+          self.table,
+          row_index,
+          QColor(table_utils.COLORS["yellow"]),
         )
 
       # Set the background color of the blend path.
       blend_path_item = self.table.item(row_index, 1)
-      blend_path = blend_path_item.text()
-      if not os.path.exists(blend_path) and not os.path.exists(
-        os.path.join(self.state_saver.state.settings.blender_files_path, blend_path),
+      blend_path = Path(blend_path_item.text())
+      if (
+        not blend_path.exists()
+        and not (self.state_saver.state.settings.blender_files_path / blend_path).exists()
       ):
         blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
 
@@ -755,7 +784,8 @@ class MainWindow(QWidget):
 
     # Check if the file was converted to a relative path.
     file_path = path_utils.get_abs_blend_path(
-      job.file, self.state_saver.state.settings.blender_files_path,
+      job.file,
+      self.state_saver.state.settings.blender_files_path,
     )
     scene_command = f"-S {job.scene}" if job.scene else ""
     args = [
@@ -773,14 +803,13 @@ class MainWindow(QWidget):
     args = [i for i in args if i]
     args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
-    # self.process.readyReadStandardOutput.connect(self._handle_output)
     self.process.readyRead.connect(self._handle_output)
     self.process.start()
 
 
 if __name__ == "__main__":
-#   executable_dir = os.path.dirname(sys.executable)
-#   os.chdir(executable_dir)
+  #   executable_dir = os.path.dirname(sys.executable)
+  #   os.chdir(executable_dir)
   print("DEBUG: Current Working Directory:", Path.cwd())
   main_window = MainWindow()
   sys.exit(main_window.execute())

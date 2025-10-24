@@ -28,4 +28,3 @@ codesign -f --timestamp -s 5K24F4J2M5 renderrob.dmg
 xcrun notarytool submit "renderrob.dmg" --keychain-profile "dev" --wait
 xcrun stapler staple "renderrob.dmg"
 xcrun stapler validate "renderrob.dmg"
-
