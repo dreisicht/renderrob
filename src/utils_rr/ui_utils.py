@@ -1,10 +1,10 @@
 """Util functions for helping build the render rob UI."""
 
-from pathlib import Path
 import sys
 from collections.abc import Generator
 from contextlib import closing
 from importlib import resources
+from pathlib import Path
 from typing import Any
 
 from PySide6.QtCore import QDir, QFile, QMetaObject, Qt
@@ -145,7 +145,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False) -> None
   table.setCellWidget(row, col, widget)
 
 
-def add_dropdown(table: QTableWidget, row: int, col: int, items):
+def add_dropdown(table: QTableWidget, row: int, col: int, items) -> None:
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)

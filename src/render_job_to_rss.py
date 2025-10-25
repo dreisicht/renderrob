@@ -1,6 +1,5 @@
 """Build a Python command to execute the render_settings_setter."""
 
-import os
 import sys
 from pathlib import Path
 
@@ -24,23 +23,27 @@ def render_job_to_render_settings_setter(
     samples = settings.preview.samples if settings.preview.samples_use else render_job.samples
 
   if sys.platform == "darwin":
-    cwd = Path.cwd() / "../Resources/"
+    if Path("../Resources/").exists():
+      cwd = Path("../Resources/").resolve()
+    elif Path("src").exists():
+      cwd = Path("src").resolve()
   else:
-    cwd = normalize_drive_letter(os.getcwd())
-
-  addons = list(settings.addons)
+    cwd = normalize_drive_letter(Path.cwd())
 
   # Set the resolution to an empty string if it is not set, otherwise a syntax error will occur.
   x_res = render_job.x_res if render_job.x_res else '""'
   y_res = render_job.y_res if render_job.y_res else '""'
   samples = samples if samples else '""'
 
+  addons = [addon for addon in settings.addons if addon != ""]
+  addons_command = [f"rss.activate_addons({addons})"] if addons else []
+
   python_command = [
     "import sys",
     f"sys.path.append('{cwd}')",
     "from utils_bpy import render_settings_setter",
     f"rss = render_settings_setter.RenderSettingsSetter('{render_job.scene}', {render_job.view_layers})",  # noqa: E501
-    f"rss.activate_addons({addons})",
+    *addons_command,
     f"rss.set_camera('{render_job.camera}')",
     f"rss.set_render_settings(render_device='{ui_utils.DEVICES[render_job.device]}', border={not render_job.high_quality}, samples={samples}, motion_blur={render_job.motion_blur}, engine='{ui_utils.RENDER_ENGINES[render_job.engine]}')",  # noqa: E501
     f"rss.set_denoising_settings(denoise={render_job.denoise})",

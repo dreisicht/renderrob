@@ -399,7 +399,7 @@ class MainWindow(QWidget):
           self.window.textBrowser.verticalScrollBar().value()
           > (self.window.textBrowser.verticalScrollBar().maximum()) - 1500
         ):
-          self.window.textBrowser.moveCursor(QTextCursor.End + 1)
+          self.window.textBrowser.moveCursor(QTextCursor.End)
         self.window.textBrowser.setCurrentCharFormat(color_format)
         self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
 
@@ -536,17 +536,28 @@ class MainWindow(QWidget):
       else:
         frame_step = 1
 
+      search_pattern = Path(filepath).name.replace(
+        self.state_saver.state.render_jobs[current_row].start.zfill(4), "*"
+      )
+      all_frames = [str(p) for p in Path(filepath).parent.glob(search_pattern)]
+      all_frames.sort()
+
       # The call does not take frame step and fps into account.
       # Investigated and turns out problem on Blender's side.
       subprocess.Popen(
         [
           self.state_saver.state.settings.blender_path,
           "-a",
-          filepath,
+          *all_frames,
           "-f",
           str(self.state_saver.state.settings.fps),
           "-j",
           str(frame_step),
+          # Start and end not required (at least on Mac).
+          #   "-s",
+          #   self.state_saver.state.render_jobs[current_row].start,
+          #   "-e",
+          #   self.state_saver.state.render_jobs[current_row].end,
         ],
       )
 
@@ -618,7 +629,13 @@ class MainWindow(QWidget):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
-    cwd = path_utils.normalize_drive_letter(Path.cwd())
+    if Path("../Resources").exists():
+      cwd = Path("../Resources").resolve()
+    if Path("src").exists():
+      cwd = Path("src").resolve()
+    if platform.system() == "Windows":
+      cwd = path_utils.normalize_drive_letter(str(Path.cwd()))
+
     python_command = [
       "import sys",
       f"sys.path.append('{cwd}')",
@@ -787,21 +804,21 @@ class MainWindow(QWidget):
       job.file,
       self.state_saver.state.settings.blender_files_path,
     )
-    scene_command = f"-S {job.scene}" if job.scene else ""
+    scene_command = ["-S", job.scene] if job.scene else ""
     args = [
       "-b",
       file_path,
-      scene_command,
       "-o",
       snb.frame_path,
       "-y",
+      *scene_command,
       "-F",
       ui_utils.FILE_FORMATS_COMMAND[job.file_format],
       "--python-expr",
       inline_python,
+      *render_frame_command.split(" "),
     ]
     args = [i for i in args if i]
-    args.extend(render_frame_command.split(" "))
     self.process.setArguments(args)
     self.process.readyRead.connect(self._handle_output)
     self.process.start()

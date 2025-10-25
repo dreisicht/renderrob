@@ -1,5 +1,6 @@
 """Test the state_saver module."""
 import unittest
+from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
 
@@ -28,7 +29,7 @@ class TestStateSaver(unittest.TestCase):
     del self.main_window
     return super().tearDown()
 
-  def test_get_text(self):
+  def test_get_text(self) -> None:
     """Test the get_text method."""
     self.assertEqual(state_saver.get_text(self.main_window.table.cellWidget(0, 2)), "")
     self.assertTrue(state_saver.get_text(
@@ -36,11 +37,10 @@ class TestStateSaver(unittest.TestCase):
     self.assertEqual(state_saver.get_text(
         self.main_window.table.cellWidget(0, 8), widget="dropdown"), "exr_single")
 
-  def test_state_to_table(self):
+  def test_state_to_table(self) -> None:
     """Test the state_to_table method."""
     state_saver_instance = state_saver.StateSaver()
-    with open("test/basic_state.rrp", "rb") as rrp_file:
-      state_saver_instance.state.ParseFromString(rrp_file.read())
+    state_saver_instance.state.ParseFromString(Path("test/basic_state.rrp").read_bytes())
 
     table = self.main_window.table
     state_saver_instance.state_to_table(table)
@@ -65,7 +65,7 @@ class TestStateSaver(unittest.TestCase):
     self.assertEqual(state_saver.get_text(table.item(0, 16)).split(";"), ["d"])
     self.assertEqual(state_saver.get_text(table.item(0, 17)), "e")
 
-  def test_table_to_state(self):
+  def test_table_to_state(self) -> None:
     """Test the table_to_state method."""
     self.main_window.open_file("test/basic_state.rrp")
     state_saver_instance = state_saver.StateSaver()

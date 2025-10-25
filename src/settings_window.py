@@ -31,13 +31,13 @@ class SettingsWindow:
     self.window.lineEdit.setText(self.state.blender_files_path)
 
     self.window.checkBox_2.setCheckState(
-      Qt.Checked if self.state.preview.samples_use else Qt.Unchecked
+      Qt.Checked if self.state.preview.samples_use else Qt.Unchecked,
     )
     self.window.checkBox_3.setCheckState(
-      Qt.Checked if self.state.preview.frame_step_use else Qt.Unchecked
+      Qt.Checked if self.state.preview.frame_step_use else Qt.Unchecked,
     )
     self.window.checkBox.setCheckState(
-      Qt.Checked if self.state.preview.resolution_use else Qt.Unchecked
+      Qt.Checked if self.state.preview.resolution_use else Qt.Unchecked,
     )
 
     self.window.spinBox_3.setValue(int(self.state.preview.samples))
@@ -59,7 +59,9 @@ class SettingsWindow:
   def open_blender_path(self) -> None:
     """Open a file dialog to select the path to Blender."""
     path = QFileDialog.getOpenFileName(
-      self.window, caption="Select Blender Path", filter="Blender (*.exe)"
+      self.window,
+      caption="Select Blender Path",
+      filter="Blender (*.exe)",
     )
     if path:
       self.window.lineEdit_3.setText(path[0])
