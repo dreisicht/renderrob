@@ -115,3 +115,6 @@ Debugging the run:
 ```
 xcrun notarytool log <request UUID> --keychain-profile "dev"
 ```
+
+# TODOs:
+Buttons on mac weird.

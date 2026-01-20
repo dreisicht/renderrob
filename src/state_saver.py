@@ -3,7 +3,9 @@
 Note: Only the state of the table is being handled here. The state of the settings
 is being handled in the settings window class.
 """
+
 import json
+from pathlib import Path
 from typing import Any
 
 from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
@@ -12,7 +14,7 @@ from protos import state_pb2
 from utils_rr import path_utils, table_utils, ui_utils
 
 
-def get_text(item: QTableWidgetItem, widget=None) -> str:
+def get_text(item: QTableWidgetItem, widget: str = None) -> str:
   """Get the text from a table item."""
   if not item:
     return ""
@@ -43,7 +45,7 @@ def find_job(jobs: Any, job: Any) -> int:
 class StateSaver:
   """Class to provide storing methods to the render rob proto class."""
 
-  def __init__(self):
+  def __init__(self) -> None:
     """Initialize the state saver."""
     self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
     init_settings(self.state)
@@ -63,14 +65,20 @@ class StateSaver:
       table.setItem(i, 5, QTableWidgetItem(str(render_job.x_res)))
       table.setItem(i, 6, QTableWidgetItem(str(render_job.y_res)))
       table.setItem(i, 7, QTableWidgetItem(str(render_job.samples)))
-      ui_utils.set_checkbox_values(table, i, [render_job.active,
-                                              render_job.motion_blur,
-                                              render_job.overwrite,
-                                              render_job.high_quality,
-                                              render_job.denoise])
-      ui_utils.set_combobox_indexes(table, i, [render_job.file_format,
-                                               render_job.engine,
-                                               render_job.device])
+      ui_utils.set_checkbox_values(
+        table,
+        i,
+        [
+          render_job.active,
+          render_job.motion_blur,
+          render_job.overwrite,
+          render_job.high_quality,
+          render_job.denoise,
+        ],
+      )
+      ui_utils.set_combobox_indexes(
+        table, i, [render_job.file_format, render_job.engine, render_job.device]
+      )
       table.setItem(i, 15, QTableWidgetItem(render_job.scene))
       table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))
       table.setItem(i, 17, QTableWidgetItem(render_job.comments))
@@ -94,13 +102,18 @@ class StateSaver:
       render_job.y_res = get_text(table.item(i, 6))
       render_job.samples = get_text(table.item(i, 7))
 
-      render_job.file_format = get_text(table.cellWidget(i, 8), widget="dropdown")
-      render_job.engine = get_text(table.cellWidget(i, 9), widget="dropdown")
-      render_job.device = get_text(table.cellWidget(i, 10), widget="dropdown")
+      file_format_str = get_text(table.cellWidget(i, 8), widget="dropdown")
+      render_job.file_format = state_pb2.file_format.Value(file_format_str)
+
+      engine_str = get_text(table.cellWidget(i, 9), widget="dropdown")
+      render_job.engine = state_pb2.render_engine.Value(engine_str)
+
+      device_str = get_text(table.cellWidget(i, 10), widget="dropdown")
+      render_job.device = state_pb2.device.Value(device_str)
+
       render_job.motion_blur = get_text(table.cellWidget(i, 11), widget="checkbox")
       render_job.overwrite = get_text(table.cellWidget(i, 12), widget="checkbox")
       render_job.high_quality = get_text(table.cellWidget(i, 13), widget="checkbox")
-      # render_job.animation_denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
       render_job.denoise = get_text(table.cellWidget(i, 14), widget="checkbox")
       render_job.scene = get_text(table.item(i, 15))
       del render_job.view_layers[:]
@@ -111,8 +124,8 @@ class StateSaver:
 
   def load_job_from_json(self, json_path: str) -> state_pb2.render_job:  # pylint: disable=no-member
     """Load the state from a json file."""
-    with open(json_path, "r", encoding="utf-8") as json_file:
-      json_state = json.loads(json_file.read())
+    json_path_ = Path(json_path)
+    json_state = json.loads(json_path_.read_text())
     render_job = state_pb2.render_job()  # pylint: disable=no-member
     render_job.file = json_state["file"]
     render_job.active = json_state["active"]
@@ -123,7 +136,7 @@ class StateSaver:
     render_job.y_res = json_state["y_res"]
     render_job.samples = json_state["samples"]
     render_job.device = json_state["device"]
-    render_job.engine = json_state["engine"]
+    render_job.engine = json_state["engine"].replace("blender_eevee_next", "eevee")
     render_job.motion_blur = json_state["motion_blur"]
     render_job.overwrite = json_state["overwrite"]
     render_job.high_quality = json_state["high_quality"]
@@ -134,4 +147,5 @@ class StateSaver:
       render_job.file_format = ui_utils.FILEMFORMAT_MAPPING[json_state["file_format"].lower()]
     except KeyError:
       render_job.file_format = "png"
+    json_path_.unlink()
     return render_job

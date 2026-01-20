@@ -15,7 +15,7 @@ def main():
   # base="Win32GUI" should be used only for Windows GUI app
   base = "Win32GUI" if sys.platform == "win32" else None
 
-  icon = "icons/icon.ico"
+  icon = "icon/icon.ico"
   setup(
       name="renderrob",
       version="0.1",

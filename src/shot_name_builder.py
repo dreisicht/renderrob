@@ -1,7 +1,6 @@
 """Class to build a shot name from the render job."""
 
-import os
-import pathlib
+from pathlib import Path
 
 from protos import state_pb2
 from utils_rr import ui_utils
@@ -16,15 +15,21 @@ def still_or_animation(start: str, end: str) -> str:
   if start != "" and end == "":
     return "STILL"
   if start == "" and end != "":
-    raise ValueError("End frame is set, but start frame is not.")
-  raise ValueError("Could not determine of still or animation.")
+    msg = "End frame is set, but start frame is not."
+    raise ValueError(msg)
+  msg = "Could not determine of still or animation."
+  raise ValueError(msg)
 
 
 class ShotNameBuilder:
   """Class to build a shot name from the render job."""
 
-  def __init__(self, render_job: state_pb2.render_job,  # pylint: disable=no-member
-               output_path: str, is_replay_mode: bool = False) -> None:
+  def __init__(
+    self,
+    render_job: state_pb2.render_job,  # pylint: disable=no-member
+    output_path: str,
+    is_replay_mode: bool = False,
+  ) -> None:
     """Initialize the shot name builder.
 
     Args:
@@ -40,20 +45,17 @@ class ShotNameBuilder:
 
   def get_shotname(self) -> str:
     """Build the shot name from the render job."""
-    if self.render_job.high_quality:
-      quality_state_string = "hq"
-    else:
-      quality_state_string = "pv"
+    quality_state_string = "hq" if self.render_job.high_quality else "pv"
 
     if isinstance(self.render_job.view_layers, str):
-      raise ValueError("View layer is not a list.")
+      msg = "View layer is not a list."
+      raise TypeError(msg)
 
     # The default view layer does not need to be in the shot name.
     if self.render_job.view_layers == ["View Layer"]:
       view_layer_name = None
     else:
-      view_layer_name = "+".join(
-          self.render_job.view_layers).lower().replace("view layer", "Vl")
+      view_layer_name = "+".join(self.render_job.view_layers).lower().replace("view layer", "Vl")
 
     # The default camera does not need to be in the shot name.
     if self.render_job.camera.lower() == "camera":
@@ -67,27 +69,34 @@ class ShotNameBuilder:
     else:
       scene_name = self.render_job.scene.lower().replace("scene", "Sc")
 
-    blend_filename = os.path.basename(
-        self.render_job.file).replace(".blend", "")
-    shotname_arr = [blend_filename, camera_name, scene_name, view_layer_name,
-                    quality_state_string, "v$$"]
+    blend_filename = Path(self.render_job.file).name.replace(".blend", "")
+    shotname_arr = [
+      blend_filename,
+      camera_name,
+      scene_name,
+      view_layer_name,
+      quality_state_string,
+      "v$$",
+    ]
 
     return "-".join(filter(None, shotname_arr)).replace(" ", "_")
 
   def set_version_number(self, full_frame_path: str) -> str:
     """Get the version number of the shot."""
-    _full_frame_path = pathlib.Path(full_frame_path)
+    _full_frame_path = Path(full_frame_path)
     for shot_iter_num in range(1000, -1, -1):
       # STILL
       if "v$$" not in _full_frame_path.parent.parts[-1]:
         still_path = full_frame_path.replace("v$$", "v" + str(shot_iter_num).zfill(2))
-        if pathlib.Path(still_path).exists():
+        if Path(still_path).exists():
           break
         continue
       # ANIMATION
       folderpath_str = str(_full_frame_path.parent).replace(
-          "v$$", "v" + str(shot_iter_num).zfill(2))
-      folderpath = pathlib.Path(folderpath_str)
+        "v$$",
+        "v" + str(shot_iter_num).zfill(2),
+      )
+      folderpath = Path(folderpath_str)
       if folderpath.exists():
         if any(folderpath.iterdir()):
           break
@@ -95,33 +104,33 @@ class ShotNameBuilder:
         break
 
     shot_iter_num += 1
-    if shot_iter_num > 1:
-      if self.replay_mode:
-        shot_iter_num -= 1
-      elif self.render_job.overwrite:
-        shot_iter_num -= 1
+    if shot_iter_num > 1 and (self.replay_mode or self.render_job.overwrite):
+      shot_iter_num -= 1
 
     # Update full_frame_path with iteration number.
-    return full_frame_path.replace(
-        "v$$", f"v{str(shot_iter_num).zfill(2)}")
+    return full_frame_path.replace("v$$", f"v{str(shot_iter_num).zfill(2)}")
 
   def get_full_frame_path(self, output_path: str, shotname: str) -> str:
     """Build the path to the frames including the file name and directory."""
     if not output_path:
-      output_path = str(pathlib.Path(self.render_job.file).parent)
-    output_path = output_path.replace("\\", "/")
+      output_path = Path(self.render_job.file.replace("\\", "/")).parent
 
     frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
-    if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
-      frame_render_folder = os.path.join(output_path, "stills")
+    if still_or_animation(self.render_job.start, self.render_job.end) == "STILL":
+      frame_render_folder = output_path / "stills"
       frame_name = frame_name.replace("f####", f"f{str(self.render_job.start).zfill(4)}")
     else:
-      frame_render_folder = os.path.join(output_path, shotname)
+      frame_render_folder = output_path / shotname
 
-    full_frame_path = os.path.join(frame_render_folder, frame_name)
-    full_frame_path = self.set_version_number(full_frame_path)
+    full_frame_path = frame_render_folder / frame_name
+    full_frame_path = self.set_version_number(str(full_frame_path))
 
-    if "STILL" == still_or_animation(self.render_job.start, self.render_job.end):
-      full_frame_path = full_frame_path.replace(f"f{str(self.render_job.start).zfill(4)}", "f####")
+    full_frame_path_str = str(full_frame_path)
 
-    return full_frame_path.replace("\\", "/")
+    if still_or_animation(self.render_job.start, self.render_job.end) == "STILL":
+      full_frame_path_str = full_frame_path_str.replace(
+        f"f{str(self.render_job.start).zfill(4)}",
+        "f####",
+      )
+
+    return full_frame_path_str.replace("\\", "/")

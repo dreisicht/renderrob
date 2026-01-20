@@ -1,1 +1,0 @@
-pyinstaller --icon icons/icon.ico renderrob.py

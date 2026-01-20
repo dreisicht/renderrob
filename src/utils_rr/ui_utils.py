@@ -1,12 +1,18 @@
 """Util functions for helping build the render rob UI."""
-import sys
-from contextlib import closing
-from typing import Any, List, Optional, Generator
 
-from PySide6.QtCore import QFile, QMetaObject, Qt
+import sys
+from collections.abc import Generator
+from contextlib import closing
+from importlib import resources
+from pathlib import Path
+from typing import Any
+
+from PySide6.QtCore import QDir, QFile, QMetaObject, Qt
 from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
+
+import ui
 
 TEXT_COLUMNS = [1, 2, 15, 16, 17]
 NUMBER_COLUMNS = [3, 4, 5, 6, 7]
@@ -16,45 +22,58 @@ FILE_FORMATS_COMMAND = ["OPEN_EXR", "OPEN_EXR_MULTILAYER", "JPEG", "PNG", "TIFF"
 FILE_FORMATS_UI = ["exr single", "exr multi", "jpeg", "png", "tiff"]
 FILE_FORMATS_ACTUAL = ["exr", "exr", "jpg", "png", "tiff"]
 FILEMFORMAT_MAPPING = {
-    "png": "png",
-    "jpeg": "jpeg",
-    "tiff": "tiff",
-    "open_exr_multilayer": "exr_multi",
-    "open_exr": "exr_single",
+  "png": "png",
+  "jpeg": "jpeg",
+  "tiff": "tiff",
+  "open_exr_multilayer": "exr_multi",
+  "open_exr": "exr_single",
 }
 
 RENDER_ENGINES = ["cycles", "eevee"]
 DEVICES = ["gpu", "cpu"]
 PLACEHOLDER_TEXT = {
-    1: "File",
-    2: "Camera",
-    3: "Start",
-    4: "End",
-    5: "X Res",
-    6: "Y Res",
-    7: "Samples",
-    15: "Scene",
-    16: "View Layers",
-    17: "Comments",
+  1: "File",
+  2: "Camera",
+  3: "Start",
+  4: "End",
+  5: "X Res",
+  6: "Y Res",
+  7: "Samples",
+  15: "Scene",
+  16: "View Layers",
+  17: "Comments",
 }
 TABLE_CHANGED_FUNCTION = None
 
 
-def load_ui_from_file(ui_file_name: str, custom_widgets: Optional[List[Any]] = None) -> QUiLoader:
+def load_ui_from_file(ui_file_name: str, custom_widgets: list[Any] | None = None) -> QUiLoader:
   """Load a UI file from the given path and return the widget."""
   ui_loader = QUiLoader()
+
+  if Path(ui_file_name).exists():
+    ui_file_path = Path(ui_file_name)
+  elif (Path("ui") / ui_file_name).exists():
+    ui_file_path = Path("ui") / ui_file_name
+  else:
+    ui_file_path = resources.files(ui) / ui_file_name
+
+  qt_q_dir = QDir(ui_file_path.parent)
+  ui_loader.setWorkingDirectory(qt_q_dir)
+
   if custom_widgets:
     for custom_widget in custom_widgets:
       ui_loader.registerCustomWidget(custom_widget)
-  ui_file = QFile(ui_file_name)
 
+  ui_file = QFile(str(ui_file_path))
+
+  window = None
   with closing(ui_file) as qt_file:
     if qt_file.open(QFile.ReadOnly):
       window = ui_loader.load(qt_file)
     else:
-      print('Failed to read UI')
+      print("Failed to read UI")
 
-  if not window:  # pylint:disable=possibly-used-before-assignment
+  if not window:
     print(ui_loader.errorString())
     sys.exit(-1)
   QMetaObject.connectSlotsByName(window)
@@ -98,8 +117,7 @@ def set_combobox_background_color(table: QTableWidget, row: int, col: int, color
   """Set color of comboboxes."""
   widget = table.cellWidget(row, col)
   if widget:
-    widget.setStyleSheet(
-        f"QComboBox:drop-down {{background-color: {color.name()};}}")
+    widget.setStyleSheet(f"QComboBox:drop-down {{background-color: {color.name()};}}")
 
 
 def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
@@ -109,7 +127,7 @@ def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color
     widget.setStyleSheet(f"background-color: {color.name()};")
 
 
-def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
+def add_checkbox(table: QTableWidget, row: int, col: int, checked=False) -> None:
   """Add a checkbox to the given table at the given row and column."""
   widget = QWidget()
   check_box = QCheckBox()
@@ -127,7 +145,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False):
   table.setCellWidget(row, col, widget)
 
 
-def add_dropdown(table: QTableWidget, row: int, col: int, items):
+def add_dropdown(table: QTableWidget, row: int, col: int, items) -> None:
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)

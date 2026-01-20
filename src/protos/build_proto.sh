@@ -1,2 +1,4 @@
-protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/state.proto
-protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/cache.proto
+PROTOS_DIR=src/protos
+
+uv run protoc --proto_path=$PROTOS_DIR --python_out=$PROTOS_DIR $PROTOS_DIR/state.proto
+uv run protoc --proto_path=$PROTOS_DIR --python_out=$PROTOS_DIR $PROTOS_DIR/cache.proto

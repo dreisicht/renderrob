@@ -2,9 +2,20 @@
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "python.testing.unittestArgs": ["-v", "-s", ".", "-p", "*_test.py"],
+  "python.testing.unittestArgs": [
+    "-v",
+    "-s",
+    ".",
+    "-p",
+    "*_test.py"
+  ],
   "python.testing.pytestEnabled": false,
   "python.testing.unittestEnabled": true,
-  "cSpell.words": ["renderrob", "STATESAVER", "steamapps"],
-  "python.analysis.typeCheckingMode": "off"
+  "cSpell.words": [
+    "renderrob",
+    "STATESAVER",
+    "steamapps"
+  ],
+  "python.analysis.typeCheckingMode": "off",
+  "editor.formatOnSave": false
 }

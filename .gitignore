@@ -17,3 +17,9 @@ dist/*
 build/exe.win-amd64-3.10/*
 RenderRob.app
 .DS_Store
+.eggs/
+dist/
+build/
+*.log
+*.zip
+*.dmg

@@ -1,6 +1,5 @@
 """Settings dialog for RenderRob."""
 
-# import appdirs
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
 from PySide6.QtUiTools import QUiLoader
@@ -10,7 +9,7 @@ from protos import state_pb2
 from utils_rr import ui_utils
 
 
-class SettingsWindow():
+class SettingsWindow:
   """Settings dialog for RenderRob.
 
   This class represents a settings dialog for RenderRob. It allows the user to modify various
@@ -21,9 +20,9 @@ class SettingsWindow():
   def __init__(self, state: state_pb2.render_rob_state) -> None:  # pylint: disable=no-member
     """Open the settings dialog."""
     self.state = state.settings
-    self.window = ui_utils.load_ui_from_file("ui/settings.ui")
+    self.window = ui_utils.load_ui_from_file("settings.ui")
     self.window.setWindowTitle("RenderRob Settings")
-    self.window.setWindowIcon(QIcon("icons/icon.ico"))
+    self.window.setWindowIcon(QIcon("icon/icon.ico"))
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
 
@@ -32,11 +31,14 @@ class SettingsWindow():
     self.window.lineEdit.setText(self.state.blender_files_path)
 
     self.window.checkBox_2.setCheckState(
-        Qt.Checked if self.state.preview.samples_use else Qt.Unchecked)
+      Qt.Checked if self.state.preview.samples_use else Qt.Unchecked,
+    )
     self.window.checkBox_3.setCheckState(
-        Qt.Checked if self.state.preview.frame_step_use else Qt.Unchecked)
+      Qt.Checked if self.state.preview.frame_step_use else Qt.Unchecked,
+    )
     self.window.checkBox.setCheckState(
-        Qt.Checked if self.state.preview.resolution_use else Qt.Unchecked)
+      Qt.Checked if self.state.preview.resolution_use else Qt.Unchecked,
+    )
 
     self.window.spinBox_3.setValue(int(self.state.preview.samples))
     self.window.spinBox_2.setValue(int(self.state.preview.frame_step))
@@ -57,21 +59,22 @@ class SettingsWindow():
   def open_blender_path(self) -> None:
     """Open a file dialog to select the path to Blender."""
     path = QFileDialog.getOpenFileName(
-        self.window, caption="Select Blender Path", filter="Blender (*.exe)")
+      self.window,
+      caption="Select Blender Path",
+      filter="Blender (*.exe)",
+    )
     if path:
       self.window.lineEdit_3.setText(path[0])
 
   def open_blender_files_path(self) -> None:
     """Open a file dialog to select the path to Blender files."""
-    path = QFileDialog.getExistingDirectory(
-        self.window, caption="Select Blender Files Path")
+    path = QFileDialog.getExistingDirectory(self.window, caption="Select Blender Files Path")
     if path:
       self.window.lineEdit.setText(path)
 
   def open_output_path(self) -> None:
     """Open a file dialog to select the output path."""
-    path = QFileDialog.getExistingDirectory(
-        self.window, caption="Select Output Path")
+    path = QFileDialog.getExistingDirectory(self.window, caption="Select Output Path")
     if path:
       self.window.lineEdit_2.setText(path)
 

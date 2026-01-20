@@ -3,7 +3,7 @@ import unittest
 
 from PySide6.QtWidgets import QApplication
 
-import main  # type: ignore
+import main
 from utils_rr import table_utils
 
 # pylint: disable=protected-access
