@@ -16,18 +16,18 @@ from utils_rr import path_utils, table_utils, ui_utils
 
 
 @overload
-def get_text(item: QWidget, widget: Literal["checkbox"]) -> bool: ...
+def get_text(item: QWidget | None, widget: Literal["checkbox"]) -> bool: ...
 
 
 @overload
-def get_text(item: QTableWidgetItem | QWidget, widget: Literal["dropdown"]) -> str: ...
+def get_text(item: QTableWidgetItem | QWidget | None, widget: Literal["dropdown"]) -> str: ...
 
 
 @overload
-def get_text(item: QTableWidgetItem, widget: None = None) -> str: ...
+def get_text(item: QTableWidgetItem | None, widget: None = None) -> str: ...
 
 
-def get_text(item: QTableWidgetItem | QWidget, widget: str | None = None) -> str | bool:
+def get_text(item: QTableWidgetItem | QWidget | None, widget: str | None = None) -> str | bool:
   """Get the value of a table cell, as text or - for a checkbox - as a bool."""
   if not item:
     return ""

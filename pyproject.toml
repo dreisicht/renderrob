@@ -20,6 +20,9 @@ dependencies = [
 dev = [
     "grpcio-tools>=1.76.0",
     "ruff>=0.16.0",
+    # ty is pre-1.0 and gains rules with every release, so pin it exactly: a floor would turn a
+    # green branch red on somebody else's release rather than on a change made here.
+    "ty==0.0.79",
 ]
 
 [build-system]
@@ -220,3 +223,49 @@ explicit = true
 # Tests build protobuf fixtures by hand and assert on booleans; annotating every helper and
 # routing every literal through a constant would bury what each test actually checks.
 "*_test.py" = ["ANN", "PLR2004", "PLR0915", "S101"]
+
+[tool.ty.environment]
+# The app imports its own modules as top-level names (`import main`, `from utils_rr import ...`),
+# so ty needs the same source root the test runner uses.
+root = ["src"]
+
+[tool.ty.rules]
+# Render Rob builds most of its object graph at runtime, in three ways ty cannot follow:
+#   * PySide6's "forgiveness mode" enums - Qt.AlignCenter, QMessageBox.Yes, QFile.ReadOnly. They
+#     exist at runtime, but the stubs only declare the scoped spellings (Qt.AlignmentFlag.*).
+#   * bpy, which has no stubs at all and resolves everything through Blender's RNA at runtime.
+#   * The widgets in window.ui and settings.ui, which QUiLoader attaches to a plain QWidget by
+#     the object names in the .ui file - self.window.tableWidget and friends.
+# Together those are almost every occurrence, so the rule is off rather than annotated away at
+# hundreds of call sites. Note what this gives up: it is the rule that caught StateSaver's
+# undeclared `parent_widget`. Declare instance attributes in __init__ and it stays caught.
+unresolved-attribute = "ignore"
+
+# Qt widgets do not exist until setup() runs, so main.py holds them as None until then, and
+# every use afterwards looks like a use of None.
+[[tool.ty.overrides]]
+include = ["src/main.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+
+# Everything reached through bpy.context and bpy.data is untyped, so assigning to a render
+# setting looks like assigning to an attribute of None.
+[[tool.ty.overrides]]
+include = ["src/utils_bpy/**"]
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+
+# The tests drive the same untyped Qt and bpy objects as the code above.
+[[tool.ty.overrides]]
+include = ["src/*_test*.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+not-iterable = "ignore"
+
+# cx_Freeze is only needed for the Windows build, so it is not a project dependency and cannot
+# be resolved here.
+[[tool.ty.overrides]]
+include = ["tools/setup.py"]
+[tool.ty.overrides.rules]
+unresolved-import = "ignore"

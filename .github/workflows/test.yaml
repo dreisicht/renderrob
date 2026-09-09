@@ -26,11 +26,21 @@ jobs:
       - name: Install dependencies
         run: uv sync --group dev
 
+      # ty resolves protos.state_pb2 through the generated stubs, so they have to exist first.
+      - name: Build the proto bindings
+        run: >
+          uv run python -m grpc_tools.protoc
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
+          src/protos/state.proto src/protos/cache.proto
+
       - name: Check formatting
         run: uv run ruff format --check .
 
       - name: Lint
         run: uv run ruff check --output-format=github .
+
+      - name: Type check
+        run: uv run ty check --output-format=github
 
   test:
     name: Tests (${{ matrix.os }})
