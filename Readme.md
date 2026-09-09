@@ -77,13 +77,16 @@ directory):
 cd src && uv run python main.py
 ```
 
-Run the tests and the linter:
+Run the tests, the linter and the type checker:
 
 ```
 cd src && QT_QPA_PLATFORM=offscreen uv run python -m unittest discover -s . -p '*_test.py'
 uv run ruff check .
 uv run ruff format --check .
+uv run ty check
 ```
+
+`ty check` needs the generated proto stubs, so run `sh src/protos/build_proto.sh` first.
 
 Install QtDesigner:
 
