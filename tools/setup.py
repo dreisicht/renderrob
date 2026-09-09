@@ -1,15 +1,16 @@
 """Setup for cx_freeze."""
 
 import sys
-from cx_Freeze import setup, Executable
+
+from cx_Freeze import Executable, setup
 
 
-def main():
+def main() -> None:
   """Setup for cx_freeze."""
   # Dependencies are automatically detected, but it might need fine tuning.
   build_exe_options = {
-      "excludes": ["tkinter", "unittest"],
-      "zip_include_packages": ["encodings", "PySide6", "protos"],
+    "excludes": ["tkinter", "unittest"],
+    "zip_include_packages": ["encodings", "PySide6", "protos"],
   }
 
   # base="Win32GUI" should be used only for Windows GUI app
@@ -17,11 +18,11 @@ def main():
 
   icon = "icon/icon.ico"
   setup(
-      name="renderrob",
-      version="0.1",
-      description="RenderRob",
-      options={"build_exe": build_exe_options},
-      executables=[Executable("renderrob.py", base=base, icon=icon)],
+    name="renderrob",
+    version="0.1",
+    description="RenderRob",
+    options={"build_exe": build_exe_options},
+    executables=[Executable("renderrob.py", base=base, icon=icon)],
   )
 
 

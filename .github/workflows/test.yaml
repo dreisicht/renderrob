@@ -1,0 +1,80 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Qt has no display on a runner, and the suite constructs real widgets.
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  lint:
+    name: Ruff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          # Pinned rather than ">=3.13", because bpy only publishes wheels for specific versions.
+          python-version: "3.13"
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      # ty resolves protos.state_pb2 through the generated stubs, so they have to exist first.
+      - name: Build the proto bindings
+        run: >
+          uv run python -m grpc_tools.protoc
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
+          src/protos/state.proto src/protos/cache.proto
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Lint
+        run: uv run ruff check --output-format=github .
+
+      - name: Type check
+        run: uv run ty check --output-format=github
+
+  test:
+    name: Tests (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.13"
+          enable-cache: true
+
+      # Qt's own dependencies, whose Debian package names have shifted across Ubuntu releases.
+      # The action tracks that so the workflow does not have to.
+      - name: Install Qt's system libraries
+        if: runner.os == 'Linux'
+        uses: tlambert03/setup-qt-libs@v1
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Build the proto bindings
+        run: >
+          uv run python -m grpc_tools.protoc
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
+          src/protos/state.proto src/protos/cache.proto
+
+      - name: Run the unit tests
+        # The suite imports `main`, `utils_rr`, ... as top-level modules, and src/ is not a
+        # package, so it has to be the working directory.
+        working-directory: src
+        run: uv run python -m unittest discover --start-directory . --pattern "*_test.py" --verbose

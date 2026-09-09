@@ -6,12 +6,14 @@ from pathlib import Path
 
 def discover_blender_path() -> str:
   """Discover the path to Blender."""
-  possibilities = ["C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
-                   "C:/Program Files/Blender Foundation/Blender/blender.exe",
-                   "/Applications/Blender.app/Contents/MacOS/Blender",
-                   "/usr/bin/blender",
-                   "/usr/local/bin/blender",
-                   "~/blender/blender"]
+  possibilities = [
+    "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
+    "C:/Program Files/Blender Foundation/Blender/blender.exe",
+    "/Applications/Blender.app/Contents/MacOS/Blender",
+    "/usr/bin/blender",
+    "/usr/local/bin/blender",
+    "~/blender/blender",
+  ]
 
   for blender_path in possibilities:
     blender_path_path = Path(blender_path).expanduser()
@@ -46,3 +48,17 @@ def normalize_drive_letter(path: str) -> str:
   if path[1] == ":":
     return path[0].upper() + path[1:]
   return path
+
+
+def get_blender_module_path() -> str:
+  """Return the directory Blender has to put on sys.path to import Render Rob's bpy helpers.
+
+  In a py2app bundle those modules are copied next to the executable, under ../Resources. In a
+  source checkout they sit at the top of src/, one level above this file. Returning whichever one
+  actually holds utils_bpy keeps this correct however Render Rob was started, and - unlike asking
+  for the current working directory - independent of where it was started from.
+  """
+  bundle_resources = Path("../Resources")
+  if (bundle_resources / "utils_bpy").is_dir():
+    return normalize_drive_letter(str(bundle_resources.resolve()))
+  return normalize_drive_letter(str(Path(__file__).parent.parent.resolve()))

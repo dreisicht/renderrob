@@ -96,14 +96,11 @@ class TestRenderSettingsSetter(unittest.TestCase):
     with patch("utils_common.print_utils.print_error") as mock_print_error:
       self.rss.set_view_layers(["NonexistentViewLayer"])
     mock_print_error.assert_called_with(
-      "View Layer NonexistentViewLayer not found. Please check the name in the sheet!"
+      "View Layer NonexistentViewLayer not found. Please check the name in the sheet!",
     )
 
-  # def test_activate_addons(self):
-  #   addon_name = "mesh_f2"
-  #   bpy.ops.preferences.addon_enable = mock_enable_addon
-  #   with patch("utils_common.print_utils.print_info") as mock_print_info:
-  #     self.rss.activate_addons([addon_name])
+  # TODO(dreisicht): Cover activate_addons. It needs bpy.ops.preferences.addon_enable to be
+  # stubbed out, since the bare bpy module has no addons installed to enable.
 
   def test_set_camera_existing_camera(self):
     """Test the set_camera function with an existing camera."""
@@ -122,22 +119,34 @@ class TestRenderSettingsSetter(unittest.TestCase):
   def test_set_render_settings_cpu_engine(self):
     """Test the set_render_settings function with the CPU engine."""
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.eevee.use_motion_blur = True
-    self.rss.set_render_settings("cpu", False, 128, False, "EEVEE")
-    self.assertEqual(scene.render.engine, "BLENDER_EEVEE_NEXT")
+    scene.render.engine = self.rss.eevee_engine_identifier()
+    scene.render.use_motion_blur = True
+    self.rss.set_render_settings(
+      "cpu",
+      border=False,
+      samples=128,
+      motion_blur=False,
+      engine="EEVEE",
+    )
+    self.assertEqual(scene.render.engine, self.rss.eevee_engine_identifier())
     self.assertEqual(scene.eevee.taa_render_samples, 128)
     self.assertEqual(scene.cycles.device, "CPU")
-    self.assertFalse(scene.eevee.use_motion_blur)
+    self.assertFalse(scene.render.use_motion_blur)
 
   @unittest.skipIf(not check_gpu(), "GPU is not supported on this machine.")
   def test_set_render_settings_gpu_engine(self):
     """Test the set_render_settings function with the GPU engine."""
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.eevee.use_motion_blur = True
+    scene.render.engine = self.rss.eevee_engine_identifier()
+    scene.render.use_motion_blur = True
     bpy.context.preferences.addons["cycles"].preferences.compute_device_type = "OPTIX"
-    self.rss.set_render_settings("gpu", False, 128, False, "CYCLES")
+    self.rss.set_render_settings(
+      "gpu",
+      border=False,
+      samples=128,
+      motion_blur=False,
+      engine="CYCLES",
+    )
     self.assertEqual(scene.render.engine, "CYCLES")
     self.assertEqual(scene.cycles.samples, 128)
     self.assertEqual(scene.cycles.device, "GPU")
@@ -151,10 +160,10 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene = bpy.context.scene
     scene.view_layers.new("View Layer1")
     scene.view_layers.new("View Layer2")
-    self.rss.set_denoising_settings(False)
+    self.rss.set_denoising_settings(denoise=False)
     self.assertFalse(scene.cycles.use_denoising)
     self.assertFalse(self.rss.current_scene_data.cycles.use_animated_seed)
-    self.rss.set_denoising_settings(True)
+    self.rss.set_denoising_settings(denoise=True)
     self.assertTrue(scene.cycles.use_denoising)
     self.assertTrue(self.rss.current_scene_data.cycles.use_animated_seed)
 

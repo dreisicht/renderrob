@@ -5,17 +5,30 @@ is being handled in the settings window class.
 """
 
 import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Any
+from typing import Literal, overload
 
-from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem, QWidget
 
 from protos import state_pb2
 from utils_rr import path_utils, table_utils, ui_utils
 
 
-def get_text(item: QTableWidgetItem, widget: str = None) -> str:
-  """Get the text from a table item."""
+@overload
+def get_text(item: QWidget | None, widget: Literal["checkbox"]) -> bool: ...
+
+
+@overload
+def get_text(item: QTableWidgetItem | QWidget | None, widget: Literal["dropdown"]) -> str: ...
+
+
+@overload
+def get_text(item: QTableWidgetItem | None, widget: None = None) -> str: ...
+
+
+def get_text(item: QTableWidgetItem | QWidget | None, widget: str | None = None) -> str | bool:
+  """Get the value of a table cell, as text or - for a checkbox - as a bool."""
   if not item:
     return ""
   if widget == "dropdown":
@@ -34,7 +47,10 @@ def init_settings(state: state_pb2.render_rob_state) -> None:  # pylint: disable
   state.settings.preview.resolution = 50
 
 
-def find_job(jobs: Any, job: Any) -> int:
+def find_job(
+  jobs: Iterable[state_pb2.render_job],  # pylint: disable=no-member
+  job: state_pb2.render_job | None,  # pylint: disable=no-member
+) -> int:
   """Find a job in a list of jobs."""
   for i, current_job in enumerate(jobs):
     if current_job == job:
@@ -48,6 +64,8 @@ class StateSaver:
   def __init__(self) -> None:
     """Initialize the state saver."""
     self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
+    # Set by the main window once it exists, so dialogs raised from here get a parent.
+    self.parent_widget: QWidget | None = None
     init_settings(self.state)
 
   def state_to_table(self, table: QTableWidget) -> None:
@@ -77,7 +95,9 @@ class StateSaver:
         ],
       )
       ui_utils.set_combobox_indexes(
-        table, i, [render_job.file_format, render_job.engine, render_job.device]
+        table,
+        i,
+        [render_job.file_format, render_job.engine, render_job.device],
       )
       table.setItem(i, 15, QTableWidgetItem(render_job.scene))
       table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))
@@ -86,7 +106,6 @@ class StateSaver:
 
   def table_to_state(self, table: QTableWidget) -> None:
     """Create a render job from a table row."""
-
     del self.state.render_jobs[:]
     for i in range(table.rowCount()):
       render_job = state_pb2.render_job()  # pylint: disable=no-member

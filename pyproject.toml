@@ -14,6 +14,17 @@ dependencies = [
     "pyside6-essentials>=6.10.0",
 ]
 
+[dependency-groups]
+# protoc ships inside grpcio-tools, so the proto bindings can be generated from the project's
+# own environment on every platform instead of needing a system protoc install.
+dev = [
+    "grpcio-tools>=1.76.0",
+    "ruff>=0.16.0",
+    # ty is pre-1.0 and gains rules with every release, so pin it exactly: a floor would turn a
+    # green branch red on somebody else's release rather than on a change made here.
+    "ty==0.0.79",
+]
+
 [build-system]
 requires = ["setuptools>=64", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -57,7 +68,7 @@ exclude = [
 line-length = 100
 indent-width = 2
 
-target-version = "py311"
+target-version = "py313"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`) codes by default.
@@ -113,7 +124,6 @@ select = [
     "C4",
     "FBT",
     "C90",
-    "DOC",
     "Q",
     "G",
     "I",
@@ -134,8 +144,16 @@ ignore = [
     "PT009",  # Don't use assert functions of testing class.
     "FIX002", #
     "TD003",  # Missing link in todo.
-    "S603", # Check subprocess.run input
+    "S603",   # Check subprocess.run input.
     "CPY001",
+    # Render Rob deliberately launches the platform's own tools (open, xdg-open, codesign,
+    # nvidia-smi) and the user-configured Blender by name, so they resolve on PATH.
+    "S607",
+    # Qt and bpy take booleans positionally throughout (setChecked(True), blockSignals(True),
+    # view_layer.use = True). We don't control those signatures.
+    "FBT003",
+    # Conflicts with `ruff format`, which owns trailing commas.
+    "COM812",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
@@ -192,3 +210,62 @@ explicit = true
 name = "gdal-wheels"
 url = "https://gitlab.com/api/v4/projects/61637378/packages/pypi/simple"
 explicit = true
+
+[tool.ruff.lint.per-file-ignores]
+# Qt dispatches event handlers and delegate hooks by name, so these cannot be renamed to
+# snake_case without silently unhooking them.
+"src/main.py" = ["N802"]
+"src/utils_rr/dropwidget.py" = ["N802"]
+"src/utils_rr/table_utils.py" = ["N802"]
+# These modules exist to write to the console.
+"src/utils_common/print_utils.py" = ["T201"]
+"src/utils_common/rr_c_image.py" = ["T201"]
+# Tests build protobuf fixtures by hand and assert on booleans; annotating every helper and
+# routing every literal through a constant would bury what each test actually checks.
+"*_test.py" = ["ANN", "PLR2004", "PLR0915", "S101"]
+
+[tool.ty.environment]
+# The app imports its own modules as top-level names (`import main`, `from utils_rr import ...`),
+# so ty needs the same source root the test runner uses.
+root = ["src"]
+
+[tool.ty.rules]
+# Render Rob builds most of its object graph at runtime, in three ways ty cannot follow:
+#   * PySide6's "forgiveness mode" enums - Qt.AlignCenter, QMessageBox.Yes, QFile.ReadOnly. They
+#     exist at runtime, but the stubs only declare the scoped spellings (Qt.AlignmentFlag.*).
+#   * bpy, which has no stubs at all and resolves everything through Blender's RNA at runtime.
+#   * The widgets in window.ui and settings.ui, which QUiLoader attaches to a plain QWidget by
+#     the object names in the .ui file - self.window.tableWidget and friends.
+# Together those are almost every occurrence, so the rule is off rather than annotated away at
+# hundreds of call sites. Note what this gives up: it is the rule that caught StateSaver's
+# undeclared `parent_widget`. Declare instance attributes in __init__ and it stays caught.
+unresolved-attribute = "ignore"
+
+# Qt widgets do not exist until setup() runs, so main.py holds them as None until then, and
+# every use afterwards looks like a use of None.
+[[tool.ty.overrides]]
+include = ["src/main.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+invalid-assignment = "ignore"
+
+# Everything reached through bpy.context and bpy.data is untyped, so assigning to a render
+# setting looks like assigning to an attribute of None.
+[[tool.ty.overrides]]
+include = ["src/utils_bpy/**"]
+[tool.ty.overrides.rules]
+invalid-assignment = "ignore"
+
+# The tests drive the same untyped Qt and bpy objects as the code above.
+[[tool.ty.overrides]]
+include = ["src/*_test*.py"]
+[tool.ty.overrides.rules]
+invalid-argument-type = "ignore"
+not-iterable = "ignore"
+
+# cx_Freeze is only needed for the Windows build, so it is not a project dependency and cannot
+# be resolved here.
+[[tool.ty.overrides]]
+include = ["tools/setup.py"]
+[tool.ty.overrides.rules]
+unresolved-import = "ignore"
