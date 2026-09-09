@@ -1,6 +1,6 @@
 """Placeholder delegate for QTableWidget."""
 
-from PySide6.QtCore import QModelIndex, Qt
+from PySide6.QtCore import QModelIndex, QPersistentModelIndex, Qt
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem, QTableWidget, QWidget
 
@@ -18,7 +18,7 @@ class PlaceholderDelegate(QStyledItemDelegate):
     self,
     painter: QPainter,
     option: QStyleOptionViewItem,
-    index: QModelIndex,
+    index: QModelIndex | QPersistentModelIndex,
   ) -> None:
     """Paint the placeholder text."""
     super().paint(painter, option, index)

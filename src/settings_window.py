@@ -2,8 +2,7 @@
 
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QIcon
-from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QFileDialog
+from PySide6.QtWidgets import QFileDialog, QWidget
 
 from protos import state_pb2
 from utils_rr import ui_utils
@@ -49,7 +48,7 @@ class SettingsWindow:
 
     self.window.exec()
 
-  def make_settings_window_connections(self, window: QUiLoader) -> None:
+  def make_settings_window_connections(self, window: QWidget) -> None:
     """Make connections for buttons in settings dialog.."""
     window.buttonBox.accepted.connect(self.save_settings_state)
     window.blender_button.clicked.connect(self.open_blender_path)
@@ -58,13 +57,15 @@ class SettingsWindow:
 
   def open_blender_path(self) -> None:
     """Open a file dialog to select the path to Blender."""
-    path = QFileDialog.getOpenFileName(
+    # getOpenFileName returns a (file name, selected filter) pair, which is truthy even when the
+    # dialog is cancelled - unlike getExistingDirectory below, which returns a plain string.
+    blender_path, _ = QFileDialog.getOpenFileName(
       self.window,
       caption="Select Blender Path",
       filter="Blender (*.exe)",
     )
-    if path:
-      self.window.lineEdit_3.setText(path[0])
+    if blender_path:
+      self.window.lineEdit_3.setText(blender_path)
 
   def open_blender_files_path(self) -> None:
     """Open a file dialog to select the path to Blender files."""

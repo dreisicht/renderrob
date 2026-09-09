@@ -15,7 +15,7 @@ class DropWidget(QWidget):
 
   def dropEvent(self, event: QDropEvent) -> None:
     """Add every dropped .blend file as a new row."""
-    if event.mimeData().hasUrls:
+    if event.mimeData().hasUrls():
       for url in event.mimeData().urls():
         file_path = url.toLocalFile()
         if not url.isLocalFile():

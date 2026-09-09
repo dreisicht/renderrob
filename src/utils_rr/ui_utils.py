@@ -1,7 +1,7 @@
 """Util functions for helping build the render rob UI."""
 
 import sys
-from collections.abc import Generator
+from collections.abc import Callable, Generator
 from contextlib import closing
 from importlib import resources
 from pathlib import Path
@@ -51,7 +51,8 @@ PLACEHOLDER_TEXT = {
   16: "View Layers",
   17: "Comments",
 }
-TABLE_CHANGED_FUNCTION = None
+# Set by main.py once the main window exists, so the table widgets can report their edits.
+TABLE_CHANGED_FUNCTION: Callable[..., None] | None = None
 
 
 STYLESHEET_FILE_NAME = "style.qss"
@@ -88,7 +89,7 @@ def load_stylesheet(colors: dict[str, int]) -> str:
   return Template(stylesheet_path.read_text(encoding="utf-8")).substitute(substitutions)
 
 
-def load_ui_from_file(ui_file_name: str, custom_widgets: list[Any] | None = None) -> QUiLoader:
+def load_ui_from_file(ui_file_name: str, custom_widgets: list[Any] | None = None) -> QWidget:
   """Load a UI file from the given path and return the widget."""
   ui_loader = QUiLoader()
 

@@ -6,6 +6,7 @@ ERRORCACHE
 *.exe
 deployment/*
 *_pb2.py
+*_pb2.pyi
 .rr_cache
 experiment.py
 tmp/*

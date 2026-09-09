@@ -7,15 +7,28 @@ is being handled in the settings window class.
 import json
 from collections.abc import Iterable
 from pathlib import Path
+from typing import Literal, overload
 
-from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem
+from PySide6.QtWidgets import QCheckBox, QTableWidget, QTableWidgetItem, QWidget
 
 from protos import state_pb2
 from utils_rr import path_utils, table_utils, ui_utils
 
 
-def get_text(item: QTableWidgetItem, widget: str | None = None) -> str:
-  """Get the text from a table item."""
+@overload
+def get_text(item: QWidget, widget: Literal["checkbox"]) -> bool: ...
+
+
+@overload
+def get_text(item: QTableWidgetItem | QWidget, widget: Literal["dropdown"]) -> str: ...
+
+
+@overload
+def get_text(item: QTableWidgetItem, widget: None = None) -> str: ...
+
+
+def get_text(item: QTableWidgetItem | QWidget, widget: str | None = None) -> str | bool:
+  """Get the value of a table cell, as text or - for a checkbox - as a bool."""
   if not item:
     return ""
   if widget == "dropdown":
@@ -51,6 +64,8 @@ class StateSaver:
   def __init__(self) -> None:
     """Initialize the state saver."""
     self.state = state_pb2.render_rob_state()  # pylint: disable=no-member
+    # Set by the main window once it exists, so dialogs raised from here get a parent.
+    self.parent_widget: QWidget | None = None
     init_settings(self.state)
 
   def state_to_table(self, table: QTableWidget) -> None:

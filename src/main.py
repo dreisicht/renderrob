@@ -372,11 +372,8 @@ class MainWindow(QWidget):
     if reply == QMessageBox.Yes:
       self.save_file()
       return True
-    if reply == QMessageBox.No:
-      return True
-    if reply == QMessageBox.Cancel:
-      return False
-    return None
+    # Anything but an explicit No - a cancel, or the dialog being closed - stops the action.
+    return reply == QMessageBox.No
 
   ######### CONSOLE WINDOW ###########
   def _scroll_console_to_end_if_at_bottom(self) -> None:
@@ -533,7 +530,7 @@ class MainWindow(QWidget):
     self.set_table_colors()
     self.table.blockSignals(False)
 
-  def play_job(self) -> int:
+  def play_job(self) -> None:
     """Open a job in image viewer or Blender Player."""
     self.state_saver.table_to_state(self.table)
     current_row = self.table.currentRow()

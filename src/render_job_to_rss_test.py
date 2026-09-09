@@ -24,7 +24,7 @@ class TestRenderJobToRss(unittest.TestCase):
     render_job.y_res = str(1080)
     render_job.samples = str(128)
     render_job.file_format = 0
-    render_job.engine = 0
+    render_job.engine = state_pb2.render_engine.cycles
     render_job.device = 0
     render_job.motion_blur = True
     render_job.overwrite = True

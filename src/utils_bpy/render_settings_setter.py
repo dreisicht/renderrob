@@ -38,7 +38,9 @@ class RenderSettingsSetter:
     self.current_scene_data = bpy.context.scene
     self.current_scene_render = self.current_scene_data.render
 
-  def resolve_view_layers(self, view_layer_names: list[str]) -> object | None:
+  def resolve_view_layers(
+    self, view_layer_names: list[str] | None
+  ) -> "bpy.types.ViewLayer | bpy.types.bpy_prop_collection | list[bpy.types.ViewLayer] | None":
     """Look the requested view layers up in the current scene.
 
     Returns the single view layer, the list of view layers, or the scene's whole collection when
@@ -78,7 +80,7 @@ class RenderSettingsSetter:
       return None
     return [scene_view_layers[name] for name in requested_names]
 
-  def set_view_layers(self, view_layer_names: list[str]) -> None:
+  def set_view_layers(self, view_layer_names: list[str] | None) -> None:
     """Set the view layer to be rendered."""
     for view_layer in self.current_scene_data.view_layers:
       view_layer.use = False
@@ -133,7 +135,7 @@ class RenderSettingsSetter:
     render_device: str,
     *,
     border: bool,
-    samples: str,
+    samples: str | int,
     motion_blur: bool,
     engine: str,
   ) -> None:

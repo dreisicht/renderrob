@@ -9,8 +9,8 @@ from utils_rr.path_utils import normalize_drive_letter
 
 
 def render_job_to_render_settings_setter(
-  render_job: state_pb2.render_job,  # pylint: disable=no-member  # ty: ignore[unresolved-attribute]
-  settings: state_pb2.settings,  # ty: ignore[unresolved-attribute]
+  render_job: state_pb2.render_job,  # pylint: disable=no-member
+  settings: state_pb2.settings,
 ) -> str:  # pylint: disable=no-member
   """Build a Python command to execute the render_settings_setter."""
   if render_job.high_quality:

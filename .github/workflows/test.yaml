@@ -60,7 +60,7 @@ jobs:
       - name: Build the proto bindings
         run: >
           uv run python -m grpc_tools.protoc
-          --proto_path=src/protos --python_out=src/protos
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
           src/protos/state.proto src/protos/cache.proto
 
       - name: Run the unit tests

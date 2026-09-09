@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QModelIndex
+from PySide6.QtCore import QModelIndex, QPersistentModelIndex
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (
   QCheckBox,
@@ -143,7 +143,10 @@ def make_editable(table_widget: QTableWidget) -> None:
     """Allow editing of QTableWidget."""
 
     def createEditor(  # pylint: disable=invalid-name
-      self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+      self,
+      parent: QWidget,
+      option: QStyleOptionViewItem,
+      index: QModelIndex | QPersistentModelIndex,
     ) -> QWidget:
       """Allow editing by returning the default editor."""
       return QStyledItemDelegate.createEditor(self, parent, option, index)
@@ -170,9 +173,14 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
   class ReadOnlyDelegate(QStyledItemDelegate):
     """Prevent editing of QTableWidget."""
 
+    # ty: ignore[invalid-method-override] - returning None is Qt's documented way to make a cell
+    # uneditable, but PySide6's stub types the return as a plain QWidget.
     def createEditor(  # pylint: disable=invalid-name
-      self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
-    ) -> None:
+      self,
+      parent: QWidget,
+      option: QStyleOptionViewItem,
+      index: QModelIndex | QPersistentModelIndex,
+    ) -> QWidget | None:
       """Prevent editing of QTableWidget by returning None."""
       del parent, option, index
 
