@@ -1,11 +1,8 @@
 """Build a Python command to execute the render_settings_setter."""
 
-import sys
-from pathlib import Path
-
 from protos import state_pb2
 from utils_rr import ui_utils
-from utils_rr.path_utils import normalize_drive_letter
+from utils_rr.path_utils import get_blender_module_path
 
 
 def render_job_to_render_settings_setter(
@@ -22,14 +19,6 @@ def render_job_to_render_settings_setter(
     frame_step = settings.preview.frame_step if settings.preview.frame_step_use else 1
     samples = settings.preview.samples if settings.preview.samples_use else render_job.samples
 
-  if sys.platform == "darwin":
-    if Path("../Resources/").exists():
-      cwd = Path("../Resources/").resolve()
-    elif Path("src").exists():
-      cwd = Path("src").resolve()
-  else:
-    cwd = normalize_drive_letter(str(Path.cwd()))
-
   # Set the resolution to an empty string if it is not set, otherwise a syntax error will occur.
   x_res = render_job.x_res or '""'
   y_res = render_job.y_res or '""'
@@ -40,7 +29,7 @@ def render_job_to_render_settings_setter(
 
   python_command = [
     "import sys",
-    f"sys.path.append('{cwd}')",
+    f"sys.path.append('{get_blender_module_path()}')",
     "from utils_bpy import render_settings_setter",
     f"rss = render_settings_setter.RenderSettingsSetter('{render_job.scene}', {render_job.view_layers})",  # noqa: E501
     *addons_command,

@@ -4,6 +4,7 @@ import os
 import platform
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.path.append(Path(__file__).parent.parent.as_posix())
@@ -69,7 +70,7 @@ class MainWindow(QWidget):
   def get_temp_dir(self) -> Path:
     """Get the temporary directory for cache files."""
     if sys.platform == "darwin":
-      temp_dir = Path(os.getenv("TMPDIR"))
+      temp_dir = Path(os.getenv("TMPDIR") or tempfile.gettempdir())
     else:
       temp_dir = Path.cwd()
     if not temp_dir.exists():
@@ -661,16 +662,9 @@ class MainWindow(QWidget):
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
-    if Path("../Resources").exists():
-      cwd = Path("../Resources").resolve()
-    if Path("src").exists():
-      cwd = Path("src").resolve()
-    if platform.system() == "Windows":
-      cwd = path_utils.normalize_drive_letter(str(Path.cwd()))
-
     python_command = [
       "import sys",
-      f"sys.path.append('{cwd}')",
+      f"sys.path.append('{path_utils.get_blender_module_path()}')",
       "from utils_bpy import settings_loader",
     ]
     python_command = " ; ".join(python_command)

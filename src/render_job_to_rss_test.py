@@ -1,7 +1,11 @@
 """Unit tests for shot_name_builder.py."""
 
+import os
+import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import render_job_to_rss
 from protos import state_pb2
@@ -38,11 +42,11 @@ class TestRenderJobToRss(unittest.TestCase):
       render_job,
       settings,
     )
-    cwd = path_utils.normalize_drive_letter(str(Path.cwd()))
+    module_dir = path_utils.normalize_drive_letter(str(Path(render_job_to_rss.__file__).parent))
     self.assertEqual(
       rss,
       (
-        f"import sys ; sys.path.append('{cwd}') ; "
+        f"import sys ; sys.path.append('{module_dir}') ; "
         "from utils_bpy import render_settings_setter ;"
         " rss = render_settings_setter.RenderSettingsSetter("
         "'Scene', ['View Layer']) ; rss.set_camera('Camera') ; rss"
@@ -52,3 +56,22 @@ class TestRenderJobToRss(unittest.TestCase):
         "high_quality=True) ; rss.custom_commands()"
       ),
     )
+
+    def test_module_path_is_independent_of_platform_and_cwd(self) -> None:
+      """The path handed to Blender must not depend on the platform or the working directory."""
+      expected = path_utils.normalize_drive_letter(str(Path(render_job_to_rss.__file__).parent))
+      original_cwd = Path.cwd()
+      try:
+        for platform_name in ("darwin", "win32", "linux"):
+          with (
+            patch.object(sys, "platform", platform_name),
+            tempfile.TemporaryDirectory() as elsewhere,
+          ):
+            os.chdir(elsewhere)
+            self.assertEqual(path_utils.get_blender_module_path(), expected)
+      finally:
+        os.chdir(original_cwd)
+
+
+if __name__ == "__main__":
+  unittest.main()
