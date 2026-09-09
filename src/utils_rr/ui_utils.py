@@ -5,12 +5,19 @@ from collections.abc import Generator
 from contextlib import closing
 from importlib import resources
 from pathlib import Path
+from string import Template
 from typing import Any
 
 from PySide6.QtCore import QDir, QFile, QMetaObject, Qt
-from PySide6.QtGui import QColor
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
+from PySide6.QtWidgets import (
+  QCheckBox,
+  QComboBox,
+  QHBoxLayout,
+  QTableWidget,
+  QTableWidgetItem,
+  QWidget,
+)
 
 import ui
 from utils_common import print_utils
@@ -47,16 +54,45 @@ PLACEHOLDER_TEXT = {
 TABLE_CHANGED_FUNCTION = None
 
 
+STYLESHEET_FILE_NAME = "style.qss"
+
+
+def resolve_ui_file(file_name: str) -> Path:
+  """Find a file shipped in the ui package.
+
+  Where it lives depends on how Render Rob was started: from the repository, from the working
+  directory of a frozen build, or from inside the installed package.
+  """
+  if Path(file_name).exists():
+    return Path(file_name)
+  if (Path("ui") / file_name).exists():
+    return Path("ui") / file_name
+  return Path(str(resources.files(ui) / file_name))
+
+
+def load_stylesheet(colors: dict[str, int]) -> str:
+  """Build the application stylesheet for the given palette.
+
+  The .qss file is written with $placeholders so that the same rules serve the light and the dark
+  theme; see utils_rr/table_utils.py for the palettes.
+
+  Styling is cosmetic, so a bundle that is missing the file still starts, just unstyled.
+  """
+  stylesheet_path = resolve_ui_file(STYLESHEET_FILE_NAME)
+  if not stylesheet_path.is_file():
+    print_utils.print_warning(f"I couldn't find my stylesheet at {stylesheet_path}.")
+    return ""
+  substitutions = {name: f"#{value:06x}" for name, value in colors.items()}
+  # Qt needs forward slashes in url() even on Windows.
+  substitutions["icons_dir"] = (stylesheet_path.parent / "icons").as_posix()
+  return Template(stylesheet_path.read_text(encoding="utf-8")).substitute(substitutions)
+
+
 def load_ui_from_file(ui_file_name: str, custom_widgets: list[Any] | None = None) -> QUiLoader:
   """Load a UI file from the given path and return the widget."""
   ui_loader = QUiLoader()
 
-  if Path(ui_file_name).exists():
-    ui_file_path = Path(ui_file_name)
-  elif (Path("ui") / ui_file_name).exists():
-    ui_file_path = Path("ui") / ui_file_name
-  else:
-    ui_file_path = resources.files(ui) / ui_file_name
+  ui_file_path = resolve_ui_file(ui_file_name)
 
   qt_q_dir = QDir(ui_file_path.parent)
   ui_loader.setWorkingDirectory(qt_q_dir)
@@ -114,27 +150,25 @@ def set_checkbox_values(table: QTableWidget, row: int, values: list[bool]) -> No
     checkbox_item.blockSignals(False)
 
 
-def set_combobox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
-  """Set color of comboboxes."""
-  widget = table.cellWidget(row, col)
-  if widget:
-    widget.setStyleSheet(f"QComboBox:drop-down {{background-color: {color.name()};}}")
+def add_background_item(table: QTableWidget, row: int, col: int) -> None:
+  """Put an empty, inert item behind a cell that holds a widget.
 
-
-def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color: QColor) -> None:
-  """Set color of checkboxes."""
-  widget = table.cellWidget(row, col)
-  if widget:
-    widget.setStyleSheet(f"background-color: {color.name()};")
+  A cell widget covers the view's own background, so a cell that only contains a checkbox or a
+  dropdown would stay uncolored while the rest of its row takes on the job's status color. The
+  item is never read back - state_saver reads those columns via cellWidget - it exists purely so
+  that color_row_background has something to paint.
+  """
+  item = QTableWidgetItem()
+  item.setFlags(Qt.ItemIsEnabled)
+  table.setItem(row, col, item)
 
 
 def add_checkbox(table: QTableWidget, row: int, col: int, *, checked: bool = False) -> None:
   """Add a checkbox to the given table at the given row and column."""
   widget = QWidget()
+  # The cell widget must not paint its own background, or it hides the row color.
+  widget.setAttribute(Qt.WA_TranslucentBackground)
   check_box = QCheckBox()
-  # Warning: Setting the size way bigger here, so that the click area is bigger. If other styles
-  # are used, this might need to be adjusted. See in renderrob.py: self.app.setStye("Breeze")
-  check_box.setStyleSheet("QCheckBox::indicator { width: 50px; height: 50px;}")
   layout = QHBoxLayout(widget)
   layout.addWidget(check_box)
   layout.setAlignment(Qt.AlignCenter)
@@ -143,6 +177,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, *, checked: bool = Fal
   check_box.setCheckState(Qt.Checked if checked else Qt.Unchecked)
   # Refactor: Hook up checkboxes with table_changed function.
   check_box.clicked.connect(TABLE_CHANGED_FUNCTION)
+  add_background_item(table, row, col)
   table.setCellWidget(row, col, widget)
 
 
@@ -151,6 +186,7 @@ def add_dropdown(table: QTableWidget, row: int, col: int, items: list[str]) -> N
   dropdown = QComboBox()
   dropdown.addItems(items)
   dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
+  add_background_item(table, row, col)
   table.setCellWidget(row, col, dropdown)
 
 

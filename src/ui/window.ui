@@ -13,9 +13,6 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <property name="styleSheet">
-   <string notr="true"/>
-  </property>
   <widget class="DropWidget" name="centralwidget">
    <property name="acceptDrops">
     <bool>true</bool>
@@ -273,10 +270,6 @@
             </item>
             <item>
              <widget class="QTableWidget" name="tableWidget">
-              <property name="styleSheet">
-               <string notr="true">QTableWidget {
-                                background: #ebebeb}</string>
-              </property>
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
@@ -558,16 +551,6 @@
             <bold>false</bold>
            </font>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QTextEdit, QListView {
-                        font: 9pt &quot;Fira Code&quot;;
-                        color: rgb(255, 255, 255);
-                        background-color: rgb(52, 80, 100);
-                        }
-
-
-                      </string>
-          </property>
          </widget>
         </item>
        </layout>
@@ -576,16 +559,6 @@
     </item>
     <item>
      <widget class="QProgressBar" name="progressBar">
-      <property name="styleSheet">
-       <string notr="true"> QProgressBar::chunk {
-                background-color: #78909c;
-                width: 20px;
-                text-align: center;
-                }
-                QProgressBar {
-                text-align: center;
-                }</string>
-      </property>
       <property name="value">
        <number>24</number>
       </property>

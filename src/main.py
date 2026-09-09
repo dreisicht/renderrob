@@ -11,7 +11,15 @@ sys.path.append(Path(__file__).parent.parent.as_posix())
 
 
 from PySide6.QtCore import QCoreApplication, QProcess, Qt
-from PySide6.QtGui import QAction, QCloseEvent, QColor, QIcon, QTextCharFormat, QTextCursor
+from PySide6.QtGui import (
+  QAction,
+  QCloseEvent,
+  QColor,
+  QIcon,
+  QPalette,
+  QTextCharFormat,
+  QTextCursor,
+)
 from PySide6.QtWidgets import (
   QApplication,
   QFileDialog,
@@ -37,6 +45,11 @@ UI_FILE_NAME = "window.ui"
 # Qt reports the color scheme as an enum whose values are Unknown/Light/Dark.
 LIGHT_COLOR_SCHEME = 1
 DARK_COLOR_SCHEME = 2
+# Halfway up QColor's 0-255 lightness scale, used to tell a dark desktop from a light one.
+MID_LIGHTNESS = 128
+
+# Tall enough for the comboboxes and checkboxes in a row to breathe.
+TABLE_ROW_HEIGHT = 30
 
 # How far from the bottom of the console the user may be and still have the view follow the output.
 CONSOLE_FOLLOW_THRESHOLD = 1500
@@ -86,14 +99,31 @@ class MainWindow(QWidget):
     self.cache_path = self.get_temp_dir() / ".rr_cache"
 
     # NOTE: Avoid global state with theme colors.
-    if self.app.styleHints().colorScheme().value == LIGHT_COLOR_SCHEME:
-      table_utils.COLORS = table_utils.COLORS_LIGHT
-    elif self.app.styleHints().colorScheme().value == DARK_COLOR_SCHEME:
-      table_utils.COLORS = table_utils.COLORS_DARK
+    table_utils.COLORS = self.pick_palette()
+
+  def pick_palette(self) -> dict[str, int]:
+    """Choose the light or the dark palette to match the desktop.
+
+    Qt reports Unknown on platforms that do not expose a preference, so fall back to reading the
+    lightness of the style's own window color instead of guessing.
+    """
+    color_scheme = self.app.styleHints().colorScheme().value
+    if color_scheme == LIGHT_COLOR_SCHEME:
+      return table_utils.COLORS_LIGHT
+    if color_scheme == DARK_COLOR_SCHEME:
+      return table_utils.COLORS_DARK
+    window_color = self.app.palette().color(QPalette.Window)
+    if window_color.lightness() < MID_LIGHTNESS:
+      return table_utils.COLORS_DARK
+    return table_utils.COLORS_LIGHT
 
   def setup(self) -> None:
     """Provide main function."""
-    self.app.setStyle("Breeze")
+    # Fusion is the only style PySide6 ships on every platform. The previous "Breeze" is a KDE
+    # platform style, so setStyle silently did nothing and the widget metrics tuned for it - most
+    # visibly the table's checkbox size - were wrong everywhere.
+    self.app.setStyle("Fusion")
+    self.app.setStyleSheet(ui_utils.load_stylesheet(table_utils.COLORS))
     if self.cache_path.exists():
       self.load_cache()
     self.resize(1800, self.app.primaryScreen().size().height())
@@ -103,9 +133,7 @@ class MainWindow(QWidget):
     self.window.setWindowIcon(QIcon("icon/icon-256.png"))
     self.app.setWindowIcon(QIcon("icon/icon-256.png"))
     self.table = self.window.tableWidget
-    self.table.setStyleSheet(
-      "QTableWidget {background-color: " + str(table_utils.COLORS["grey_light"]) + "}",
-    )
+    self.table.verticalHeader().setDefaultSectionSize(TABLE_ROW_HEIGHT)
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -375,17 +403,22 @@ class MainWindow(QWidget):
     bash_colors = print_utils.BASH_COLORS
     # (ANSI prefix, text background, text foreground, row color)
     severities = (
-      (bash_colors["BACK_RED"] + " " + bash_colors["FORE_WHITE"], "red", "white", "red"),
+      (
+        bash_colors["BACK_RED"] + " " + bash_colors["FORE_WHITE"],
+        "console_error",
+        "console_foreground",
+        "red",
+      ),
       (
         bash_colors["BACK_YELLOW"] + " " + bash_colors["FORE_BLACK"],
-        "yellow",
-        "black_dark",
+        "console_warning",
+        "console_background",
         "yellow",
       ),
       (
         bash_colors["BACK_CYAN"] + " " + bash_colors["FORE_BLACK"],
-        "blue_grey_lighter",
-        "black_dark",
+        "console_info",
+        "console_foreground",
         None,
       ),
     )
@@ -702,7 +735,7 @@ class MainWindow(QWidget):
     else:
       all_jobs_count = len([x for x in self.state_saver.state.render_jobs if x.active])
       done_jobs_count = len(self.green_jobs) + len(self.yellow_jobs) + len(self.red_jobs)
-      self.window.progressBar.setValue(100 * done_jobs_count / all_jobs_count)
+      self.window.progressBar.setValue(100 * done_jobs_count // all_jobs_count)
       if self.active_render_job.active:
         self.render_job(self.active_render_job)
     self.window.textBrowser.moveCursor(QTextCursor.End)

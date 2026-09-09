@@ -1,0 +1,376 @@
+/*
+ * Render Rob's application stylesheet.
+ *
+ * The placeholders are substituted from the active palette in
+ * utils_rr/table_utils.py, so this file works unchanged for both the light and the dark theme. Load it through
+ * ui_utils.load_stylesheet() rather than reading it directly.
+ */
+
+QWidget {
+  background-color: $window;
+  color: $text;
+  font-size: 13px;
+}
+
+QToolTip {
+  background-color: $surface;
+  color: $text;
+  border: 1px solid $border_strong;
+  padding: 4px 6px;
+}
+
+/* ---------------------------------------------------------------- menu bar */
+
+QMenuBar {
+  background-color: $window;
+  border-bottom: 1px solid $border;
+  padding: 2px 4px;
+}
+
+QMenuBar::item {
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+  background-color: $selection;
+}
+
+QMenu {
+  background-color: $surface;
+  border: 1px solid $border;
+  padding: 4px;
+}
+
+QMenu::item {
+  padding: 6px 24px 6px 12px;
+  border-radius: 4px;
+}
+
+QMenu::item:selected {
+  background-color: $accent;
+  color: $accent_text;
+}
+
+QMenu::separator {
+  height: 1px;
+  background: $border;
+  margin: 4px 8px;
+}
+
+/* ----------------------------------------------------------------- buttons */
+
+QPushButton {
+  background-color: $surface;
+  color: $text;
+  border: 1px solid $border_strong;
+  border-radius: 6px;
+  padding: 7px 14px;
+  min-height: 16px;
+}
+
+/* The sidebar buttons pair an icon with a label, so their text lines up on the left. */
+QPushButton#add_button,
+QPushButton#delete_button,
+QPushButton#duplicate_button,
+QPushButton#up_button,
+QPushButton#down_button,
+QPushButton#blender_button,
+QPushButton#sync_button,
+QPushButton#play_button,
+QPushButton#open_button,
+QPushButton#render_button,
+QPushButton#stop_button {
+  text-align: left;
+}
+
+QPushButton:hover {
+  background-color: $surface_alt;
+  border-color: $accent;
+}
+
+QPushButton:pressed {
+  background-color: $selection;
+}
+
+QPushButton:disabled {
+  color: $text_muted;
+  border-color: $border;
+  background-color: $window;
+}
+
+/* The two buttons that actually start and stop work carry the accent. */
+QPushButton#render_button {
+  background-color: $accent;
+  color: $accent_text;
+  border-color: $accent;
+  font-weight: bold;
+}
+
+QPushButton#render_button:hover {
+  background-color: $accent_hover;
+  border-color: $accent_hover;
+}
+
+QPushButton#render_button:disabled {
+  background-color: $window;
+  color: $text_muted;
+  border-color: $border;
+}
+
+QPushButton#stop_button:enabled {
+  background-color: $danger;
+  color: #ffffff;
+  border-color: $danger;
+  font-weight: bold;
+}
+
+QPushButton#stop_button:hover:enabled {
+  background-color: $danger_hover;
+  border-color: $danger_hover;
+}
+
+/* ------------------------------------------------------------------- table */
+
+QTableWidget {
+  background-color: $surface;
+  alternate-background-color: $surface_alt;
+  gridline-color: $border;
+  border: 1px solid $border;
+  border-radius: 6px;
+  selection-background-color: $selection;
+  selection-color: $text;
+}
+
+/*
+ * Deliberately no QTableWidget::item rule at all. Any such rule makes Qt paint items through the
+ * stylesheet, which drops the background a QTableWidgetItem sets on itself - and those per-row
+ * status colors are the whole point of the table. Row padding comes from the row height that
+ * main.py sets instead.
+ */
+
+QHeaderView {
+  background-color: $header_background;
+}
+
+QHeaderView::section {
+  background-color: $header_background;
+  color: $text_muted;
+  padding: 6px 4px;
+  border: none;
+  border-right: 1px solid $border;
+  border-bottom: 1px solid $border_strong;
+  font-weight: bold;
+}
+
+QHeaderView::section:last {
+  border-right: none;
+}
+
+QTableCornerButton::section {
+  background-color: $header_background;
+  border: none;
+  border-bottom: 1px solid $border_strong;
+}
+
+/* ------------------------------------------------- inputs inside the table */
+
+QComboBox {
+  background-color: $surface;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  padding: 3px 6px;
+  /* Leaves a margin of the row's status color around the control. */
+  margin: 3px 5px;
+  min-height: 18px;
+}
+
+QComboBox:hover {
+  border-color: $accent;
+}
+
+QComboBox::drop-down {
+  border: none;
+  width: 18px;
+}
+
+QComboBox QAbstractItemView {
+  background-color: $surface;
+  border: 1px solid $border_strong;
+  selection-background-color: $accent;
+  selection-color: $accent_text;
+  outline: none;
+}
+
+QCheckBox {
+  background: transparent;
+  spacing: 7px;
+}
+
+QCheckBox::indicator {
+  width: 16px;
+  height: 16px;
+  border: 1px solid $border_strong;
+  border-radius: 4px;
+  background-color: $surface;
+}
+
+QCheckBox::indicator:hover {
+  border-color: $accent;
+}
+
+QCheckBox::indicator:checked {
+  background-color: $accent;
+  border-color: $accent;
+  image: url($icons_dir/check.svg);
+}
+
+QLineEdit,
+QSpinBox {
+  background-color: $surface;
+  color: $text;
+  border: 1px solid $border;
+  border-radius: 4px;
+  padding: 5px 7px;
+  selection-background-color: $accent;
+  selection-color: $accent_text;
+}
+
+QLineEdit:focus,
+QSpinBox:focus {
+  border-color: $accent;
+}
+
+QSpinBox::up-button,
+QSpinBox::down-button {
+  background-color: $surface_alt;
+  border-left: 1px solid $border;
+  width: 15px;
+}
+
+QSpinBox::up-button {
+  subcontrol-position: top right;
+  border-top-right-radius: 3px;
+  border-bottom: 1px solid $border;
+}
+
+QSpinBox::down-button {
+  subcontrol-position: bottom right;
+  border-bottom-right-radius: 3px;
+}
+
+QSpinBox::up-button:hover,
+QSpinBox::down-button:hover {
+  background-color: $selection;
+}
+
+QSpinBox::up-arrow {
+  image: url($icons_dir/caret-up.svg);
+  width: 8px;
+  height: 8px;
+}
+
+QSpinBox::down-arrow {
+  image: url($icons_dir/caret-down.svg);
+  width: 8px;
+  height: 8px;
+}
+
+/* ----------------------------------------------------------------- console */
+
+QTextBrowser {
+  background-color: $console_background;
+  color: $console_foreground;
+  border: 1px solid $border;
+  border-radius: 6px;
+  padding: 6px;
+  font-family: "Fira Code", "JetBrains Mono", "DejaVu Sans Mono", monospace;
+  font-size: 12px;
+}
+
+/* ------------------------------------------------------------ progress bar */
+
+QProgressBar {
+  background-color: $surface_alt;
+  border: 1px solid $border;
+  border-radius: 6px;
+  height: 16px;
+  text-align: center;
+  color: $text_muted;
+  font-size: 11px;
+}
+
+QProgressBar::chunk {
+  background-color: $accent;
+  border-radius: 5px;
+}
+
+/* --------------------------------------------------- splitter and scrollbars */
+
+QSplitter::handle {
+  background-color: $border;
+  height: 3px;
+  margin: 3px 0;
+}
+
+QSplitter::handle:hover {
+  background-color: $accent;
+}
+
+QScrollBar:vertical {
+  background: transparent;
+  width: 11px;
+  margin: 0;
+}
+
+QScrollBar:horizontal {
+  background: transparent;
+  height: 11px;
+  margin: 0;
+}
+
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal {
+  background: $border_strong;
+  border-radius: 5px;
+  min-height: 28px;
+  min-width: 28px;
+}
+
+QScrollBar::handle:vertical:hover,
+QScrollBar::handle:horizontal:hover {
+  background: $accent;
+}
+
+QScrollBar::add-line,
+QScrollBar::sub-line,
+QScrollBar::add-page,
+QScrollBar::sub-page {
+  background: none;
+  border: none;
+  height: 0;
+  width: 0;
+}
+
+/* ------------------------------------------------------------------ dialog */
+
+QDialogButtonBox QPushButton {
+  min-width: 76px;
+}
+
+QGroupBox {
+  border: 1px solid $border;
+  border-radius: 6px;
+  margin-top: 10px;
+  padding-top: 8px;
+  font-weight: bold;
+}
+
+QGroupBox::title {
+  subcontrol-origin: margin;
+  left: 10px;
+  padding: 0 4px;
+  color: $text_muted;
+}
