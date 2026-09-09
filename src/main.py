@@ -536,8 +536,8 @@ class MainWindow(QWidget):
       else:
         frame_step = 1
 
-      search_pattern = Path(filepath).name.replace(
-        self.state_saver.state.render_jobs[current_row].start.zfill(4), "*"
+      search_pattern = Path(snb.frame_path).name.replace(
+        "####", "*",
       )
       all_frames = [str(p) for p in Path(filepath).parent.glob(search_pattern)]
       all_frames.sort()

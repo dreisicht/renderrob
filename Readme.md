@@ -73,8 +73,8 @@ pyqt6-tools designer
 Convert protos:
 
 ```
-protoc --proto_path=protos/ --python_out=protos/ protos/state.proto
-protoc --proto_path=protos/ --python_out=protos/ protos/cache.proto
+protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/state.proto
+protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/cache.proto
 ```
 
 Create .ico file

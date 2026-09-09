@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 
-def discover_blender_path() -> None:
+def discover_blender_path() -> str:
   """Discover the path to Blender."""
   possibilities = ["C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
                    "C:/Program Files/Blender Foundation/Blender/blender.exe",

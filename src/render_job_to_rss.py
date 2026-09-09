@@ -9,8 +9,8 @@ from utils_rr.path_utils import normalize_drive_letter
 
 
 def render_job_to_render_settings_setter(
-  render_job: state_pb2.render_job,  # pylint: disable=no-member
-  settings: state_pb2.settings,
+  render_job: state_pb2.render_job,  # pylint: disable=no-member  # ty: ignore[unresolved-attribute]
+  settings: state_pb2.settings,  # ty: ignore[unresolved-attribute]
 ) -> str:  # pylint: disable=no-member
   """Build a Python command to execute the render_settings_setter."""
   if render_job.high_quality:
@@ -28,12 +28,12 @@ def render_job_to_render_settings_setter(
     elif Path("src").exists():
       cwd = Path("src").resolve()
   else:
-    cwd = normalize_drive_letter(Path.cwd())
+    cwd = normalize_drive_letter(str(Path.cwd()))
 
   # Set the resolution to an empty string if it is not set, otherwise a syntax error will occur.
-  x_res = render_job.x_res if render_job.x_res else '""'
-  y_res = render_job.y_res if render_job.y_res else '""'
-  samples = samples if samples else '""'
+  x_res = render_job.x_res or '""'
+  y_res = render_job.y_res or '""'
+  samples = samples or '""'
 
   addons = [addon for addon in settings.addons if addon != ""]
   addons_command = [f"rss.activate_addons({addons})"] if addons else []

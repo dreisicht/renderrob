@@ -4,7 +4,7 @@ version = "3.5.12"
 description = "Render Manager"
 readme = "README.md"
 authors = [{ name = "Peter Baintner", email = "pip@dreisicht.net" }]
-requires-python = ">=3.11"
+requires-python = ">=3.13"
 dependencies = [
     "bpy",
     "setuptools",
@@ -135,6 +135,7 @@ ignore = [
     "FIX002", #
     "TD003",  # Missing link in todo.
     "S603", # Check subprocess.run input
+    "CPY001",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
