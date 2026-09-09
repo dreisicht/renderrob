@@ -1,14 +1,15 @@
 """Utility functions for printing to the console."""
+
 import sys
 from pathlib import Path
 
 BASH_COLORS = {
-    "RESET_ALL": "\u001b[0m",
-    "BACK_CYAN": "\u001b[46m",
-    "BACK_RED": "\u001b[41m",
-    "BACK_YELLOW": "\u001b[43m",
-    "FORE_BLACK": "\u001b[30m",
-    "FORE_WHITE": "\u001b[37m",
+  "RESET_ALL": "\u001b[0m",
+  "BACK_CYAN": "\u001b[46m",
+  "BACK_RED": "\u001b[41m",
+  "BACK_YELLOW": "\u001b[43m",
+  "FORE_BLACK": "\u001b[30m",
+  "FORE_WHITE": "\u001b[37m",
 }
 CACHEFILEPATH = Path("ERRORCACHE")
 
@@ -53,8 +54,11 @@ def print_info_input(ipt_str: object) -> None:
 def print_info(ipt_str: object) -> None:
   """Print an info message to the console."""
   ipt_str = str(ipt_str)
-  print(BASH_COLORS["BACK_CYAN"], BASH_COLORS["FORE_BLACK"] +
-        "[INFO] " + ipt_str + BASH_COLORS["RESET_ALL"], flush=True)
+  print(
+    BASH_COLORS["BACK_CYAN"],
+    BASH_COLORS["FORE_BLACK"] + "[INFO] " + ipt_str + BASH_COLORS["RESET_ALL"],
+    flush=True,
+  )
 
 
 def write_cache(ipt_str: str) -> None:

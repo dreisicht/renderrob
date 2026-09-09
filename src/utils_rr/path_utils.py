@@ -6,12 +6,14 @@ from pathlib import Path
 
 def discover_blender_path() -> str:
   """Discover the path to Blender."""
-  possibilities = ["C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
-                   "C:/Program Files/Blender Foundation/Blender/blender.exe",
-                   "/Applications/Blender.app/Contents/MacOS/Blender",
-                   "/usr/bin/blender",
-                   "/usr/local/bin/blender",
-                   "~/blender/blender"]
+  possibilities = [
+    "C:/Program Files (x86)/Steam/steamapps/common/Blender/blender.exe",
+    "C:/Program Files/Blender Foundation/Blender/blender.exe",
+    "/Applications/Blender.app/Contents/MacOS/Blender",
+    "/usr/bin/blender",
+    "/usr/local/bin/blender",
+    "~/blender/blender",
+  ]
 
   for blender_path in possibilities:
     blender_path_path = Path(blender_path).expanduser()

@@ -174,7 +174,9 @@ class MainWindow(QWidget):
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(
       lambda: table_utils.move_row_up(
-        self.table, self.before_table_change, self.after_table_change,
+        self.table,
+        self.before_table_change,
+        self.after_table_change,
       ),
     )
     self.window.down_button.clicked.connect(
@@ -539,7 +541,8 @@ class MainWindow(QWidget):
         frame_step = 1
 
       search_pattern = Path(snb.frame_path).name.replace(
-        "####", "*",
+        "####",
+        "*",
       )
       all_frames = [str(p) for p in Path(filepath).parent.glob(search_pattern)]
       all_frames.sort()

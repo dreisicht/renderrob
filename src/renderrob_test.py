@@ -1,4 +1,5 @@
 """Unit tests for main module."""
+
 import unittest
 from pathlib import Path
 

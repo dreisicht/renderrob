@@ -1,4 +1,5 @@
 """Helper class to be able to register events for drag and drop operations."""
+
 from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PySide6.QtWidgets import QWidget
 

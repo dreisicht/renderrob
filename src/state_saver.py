@@ -80,7 +80,9 @@ class StateSaver:
         ],
       )
       ui_utils.set_combobox_indexes(
-        table, i, [render_job.file_format, render_job.engine, render_job.device],
+        table,
+        i,
+        [render_job.file_format, render_job.engine, render_job.device],
       )
       table.setItem(i, 15, QTableWidgetItem(render_job.scene))
       table.setItem(i, 16, QTableWidgetItem(";".join(render_job.view_layers)))

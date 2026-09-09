@@ -1,4 +1,5 @@
 """Unit tests for shot_name_builder.py."""
+
 import tempfile
 import unittest
 from pathlib import Path
@@ -85,7 +86,8 @@ class TestShotNameBuilder(unittest.TestCase):
     output_path = "/home/rob/Projects/renders/"
     snb = shot_name_builder.ShotNameBuilder(render_job, output_path)
     self.assertEqual(
-        snb.frame_path, "/home/rob/Projects/renders/rr_test-hq-v01/rr_test-hq-v01-f####.exr")
+      snb.frame_path, "/home/rob/Projects/renders/rr_test-hq-v01/rr_test-hq-v01-f####.exr"
+    )
 
   def test_get_frame_path_no_output(self) -> None:
     """Test that the shot name is built correctly."""
@@ -111,7 +113,8 @@ class TestShotNameBuilder(unittest.TestCase):
     output_path = ""
     snb = shot_name_builder.ShotNameBuilder(render_job, output_path)
     self.assertEqual(
-        snb.frame_path, "/home/rob/Projects/RenderRob/rr_test-hq-v01/rr_test-hq-v01-f####.png")
+      snb.frame_path, "/home/rob/Projects/RenderRob/rr_test-hq-v01/rr_test-hq-v01-f####.png"
+    )
 
   def test_set_version_number(self):
     """Test set_version_number."""
@@ -158,57 +161,70 @@ class TestShotNameBuilder(unittest.TestCase):
 
       # Empty folder leads to v01, in every mode.
       render_job.overwrite = False
-      self.assertEqual(version_number(replay=False),
-                       in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png"))
-      self.assertEqual(version_number(replay=True),
-                       in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png"))
+      self.assertEqual(
+        version_number(replay=False), in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png")
+      )
+      self.assertEqual(
+        version_number(replay=True), in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png")
+      )
       render_job.overwrite = True
-      self.assertEqual(version_number(replay=True),
-                       in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png"))
+      self.assertEqual(
+        version_number(replay=True), in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png")
+      )
 
       # v01 already exists, so v02 is returned.
       render_job.overwrite = False
       add_rendered_frame("rr_test-hq-v01")
-      self.assertEqual(version_number(replay=False),
-                       in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png"))
+      self.assertEqual(
+        version_number(replay=False), in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png")
+      )
 
       # Replay mode, but v01 already exists, so v01 is returned.
-      self.assertEqual(version_number(replay=True),
-                       in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png"))
+      self.assertEqual(
+        version_number(replay=True), in_tempdir("rr_test-hq-v01", "rr_test-hq-v01-f####.png")
+      )
 
       # v01 and v02 already exist, but replay mode so v02 is returned.
       add_rendered_frame("rr_test-hq-v02")
-      self.assertEqual(version_number(replay=True),
-                       in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png"))
+      self.assertEqual(
+        version_number(replay=True), in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png")
+      )
 
       # v01 and v02 already exist, so v03 is returned.
-      self.assertEqual(version_number(replay=False),
-                       in_tempdir("rr_test-hq-v03", "rr_test-hq-v03-f####.png"))
+      self.assertEqual(
+        version_number(replay=False), in_tempdir("rr_test-hq-v03", "rr_test-hq-v03-f####.png")
+      )
 
       # Overwrite is set, so v02 is returned, in either mode.
       render_job.overwrite = True
-      self.assertEqual(version_number(replay=False),
-                       in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png"))
-      self.assertEqual(version_number(replay=False),
-                       in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png"))
+      self.assertEqual(
+        version_number(replay=False), in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png")
+      )
+      self.assertEqual(
+        version_number(replay=False), in_tempdir("rr_test-hq-v02", "rr_test-hq-v02-f####.png")
+      )
 
       # Still output folder is empty, so v01 is returned in either mode.
       render_job.overwrite = False
       render_job.start = "1"
       render_job.end = ""
-      self.assertEqual(still_version_number(replay=False),
-                       in_tempdir("stills", "rr_test-hq-v01-f####.png"))
-      self.assertEqual(still_version_number(replay=True),
-                       in_tempdir("stills", "rr_test-hq-v01-f####.png"))
+      self.assertEqual(
+        still_version_number(replay=False), in_tempdir("stills", "rr_test-hq-v01-f####.png")
+      )
+      self.assertEqual(
+        still_version_number(replay=True), in_tempdir("stills", "rr_test-hq-v01-f####.png")
+      )
 
       # One image in the still output folder, so a new render goes to v02 while replay stays v01.
       new_image = Path(tempdir) / "stills" / "rr_test-hq-v01-f####.png"
       new_image.parent.mkdir(parents=True)
       new_image.touch()
-      self.assertEqual(still_version_number(replay=False),
-                       in_tempdir("stills", "rr_test-hq-v02-f####.png"))
-      self.assertEqual(still_version_number(replay=True),
-                       in_tempdir("stills", "rr_test-hq-v01-f####.png"))
+      self.assertEqual(
+        still_version_number(replay=False), in_tempdir("stills", "rr_test-hq-v02-f####.png")
+      )
+      self.assertEqual(
+        still_version_number(replay=True), in_tempdir("stills", "rr_test-hq-v01-f####.png")
+      )
 
 
 if __name__ == "__main__":

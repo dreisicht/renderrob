@@ -122,7 +122,11 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene.render.engine = self.rss.eevee_engine_identifier()
     scene.render.use_motion_blur = True
     self.rss.set_render_settings(
-      "cpu", border=False, samples=128, motion_blur=False, engine="EEVEE",
+      "cpu",
+      border=False,
+      samples=128,
+      motion_blur=False,
+      engine="EEVEE",
     )
     self.assertEqual(scene.render.engine, self.rss.eevee_engine_identifier())
     self.assertEqual(scene.eevee.taa_render_samples, 128)
@@ -137,7 +141,11 @@ class TestRenderSettingsSetter(unittest.TestCase):
     scene.render.use_motion_blur = True
     bpy.context.preferences.addons["cycles"].preferences.compute_device_type = "OPTIX"
     self.rss.set_render_settings(
-      "gpu", border=False, samples=128, motion_blur=False, engine="CYCLES",
+      "gpu",
+      border=False,
+      samples=128,
+      motion_blur=False,
+      engine="CYCLES",
     )
     self.assertEqual(scene.render.engine, "CYCLES")
     self.assertEqual(scene.cycles.samples, 128)

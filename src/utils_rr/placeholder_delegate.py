@@ -15,7 +15,10 @@ class PlaceholderDelegate(QStyledItemDelegate):
     self.placeholder_text = placeholder_text
 
   def paint(
-    self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex,
+    self,
+    painter: QPainter,
+    option: QStyleOptionViewItem,
+    index: QModelIndex,
   ) -> None:
     """Paint the placeholder text."""
     super().paint(painter, option, index)

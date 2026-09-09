@@ -1,4 +1,5 @@
 """Utility functions for table operations."""
+
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
@@ -24,39 +25,39 @@ if TYPE_CHECKING:
 TableCallback = Callable[[], None]
 
 COLORS_LIGHT = {
-    "red": 0x980030,
-    "yellow": 0xffd966,
-    "green": 0x9fd3b6,
-    "blue": 0x57a3b4,
-    "blue_grey_lighter": 0x6397bd,
-    "blue_grey": 0x4f7997,
-    "blue_grey_darker": 0x345064,
-    "grey_light": 0xebebeb,
-    "grey_inactive": 0xfefefe,
-    "grey_neutral": 0x999999,
-    "black_light": 0x22282b,
-    "black_dark": 0x242a2d,
-    "white": 0xffffff,
-    "console_background": 0x345064,
-    "console_foreground": 0xebebeb,
+  "red": 0x980030,
+  "yellow": 0xFFD966,
+  "green": 0x9FD3B6,
+  "blue": 0x57A3B4,
+  "blue_grey_lighter": 0x6397BD,
+  "blue_grey": 0x4F7997,
+  "blue_grey_darker": 0x345064,
+  "grey_light": 0xEBEBEB,
+  "grey_inactive": 0xFEFEFE,
+  "grey_neutral": 0x999999,
+  "black_light": 0x22282B,
+  "black_dark": 0x242A2D,
+  "white": 0xFFFFFF,
+  "console_background": 0x345064,
+  "console_foreground": 0xEBEBEB,
 }
 
 COLORS_DARK = {
-    "red": 0x980030,
-    "yellow": 0xffd966,
-    "green": 0x9fd3b6,
-    "blue": 0x57a3b4,
-    "blue_grey_lighter": 0x6397bd,
-    "blue_grey": 0x4f7997,
-    "blue_grey_darker": 0x345064,
-    "grey_light": 0x323639,
-    "grey_inactive": 0x2b2b2b,
-    "grey_neutral": 0x222222,
-    "black_light": 0x22282b,
-    "black_dark": 0x242a2d,
-    "white": 0x232323,
-    "console_background": 0x1e2529,
-    "console_foreground": 0xd6d9db,
+  "red": 0x980030,
+  "yellow": 0xFFD966,
+  "green": 0x9FD3B6,
+  "blue": 0x57A3B4,
+  "blue_grey_lighter": 0x6397BD,
+  "blue_grey": 0x4F7997,
+  "blue_grey_darker": 0x345064,
+  "grey_light": 0x323639,
+  "grey_inactive": 0x2B2B2B,
+  "grey_neutral": 0x222222,
+  "black_light": 0x22282B,
+  "black_dark": 0x242A2D,
+  "white": 0x232323,
+  "console_background": 0x1E2529,
+  "console_foreground": 0xD6D9DB,
 }
 # NOTE: This variable is being set from renderrob.py since we only know there if a dark or a
 # light theme is requested.
@@ -75,13 +76,16 @@ def fix_active_row_path(item: QTableWidgetItem, blend_folder: str) -> None:
 
 def make_editable(table_widget: QTableWidget) -> None:
   """Undo the make QTableWidget only selectable."""
+
   class EditableDelegate(QStyledItemDelegate):
     """Allow editing of QTableWidget."""
 
     def createEditor(  # pylint: disable=invalid-name
-        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
+      self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ) -> QWidget:
       """Allow editing by returning the default editor."""
       return QStyledItemDelegate.createEditor(self, parent, option, index)
+
   delegate = EditableDelegate()
   table_widget.setItemDelegate(delegate)
   for row in range(table_widget.rowCount()):
@@ -99,14 +103,17 @@ def make_editable(table_widget: QTableWidget) -> None:
 
 def make_read_only_selectable(table_widget: QTableWidget) -> None:
   """Make QTableWidget only selectable."""
+
   #  #10 Set the render button to disabled.
   class ReadOnlyDelegate(QStyledItemDelegate):
     """Prevent editing of QTableWidget."""
 
     def createEditor(  # pylint: disable=invalid-name
-        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> None:
+      self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex
+    ) -> None:
       """Prevent editing of QTableWidget by returning None."""
       del parent, option, index
+
   delegate = ReadOnlyDelegate()
   table_widget.setItemDelegate(delegate)
   for row in range(table_widget.rowCount()):
@@ -126,8 +133,11 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
 
 
 # @operator
-def move_row_down(table_widget: QTableWidget, before_callback_function: TableCallback,
-                  after_callback_function: TableCallback) -> None:
+def move_row_down(
+  table_widget: QTableWidget,
+  before_callback_function: TableCallback,
+  after_callback_function: TableCallback,
+) -> None:
   """Move the currently selected row down."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -152,8 +162,11 @@ def move_row_down(table_widget: QTableWidget, before_callback_function: TableCal
 
 
 # @operator
-def move_row_up(table_widget: QTableWidget, before_callback_function: TableCallback,
-                after_callback_function: TableCallback) -> None:
+def move_row_up(
+  table_widget: QTableWidget,
+  before_callback_function: TableCallback,
+  after_callback_function: TableCallback,
+) -> None:
   """Move the currently selected row up."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -178,17 +191,19 @@ def move_row_up(table_widget: QTableWidget, before_callback_function: TableCallb
 
 
 # @operator
-def duplicate_row(table_widget: QTableWidget, state_saver: "StateSaver",
-                  before_callback_function: TableCallback,
-                  after_callback_function: TableCallback) -> None:
+def duplicate_row(
+  table_widget: QTableWidget,
+  state_saver: "StateSaver",
+  before_callback_function: TableCallback,
+  after_callback_function: TableCallback,
+) -> None:
   """Duplicate the currently selected row."""
   table_widget.blockSignals(True)
   before_callback_function()
 
   state_saver.table_to_state(table_widget)
   current_row = table_widget.currentRow()
-  state_saver.state.render_jobs.insert(
-      current_row + 1, state_saver.state.render_jobs[current_row])
+  state_saver.state.render_jobs.insert(current_row + 1, state_saver.state.render_jobs[current_row])
   state_saver.state_to_table(table_widget)
 
   after_callback_function()
@@ -196,9 +211,11 @@ def duplicate_row(table_widget: QTableWidget, state_saver: "StateSaver",
 
 
 # @operator
-def add_row_below(table_widget: QTableWidget,
-                  before_callback_function: TableCallback | None = None,
-                  after_callback_function: TableCallback | None = None) -> None:
+def add_row_below(
+  table_widget: QTableWidget,
+  before_callback_function: TableCallback | None = None,
+  after_callback_function: TableCallback | None = None,
+) -> None:
   """Add a row below the current row."""
   table_widget.blockSignals(True)
   if before_callback_function:
@@ -215,8 +232,11 @@ def add_row_below(table_widget: QTableWidget,
 
 
 # @operator
-def remove_active_row(table_widget: QTableWidget, before_callback_function: TableCallback,
-                      after_callback_function: TableCallback) -> None:
+def remove_active_row(
+  table_widget: QTableWidget,
+  before_callback_function: TableCallback,
+  after_callback_function: TableCallback,
+) -> None:
   """Remove the currently selected row."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -247,25 +267,27 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
   header = table_widget.horizontalHeader()
   header.setMinimumHeight(50)
   table_widget.setHorizontalHeaderLabels(
-      ["Active",
-       "File",
-       "Camera",
-       "Start",
-       "End",
-       "X\nRes",
-       "Y\nRes",
-       "Samples",
-       "File\nFormat",
-       "Engine",
-       "Device",
-       "Motion\nBlur",
-       "Continue\nJob",
-       "Final\nMode",
-       "Denoise",
-       "Scene",
-       "View\nLayers",
-       "Comments",
-       ])
+    [
+      "Active",
+      "File",
+      "Camera",
+      "Start",
+      "End",
+      "X\nRes",
+      "Y\nRes",
+      "Samples",
+      "File\nFormat",
+      "Engine",
+      "Device",
+      "Motion\nBlur",
+      "Continue\nJob",
+      "Final\nMode",
+      "Denoise",
+      "Scene",
+      "View\nLayers",
+      "Comments",
+    ]
+  )
 
   # Set the file column to stretch. The other columns will be resized to fit
   # their contents. Some of the functions here might be obsolete though. Needed
@@ -311,15 +333,17 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
     item = table_widget.item(row_index, column_index)
 
     if column_index in ui_utils.CHECKBOX_COLUMNS:
-      ui_utils.set_checkbox_background_color(
-          table_widget, row_index, column_index, color)
+      ui_utils.set_checkbox_background_color(table_widget, row_index, column_index, color)
     # if column_index in ui_utils.COMBOBOX_COLUMNS:
     #   ui_utils.set_combobox_background_color(
     #       table_widget, row_index, column_index, color)
 
     # Check if the value in the numbers columns is valid.
-    if item and item.text() and (
-            column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric()):
+    if (
+      item
+      and item.text()
+      and (column_index in ui_utils.NUMBER_COLUMNS and not item.text().isnumeric())
+    ):
       item.setBackground(QColor(COLORS["red"]))
     elif item:
       item.setBackground(color)

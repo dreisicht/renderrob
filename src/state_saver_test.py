@@ -1,4 +1,5 @@
 """Test the state_saver module."""
+
 import unittest
 from pathlib import Path
 
@@ -36,10 +37,12 @@ class TestStateSaver(unittest.TestCase):
   def test_get_text(self) -> None:
     """Test the get_text method."""
     self.assertEqual(state_saver.get_text(self.main_window.table.cellWidget(0, 2)), "")
-    self.assertTrue(state_saver.get_text(
-        self.main_window.table.cellWidget(0, 0), widget="checkbox"))
-    self.assertEqual(state_saver.get_text(
-        self.main_window.table.cellWidget(0, 8), widget="dropdown"), "exr_single")
+    self.assertTrue(
+      state_saver.get_text(self.main_window.table.cellWidget(0, 0), widget="checkbox")
+    )
+    self.assertEqual(
+      state_saver.get_text(self.main_window.table.cellWidget(0, 8), widget="dropdown"), "exr_single"
+    )
 
   def test_state_to_table(self) -> None:
     """Test the state_to_table method."""

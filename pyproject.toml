@@ -149,6 +149,8 @@ ignore = [
     # Qt and bpy take booleans positionally throughout (setChecked(True), blockSignals(True),
     # view_layer.use = True). We don't control those signatures.
     "FBT003",
+    # Conflicts with `ruff format`, which owns trailing commas.
+    "COM812",
 ]
 
 # Allow fix for all enabled rules (when `--fix`) is provided.
