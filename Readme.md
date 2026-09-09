@@ -1,7 +1,6 @@
 # Render Rob
 
-[![LinuxTestAndBuild](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/linux_test_and_build.yaml)
-[![WindowsMacBuild](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/windows_mac_build.yaml)
+[![Test](https://github.com/dreisicht/renderrob/actions/workflows/test.yaml/badge.svg)](https://github.com/dreisicht/renderrob/actions/workflows/test.yaml)
 
 ![ ](img/renderrob_deck.jpg)
 
@@ -56,7 +55,34 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 
 ## Developer area
 
-Python version required due to bpy: **3.11**
+Python version required due to bpy: **3.13**
+
+Set up the environment:
+
+```
+uv sync --group dev
+```
+
+Convert protos (needed once before the first run; protoc comes from the dev group,
+so no system install is required):
+
+```
+sh src/protos/build_proto.sh
+```
+
+Run the app:
+
+```
+uv run src/main.py
+```
+
+Run the tests and the linter:
+
+```
+cd src && QT_QPA_PLATFORM=offscreen uv run python -m unittest discover -s . -p '*_test.py'
+uv run ruff check .
+uv run ruff format --check .
+```
 
 Install QtDesigner:
 
@@ -70,30 +96,10 @@ Start QtDesigner:
 pyqt6-tools designer
 ```
 
-Convert protos:
-
-```
-protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/state.proto
-protoc --proto_path=src/protos/ --python_out=src/protos/ src/protos/cache.proto
-```
-
 Create .ico file
 
 ```
 magick.exe convert icon-16.png icon-20.png icon-24.png icon-32.png icon-40.png icon-48.png icon-64.png icon-256.png icon.ico
-```
-
-Create venv
-
-```
-python -m venv ./.venv/
-```
-
-Deploy
-
-```
-.\venv\Scripts\activate
-pyside6-deploy -c build\pysidedeploy_win.spec
 ```
 
 Remove stale origin branches
@@ -102,15 +108,20 @@ Remove stale origin branches
 git remote prune origin
 ```
 
-Manual installation and signing on Mac
+### Building
+
+Build, sign, notarize and package the Mac app:
 
 ```
-pyside6-deploy -c build/pysidedeploy_mac.spec --force --verbose --keep-deployment-files
-codesign -s "Peter Baintner" -f --timestamp -i "com.dreisicht.renderrob" --deep RenderRob.app
-xcrun notarytool submit /tmp/renderrob_testing/RenderRob.zip --wait --keychain-profile "dev"
+sh tools/build_mac.sh
 ```
 
-Debugging the run:
+Note that the `tools/pysidedeploy_*.spec` files are stale: they point at
+`renderrob.py`, which is now `src/main.py`, and hardcode local Python 3.10/3.11
+interpreter paths. Only the py2app path in `tools/build_mac.sh` is current.
+There is no CI build job; building is a local, signing-key-dependent step.
+
+Debugging a notarization run:
 
 ```
 xcrun notarytool log <request UUID> --keychain-profile "dev"
