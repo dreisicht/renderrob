@@ -13,6 +13,7 @@ from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QCheckBox, QComboBox, QHBoxLayout, QTableWidget, QWidget
 
 import ui
+from utils_common import print_utils
 
 TEXT_COLUMNS = [1, 2, 15, 16, 17]
 NUMBER_COLUMNS = [3, 4, 5, 6, 7]
@@ -71,10 +72,10 @@ def load_ui_from_file(ui_file_name: str, custom_widgets: list[Any] | None = None
     if qt_file.open(QFile.ReadOnly):
       window = ui_loader.load(qt_file)
     else:
-      print("Failed to read UI")
+      print_utils.print_error_no_exit("Failed to read UI.")
 
   if not window:
-    print(ui_loader.errorString())
+    print_utils.print_error_no_exit(ui_loader.errorString())
     sys.exit(-1)
   QMetaObject.connectSlotsByName(window)
   return window
@@ -127,7 +128,7 @@ def set_checkbox_background_color(table: QTableWidget, row: int, col: int, color
     widget.setStyleSheet(f"background-color: {color.name()};")
 
 
-def add_checkbox(table: QTableWidget, row: int, col: int, checked=False) -> None:
+def add_checkbox(table: QTableWidget, row: int, col: int, *, checked: bool = False) -> None:
   """Add a checkbox to the given table at the given row and column."""
   widget = QWidget()
   check_box = QCheckBox()
@@ -145,7 +146,7 @@ def add_checkbox(table: QTableWidget, row: int, col: int, checked=False) -> None
   table.setCellWidget(row, col, widget)
 
 
-def add_dropdown(table: QTableWidget, row: int, col: int, items) -> None:
+def add_dropdown(table: QTableWidget, row: int, col: int, items: list[str]) -> None:
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)

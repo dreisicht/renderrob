@@ -34,6 +34,19 @@ MAX_NUMBER_OF_RECENT_FILES = 5
 
 UI_FILE_NAME = "window.ui"
 
+# Qt reports the color scheme as an enum whose values are Unknown/Light/Dark.
+LIGHT_COLOR_SCHEME = 1
+DARK_COLOR_SCHEME = 2
+
+# How far from the bottom of the console the user may be and still have the view follow the output.
+CONSOLE_FOLLOW_THRESHOLD = 1500
+
+# Exit codes Render Rob reads back from a finished Blender run. 987 is Render Rob's own code for
+# "the job produced warnings"; 62097 is the one print_utils.print_error exits with.
+SUCCESS_EXIT_CODES = (0, 1)
+WARNING_EXIT_CODE = 987
+FAILURE_EXIT_CODES = (62097, 11)
+
 
 class MainWindow(QWidget):
   """Main window for RenderRob."""
@@ -73,9 +86,9 @@ class MainWindow(QWidget):
     self.cache_path = self.get_temp_dir() / ".rr_cache"
 
     # NOTE: Avoid global state with theme colors.
-    if self.app.styleHints().colorScheme().value == 1:
+    if self.app.styleHints().colorScheme().value == LIGHT_COLOR_SCHEME:
       table_utils.COLORS = table_utils.COLORS_LIGHT
-    elif self.app.styleHints().colorScheme().value == 2:
+    elif self.app.styleHints().colorScheme().value == DARK_COLOR_SCHEME:
       table_utils.COLORS = table_utils.COLORS_DARK
 
   def setup(self) -> None:
@@ -115,7 +128,7 @@ class MainWindow(QWidget):
     self.app.exec()
 
   ############### EVENTS ###############
-  def closeEvent(self, event: QCloseEvent):  # pylint: disable=invalid-name
+  def closeEvent(self, event: QCloseEvent) -> None:  # pylint: disable=invalid-name
     """Handle the close event."""
     if self.is_saved:
       event.accept()
@@ -161,7 +174,7 @@ class MainWindow(QWidget):
     self.window.open_button.clicked.connect(self.open_output_folder)
     self.window.up_button.clicked.connect(
       lambda: table_utils.move_row_up(
-        self.table, self.before_table_change, self.after_table_change
+        self.table, self.before_table_change, self.after_table_change,
       ),
     )
     self.window.down_button.clicked.connect(
@@ -200,18 +213,14 @@ class MainWindow(QWidget):
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
     """Store the cache to a file."""
-    cache_str = self.cache.SerializeToString()
-    with open(self.cache_path, "wb") as cache_file:
-      cache_file.write(cache_str)
+    self.cache_path.write_bytes(self.cache.SerializeToString())
 
   def load_cache(self) -> None:
     """Load the cache from a file."""
-    with open(self.cache_path, "rb") as cache_file:
-      cache_str = cache_file.read()
     self.cache.current_file = ""
-    self.cache.ParseFromString(cache_str)
+    self.cache.ParseFromString(self.cache_path.read_bytes())
 
-  def add_filepath_to_cache(self, file_name):
+  def add_filepath_to_cache(self, file_name: str) -> None:
     """Add a filepath to the cache."""
     if file_name not in self.cache.recent_files:
       self.cache.recent_files.insert(0, file_name)
@@ -297,7 +306,7 @@ class MainWindow(QWidget):
     )
     self.open_file(file_name, ask_for_save=False)
 
-  def open_file(self, file_name: str, ask_for_save: bool = True) -> None:
+  def open_file(self, file_name: str, *, ask_for_save: bool = True) -> None:
     """Open a RenderRob file."""
     self.green_jobs = []
     self.yellow_jobs = []
@@ -340,88 +349,81 @@ class MainWindow(QWidget):
     return None
 
   ######### CONSOLE WINDOW ###########
-  def _handle_output(self):
-    """Output the subprocess output to the textbrowser widget."""
-    self.table.blockSignals(True)
-    data = self.process.readAll()
-    output = data.data().decode()
-    color_format = QTextCharFormat()
-    if "\u001b" in output:
-      for line in output.splitlines():
-        back_color = print_utils.BASH_COLORS
-        info = back_color["BACK_CYAN"] + " " + back_color["FORE_BLACK"]
-        warning = back_color["BACK_YELLOW"] + " " + back_color["FORE_BLACK"]
-        error = back_color["BACK_RED"] + " " + back_color["FORE_WHITE"]
-        reset = back_color["RESET_ALL"]
-        if line.startswith(reset):
-          line = line.replace(reset, "")
-          color_format.setBackground(QColor(table_utils.COLORS["grey_light"]))
-          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
-        if line.startswith(info):
-          line = line.replace(info, "")
-          color_format.setBackground(QColor(table_utils.COLORS["blue_grey_lighter"]))
-          color_format.setForeground(QColor(Qt.black))
-        if line.startswith(warning):
-          line = line.replace(warning, "")
-          color_format.setBackground(QColor(table_utils.COLORS["yellow"]))
-          color_format.setForeground(QColor(Qt.black))
-
-          self.state_saver.table_to_state(self.table)
-          row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs,
-            self.active_render_job,
-          )
-
-          table_utils.color_row_background(
-            self.table,
-            row_number,
-            QColor(table_utils.COLORS["yellow"]),
-          )
-        if line.startswith(error) or "blender.crash.txt" in line:
-          line = line.replace(error, "")
-          color_format.setBackground(QColor(table_utils.COLORS["red"]))
-          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
-
-          self.state_saver.table_to_state(self.table)
-          row_number = state_saver.find_job(
-            self.state_saver.state.render_jobs,
-            self.active_render_job,
-          )
-
-          table_utils.color_row_background(
-            self.table,
-            row_number,
-            QColor(table_utils.COLORS["red"]),
-          )
-
-          # Only scroll down if user is at bottom.
-        if (
-          self.window.textBrowser.verticalScrollBar().value()
-          > (self.window.textBrowser.verticalScrollBar().maximum()) - 1500
-        ):
-          self.window.textBrowser.moveCursor(QTextCursor.End)
-        self.window.textBrowser.setCurrentCharFormat(color_format)
-        self.window.textBrowser.insertPlainText(line.replace(reset, "") + "\n")
-
-        if line.endswith(reset):
-          line = line.replace(reset, "")
-          color_format.setBackground(QColor(52, 80, 100))
-          color_format.setForeground(QColor(table_utils.COLORS["grey_light"]))
-    else:
-      # Only scroll down if user is at bottom.
-      if (
-        self.window.textBrowser.verticalScrollBar().value()
-        > (self.window.textBrowser.verticalScrollBar().maximum()) - 1500
-      ):
-        self.window.textBrowser.moveCursor(QTextCursor.End)
-      self.window.textBrowser.setCurrentCharFormat(color_format)
-      self.window.textBrowser.insertPlainText(output)
-
-    # Find a more elegant way to do this.
-    if "Blender quit" in output:
+  def _scroll_console_to_end_if_at_bottom(self) -> None:
+    """Follow the output, but only while the user has not scrolled up to read something."""
+    scroll_bar = self.window.textBrowser.verticalScrollBar()
+    if scroll_bar.value() > scroll_bar.maximum() - CONSOLE_FOLLOW_THRESHOLD:
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
-    if "blender.crash.txt" in output:
+  def _color_active_job_row(self, color_name: str) -> None:
+    """Color the row of the job that is currently rendering."""
+    self.state_saver.table_to_state(self.table)
+    row_number = state_saver.find_job(
+      self.state_saver.state.render_jobs,
+      self.active_render_job,
+    )
+    table_utils.color_row_background(self.table, row_number, QColor(table_utils.COLORS[color_name]))
+
+  def _classify_console_line(self, line: str) -> tuple[str, QTextCharFormat]:
+    """Strip Render Rob's ANSI markers off a line and return the format to render it with.
+
+    print_utils prefixes Render Rob's own messages with a background/foreground pair. A warning
+    or an error also colors the row of the job that produced it.
+    """
+    bash_colors = print_utils.BASH_COLORS
+    # (ANSI prefix, text background, text foreground, row color)
+    severities = (
+      (bash_colors["BACK_RED"] + " " + bash_colors["FORE_WHITE"], "red", "white", "red"),
+      (
+        bash_colors["BACK_YELLOW"] + " " + bash_colors["FORE_BLACK"],
+        "yellow",
+        "black_dark",
+        "yellow",
+      ),
+      (
+        bash_colors["BACK_CYAN"] + " " + bash_colors["FORE_BLACK"],
+        "blue_grey_lighter",
+        "black_dark",
+        None,
+      ),
+    )
+
+    color_format = QTextCharFormat()
+    color_format.setBackground(QColor(table_utils.COLORS["console_background"]))
+    color_format.setForeground(QColor(table_utils.COLORS["console_foreground"]))
+
+    # A crash report is an error, even though Blender does not mark it up as one.
+    is_crash = "blender.crash.txt" in line
+    for prefix, background, foreground, row_color in severities:
+      if not line.startswith(prefix) and not (is_crash and row_color == "red"):
+        continue
+      line = line.replace(prefix, "")
+      color_format.setBackground(QColor(table_utils.COLORS[background]))
+      color_format.setForeground(QColor(table_utils.COLORS[foreground]))
+      if row_color:
+        self._color_active_job_row(row_color)
+      break
+
+    return line.replace(bash_colors["RESET_ALL"], ""), color_format
+
+  def _handle_output(self) -> None:
+    """Output the subprocess output to the textbrowser widget."""
+    self.table.blockSignals(True)
+    output = self.process.readAll().data().decode()
+
+    if "\u001b" in output:
+      for line in output.splitlines():
+        text, color_format = self._classify_console_line(line)
+        self._scroll_console_to_end_if_at_bottom()
+        self.window.textBrowser.setCurrentCharFormat(color_format)
+        self.window.textBrowser.insertPlainText(text + "\n")
+    else:
+      self._scroll_console_to_end_if_at_bottom()
+      self.window.textBrowser.setCurrentCharFormat(QTextCharFormat())
+      self.window.textBrowser.insertPlainText(output)
+
+    # Always show the end of the run, whether it finished or crashed.
+    if "Blender quit" in output or "blender.crash.txt" in output:
       self.window.textBrowser.moveCursor(QTextCursor.End)
 
     self.table.blockSignals(False)
@@ -525,11 +527,11 @@ class MainWindow(QWidget):
       if platform.system() == "Darwin":  # macOS
         subprocess.call(("open", filepath))
       elif platform.system() == "Windows":  # Windows
-        os.startfile(filepath)
+        os.startfile(filepath)  # noqa: S606
       else:  # Linux variants
         subprocess.call(("xdg-open", filepath))
     else:
-      if not os.path.exists(filepath):
+      if not Path(filepath).exists():
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
       if self.state_saver.state.settings.preview.frame_step_use:
         frame_step = self.state_saver.state.settings.preview.frame_step
@@ -553,11 +555,8 @@ class MainWindow(QWidget):
           str(self.state_saver.state.settings.fps),
           "-j",
           str(frame_step),
-          # Start and end not required (at least on Mac).
-          #   "-s",
-          #   self.state_saver.state.render_jobs[current_row].start,
-          #   "-e",
-          #   self.state_saver.state.render_jobs[current_row].end,
+          # Start and end frame are deliberately not passed: they are not required (at least
+          # on Mac), and Blender ignores frame step and fps on this call anyway.
         ],
       )
 
@@ -655,25 +654,29 @@ class MainWindow(QWidget):
     self.table.blockSignals(False)
 
   ######### MAIN WINDOW UTILS ###########
+  def _record_finished_job(self, exit_code: int) -> None:
+    """File the job that just finished under the outcome its exit code reports."""
+    if not self.active_render_job:
+      return
+    if exit_code in SUCCESS_EXIT_CODES:
+      self.green_jobs.append(self.active_render_job)
+    elif exit_code == WARNING_EXIT_CODE:
+      self.yellow_jobs.append(self.active_render_job)
+    elif exit_code in FAILURE_EXIT_CODES:
+      self.red_jobs.append(self.active_render_job)
+    else:
+      msg = f"Exit code {exit_code} not recognized."
+      raise ValueError(msg)
+
   def _continue_render(self, exit_code: int) -> None:
+    """Move on to the next active render job, or finish the run."""
     self.table.blockSignals(True)
     print_utils.print_info("Continuing render.")
     # Stop the process if the stop button was pressed.
     if not self.window.stop_button.isEnabled():
       return
 
-    # Handle the previous render job and store it in the correct list.
-    if self.active_render_job:
-      if exit_code in (0, 1):
-        self.green_jobs.append(self.active_render_job)
-      elif exit_code == 987:
-        self.yellow_jobs.append(self.active_render_job)
-      elif exit_code in (62097, 11):
-        self.red_jobs.append(self.active_render_job)
-      else:
-        msg = f"Exit code {exit_code} not recognized."
-        raise ValueError(msg)
-
+    self._record_finished_job(exit_code)
     self.active_render_job = None
 
     self.state_saver.table_to_state(self.table)
@@ -702,7 +705,27 @@ class MainWindow(QWidget):
     self.window.textBrowser.moveCursor(QTextCursor.End)
     self.blockSignals(False)
 
-  def set_table_colors(self):
+  def _row_color_name(
+    self,
+    row_index: int,
+    job: state_pb2.render_job,  # pylint: disable=no-member
+    active_job_index: int,
+  ) -> str:
+    """Return the palette entry a job's row should be painted with."""
+    if job in self.green_jobs:
+      return "green"
+    if job in self.yellow_jobs:
+      return "yellow"
+    if job in self.red_jobs:
+      return "red"
+    if not job.active:
+      return "grey_inactive"
+    # Highlight the active job while a render process is running.
+    if row_index == active_job_index and self.window.stop_button.isEnabled():
+      return "blue_grey_lighter"
+    return "grey_light"
+
+  def set_table_colors(self) -> None:
     """Set the colors of the table."""
     self.table.blockSignals(True)
     active_job_index = state_saver.find_job(
@@ -712,23 +735,8 @@ class MainWindow(QWidget):
     for i, job in enumerate(self.state_saver.state.render_jobs):
       if i >= self.table.rowCount():
         break
-      if job in self.green_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["green"]))
-      elif job in self.yellow_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["yellow"]))
-      elif job in self.red_jobs:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["red"]))
-      elif not job.active:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_inactive"]))
-      # Color the active job if a render process is active.
-      elif i == active_job_index and self.window.stop_button.isEnabled():
-        table_utils.color_row_background(
-          self.table,
-          i,
-          QColor(table_utils.COLORS["blue_grey_lighter"]),
-        )
-      else:
-        table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
+      color_name = self._row_color_name(i, job, active_job_index)
+      table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS[color_name]))
 
     # Check for duplicates. The table can hold more rows than the state holds jobs while a row is
     # still being built up, so only walk the rows that have a job behind them.
@@ -824,8 +832,5 @@ class MainWindow(QWidget):
 
 
 if __name__ == "__main__":
-  #   executable_dir = os.path.dirname(sys.executable)
-  #   os.chdir(executable_dir)
-  print("DEBUG: Current Working Directory:", Path.cwd())
   main_window = MainWindow()
   sys.exit(main_window.execute())

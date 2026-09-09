@@ -1,10 +1,11 @@
 """Setup for cx_freeze."""
 
 import sys
-from cx_Freeze import setup, Executable
+
+from cx_Freeze import Executable, setup
 
 
-def main():
+def main() -> None:
   """Setup for cx_freeze."""
   # Dependencies are automatically detected, but it might need fine tuning.
   build_exe_options = {

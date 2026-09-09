@@ -1,8 +1,8 @@
 """Placeholder delegate for QTableWidget."""
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor
-from PySide6.QtWidgets import QStyledItemDelegate, QTableWidget
+from PySide6.QtCore import QModelIndex, Qt
+from PySide6.QtGui import QColor, QPainter
+from PySide6.QtWidgets import QStyledItemDelegate, QStyleOptionViewItem, QTableWidget, QWidget
 
 from utils_rr import ui_utils
 
@@ -10,11 +10,13 @@ from utils_rr import ui_utils
 class PlaceholderDelegate(QStyledItemDelegate):
   """Placeholder delegate for QTableWidget."""
 
-  def __init__(self, placeholder_text, parent=None):
+  def __init__(self, placeholder_text: str, parent: QWidget | None = None) -> None:
     super().__init__(parent)
     self.placeholder_text = placeholder_text
 
-  def paint(self, painter, option, index):
+  def paint(
+    self, painter: QPainter, option: QStyleOptionViewItem, index: QModelIndex,
+  ) -> None:
     """Paint the placeholder text."""
     super().paint(painter, option, index)
 
@@ -24,7 +26,7 @@ class PlaceholderDelegate(QStyledItemDelegate):
       painter.drawText(placeholder_rect, Qt.AlignHCenter | Qt.AlignVCenter, self.placeholder_text)
 
 
-def setup_placeholder_delegate(table_widget: QTableWidget):
+def setup_placeholder_delegate(table_widget: QTableWidget) -> None:
   """Set up the placeholder delegate for the given table widget."""
   table_widget.blockSignals(True)
   for row in range(table_widget.rowCount()):

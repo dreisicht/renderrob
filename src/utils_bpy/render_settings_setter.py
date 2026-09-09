@@ -38,6 +38,46 @@ class RenderSettingsSetter:
     self.current_scene_data = bpy.context.scene
     self.current_scene_render = self.current_scene_data.render
 
+  def resolve_view_layers(self, view_layer_names: list[str]) -> object | None:
+    """Look the requested view layers up in the current scene.
+
+    Returns the single view layer, the list of view layers, or the scene's whole collection when
+    every active layer should be rendered. Returns None when the request could not be honoured,
+    in which case an error has already been reported.
+    """
+    scene_view_layers = self.current_scene_data.view_layers
+    requested_names = [name for name in (view_layer_names or []) if name]
+
+    # A file with a single view layer has nothing to choose from.
+    if len(scene_view_layers) == 1:
+      return scene_view_layers[0]
+
+    # Nothing requested: render every active layer.
+    if not requested_names:
+      print_utils.print_info(
+        "I'm rendering every active View Layer! You can specify the View Layer to be rendered"
+        " in the sheet!",
+      )
+      return scene_view_layers
+
+    # A single layer requested.
+    if len(requested_names) == 1:
+      try:
+        return scene_view_layers[requested_names[0]]
+      except KeyError:
+        print_utils.print_error(
+          f"View Layer {requested_names[0]} not found. Please check the name in the sheet!",
+        )
+        return None
+
+    # Several layers requested.
+    if len(scene_view_layers) < len(requested_names):
+      print_utils.print_error(
+        f"You gave me more View Layers given than existing! ({view_layer_names})",
+      )
+      return None
+    return [scene_view_layers[name] for name in requested_names]
+
   def set_view_layers(self, view_layer_names: list[str]) -> None:
     """Set the view layer to be rendered."""
     for view_layer in self.current_scene_data.view_layers:
@@ -47,37 +87,11 @@ class RenderSettingsSetter:
       msg = "View Layer names should be a list of strings."
       raise TypeError(msg)
 
-    if not view_layer_names or view_layer_names == [""]:
-      if len(self.current_scene_data.view_layers) == 1:
-        self.view_layer_data = self.current_scene_data.view_layers[0]
-      else:
-        print_utils.print_info(
-          "I'm rendering every active View Layer! You can specify the View Layer to be rendered"
-          " in the sheet!",
-        )
-        self.view_layer_data = self.current_scene_data.view_layers
-    elif len(view_layer_names) == 1 and view_layer_names != []:
-      if len(self.current_scene_data.view_layers) == 1:
-        self.view_layer_data = self.current_scene_data.view_layers[0]
-      else:
-        try:
-          self.view_layer_data = self.current_scene_data.view_layers[view_layer_names[0]]
-        except KeyError:
-          print_utils.print_error(
-            f"View Layer {view_layer_names[0]} not found. Please check the name in the sheet!"
-          )
-    elif len(view_layer_names) > 1:
-      if len(self.current_scene_data.view_layers) < len(view_layer_names):
-        print_utils.print_error(
-          f"You gave me more View Layers given than existing! ({view_layer_names})"
-        )
-      else:
-        self.view_layer_data = []
-
-        for view_layer in view_layer_names:
-          self.view_layer_data.append(self.current_scene_data.view_layers[view_layer])
-    else:
-      print_utils.print_error("Unexpected ViewLayer Error.")
+    # Keep the previous selection when the lookup failed, so that a reported error is not
+    # compounded by an "unexpected" one below.
+    resolved_view_layers = self.resolve_view_layers(view_layer_names)
+    if resolved_view_layers is not None:
+      self.view_layer_data = resolved_view_layers
 
     if isinstance(self.view_layer_data, bpy.types.bpy_prop_collection | list):
       for view_layer in self.view_layer_data:
@@ -115,7 +129,13 @@ class RenderSettingsSetter:
     return "BLENDER_EEVEE_NEXT" if "BLENDER_EEVEE_NEXT" in identifiers else "BLENDER_EEVEE"
 
   def set_render_settings(
-    self, render_device: str, border: bool, samples: str, motion_blur: bool, engine: str
+    self,
+    render_device: str,
+    *,
+    border: bool,
+    samples: str,
+    motion_blur: bool,
+    engine: str,
   ) -> None:
     """Set the render settings."""
     self.current_scene_render.use_border = border
@@ -154,7 +174,7 @@ class RenderSettingsSetter:
       raise ValueError(msg)
     print_utils.print_info("Rendering on " + str(render_device))
 
-  def set_denoising_settings(self, denoise: bool) -> None:
+  def set_denoising_settings(self, *, denoise: bool) -> None:
     """Set the denoising settings."""
     if denoise:
       self.current_scene_data.cycles.use_animated_seed = True
@@ -169,6 +189,7 @@ class RenderSettingsSetter:
     xres: int,
     yres: int,
     percres: int,
+    *,
     high_quality: bool,
   ) -> None:
     """Set the output settings."""
@@ -188,6 +209,8 @@ class RenderSettingsSetter:
   def custom_commands(self) -> None:
     """Import user commands."""
     try:
-      import custom_commands  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: F401
+      # Deliberately imported here: custom_commands.py is an optional user-supplied file that
+      # runs its own Blender tweaks on import, and it may not exist at all.
+      import custom_commands  # pylint: disable=import-error,import-outside-toplevel,unused-import  # noqa: F401, PLC0415
     except ImportError:
       print_utils.print_info("No user commands found.")

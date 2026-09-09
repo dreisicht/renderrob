@@ -1,9 +1,9 @@
 """Draws an image to the console."""
 
 
-def draw_image():
+def draw_image() -> None:
   """Draws an image to the console."""
-  print("")
+  print()
   print("                                .@@@@@@@@@@@@@@@@@@@@@@")
   print("                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@   @@")
   print("                     @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
@@ -16,7 +16,7 @@ def draw_image():
   print("                     |____________@@@@@@@@____________|")
   print("                     ")
   print("                       Render Rob by dreisicht. 2023")
-  print("")
+  print()
 
 
 if __name__ == "__main__":

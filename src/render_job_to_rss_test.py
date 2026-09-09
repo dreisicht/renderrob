@@ -1,7 +1,7 @@
 """Unit tests for shot_name_builder.py."""
 
-import os
 import unittest
+from pathlib import Path
 
 import render_job_to_rss
 from protos import state_pb2
@@ -35,9 +35,9 @@ class TestRenderJobToRss(unittest.TestCase):
         render_job.comments = "This is a comment."
         settings = state_pb2.settings()  # pylint: disable=no-member
         rss = render_job_to_rss.render_job_to_render_settings_setter(
-            render_job, settings
+            render_job, settings,
         )
-        cwd = path_utils.normalize_drive_letter(os.getcwd())
+        cwd = path_utils.normalize_drive_letter(str(Path.cwd()))
         self.assertEqual(
             rss,
             (

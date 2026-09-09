@@ -1,10 +1,27 @@
 """Utility functions for table operations."""
-from typing import Any, Optional
+from collections.abc import Callable
+from typing import TYPE_CHECKING
 
+from PySide6.QtCore import QModelIndex
 from PySide6.QtGui import QColor, Qt
-from PySide6.QtWidgets import (QCheckBox, QComboBox, QHeaderView, QStyledItemDelegate, QTableWidget,
-                               QTableWidgetItem, QWidget)
-from utils_rr import ui_utils, path_utils
+from PySide6.QtWidgets import (
+  QCheckBox,
+  QComboBox,
+  QHeaderView,
+  QStyledItemDelegate,
+  QStyleOptionViewItem,
+  QTableWidget,
+  QTableWidgetItem,
+  QWidget,
+)
+
+from utils_rr import path_utils, ui_utils
+
+if TYPE_CHECKING:
+  from state_saver import StateSaver
+
+# The table operators notify the main window before and after they change the table.
+TableCallback = Callable[[], None]
 
 COLORS_LIGHT = {
     "red": 0x980030,
@@ -20,6 +37,8 @@ COLORS_LIGHT = {
     "black_light": 0x22282b,
     "black_dark": 0x242a2d,
     "white": 0xffffff,
+    "console_background": 0x345064,
+    "console_foreground": 0xebebeb,
 }
 
 COLORS_DARK = {
@@ -36,6 +55,8 @@ COLORS_DARK = {
     "black_light": 0x22282b,
     "black_dark": 0x242a2d,
     "white": 0x232323,
+    "console_background": 0x1e2529,
+    "console_foreground": 0xd6d9db,
 }
 # NOTE: This variable is being set from renderrob.py since we only know there if a dark or a
 # light theme is requested.
@@ -57,8 +78,9 @@ def make_editable(table_widget: QTableWidget) -> None:
   class EditableDelegate(QStyledItemDelegate):
     """Allow editing of QTableWidget."""
 
-    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
-      """Allow editing by returning the default editor"""
+    def createEditor(  # pylint: disable=invalid-name
+        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> QWidget:
+      """Allow editing by returning the default editor."""
       return QStyledItemDelegate.createEditor(self, parent, option, index)
   delegate = EditableDelegate()
   table_widget.setItemDelegate(delegate)
@@ -81,7 +103,8 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
   class ReadOnlyDelegate(QStyledItemDelegate):
     """Prevent editing of QTableWidget."""
 
-    def createEditor(self, parent, option, index):  # pylint: disable=invalid-name
+    def createEditor(  # pylint: disable=invalid-name
+        self, parent: QWidget, option: QStyleOptionViewItem, index: QModelIndex) -> None:
       """Prevent editing of QTableWidget by returning None."""
       del parent, option, index
   delegate = ReadOnlyDelegate()
@@ -98,14 +121,13 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
       checkbox_item = widget.findChild(QCheckBox)
       checked = checkbox_item.isChecked()
       if widget and isinstance(widget, QWidget):
-        # checkbox_item.setCheckable(False)
         checkbox_item.setDisabled(True)
         checkbox_item.setChecked(checked)
 
 
 # @operator
-def move_row_down(table_widget: QTableWidget, before_callback_function: callable,
-                  after_callback_function: callable) -> None:
+def move_row_down(table_widget: QTableWidget, before_callback_function: TableCallback,
+                  after_callback_function: TableCallback) -> None:
   """Move the currently selected row down."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -130,8 +152,8 @@ def move_row_down(table_widget: QTableWidget, before_callback_function: callable
 
 
 # @operator
-def move_row_up(table_widget: QTableWidget, before_callback_function: callable,
-                after_callback_function: callable) -> None:
+def move_row_up(table_widget: QTableWidget, before_callback_function: TableCallback,
+                after_callback_function: TableCallback) -> None:
   """Move the currently selected row up."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -156,8 +178,9 @@ def move_row_up(table_widget: QTableWidget, before_callback_function: callable,
 
 
 # @operator
-def duplicate_row(table_widget: QTableWidget, state_saver: Any,
-                  before_callback_function: callable, after_callback_function: callable) -> None:
+def duplicate_row(table_widget: QTableWidget, state_saver: "StateSaver",
+                  before_callback_function: TableCallback,
+                  after_callback_function: TableCallback) -> None:
   """Duplicate the currently selected row."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -174,8 +197,8 @@ def duplicate_row(table_widget: QTableWidget, state_saver: Any,
 
 # @operator
 def add_row_below(table_widget: QTableWidget,
-                  before_callback_function: Optional[callable] = None,
-                  after_callback_function: Optional[callable] = None) -> None:
+                  before_callback_function: TableCallback | None = None,
+                  after_callback_function: TableCallback | None = None) -> None:
   """Add a row below the current row."""
   table_widget.blockSignals(True)
   if before_callback_function:
@@ -192,8 +215,8 @@ def add_row_below(table_widget: QTableWidget,
 
 
 # @operator
-def remove_active_row(table_widget: QTableWidget, before_callback_function: callable,
-                      after_callback_function: callable) -> None:
+def remove_active_row(table_widget: QTableWidget, before_callback_function: TableCallback,
+                      after_callback_function: TableCallback) -> None:
   """Remove the currently selected row."""
   table_widget.blockSignals(True)
   before_callback_function()
@@ -221,7 +244,6 @@ def add_file_below(table_widget: QTableWidget, path: str) -> None:
 
 def post_process_row(table_widget: QTableWidget, row: int) -> None:
   """Post-process the table after loading it from a UI file."""
-
   header = table_widget.horizontalHeader()
   header.setMinimumHeight(50)
   table_widget.setHorizontalHeaderLabels(
@@ -250,7 +272,6 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
   # to be checked later.
   header.setSectionResizeMode(QHeaderView.ResizeToContents)
   header.setSectionResizeMode(1, QHeaderView.Stretch)
-  # header.setSectionResizeMode(17, QHeaderView.Fixed)
   table_widget.resizeColumnsToContents()
   ui_utils.fill_row(table_widget, row)
 
@@ -261,10 +282,7 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
     if i in ui_utils.COMBOBOX_COLUMNS or i in ui_utils.CHECKBOX_COLUMNS:
       continue
     old_item = table_widget.item(row, i)
-    if old_item:
-      text = old_item.text()
-    else:
-      text = ""
+    text = old_item.text() if old_item else ""
     item = QTableWidgetItem(text)
     if not item:
       continue
@@ -278,7 +296,6 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
 
 def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
-
   # Taking the background color of the camera tableitem as reference. The item is missing while a
   # row is still being built up, in which case there is no previous color to preserve.
   reference_item = table_widget.item(row_index, 2)
@@ -287,9 +304,8 @@ def color_row_background(table_widget: QTableWidget, row_index: int, base_color:
   color = base_color
   if previous_color == QColor(COLORS["red"]):
     color = QColor(COLORS["red"])
-  elif previous_color == QColor(COLORS["yellow"]):
-    if base_color == QColor(COLORS["green"]):
-      color = QColor(COLORS["yellow"])
+  elif previous_color == QColor(COLORS["yellow"]) and base_color == QColor(COLORS["green"]):
+    color = QColor(COLORS["yellow"])
 
   for column_index in range(table_widget.columnCount()):
     item = table_widget.item(row_index, column_index)
