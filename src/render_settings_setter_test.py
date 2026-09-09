@@ -122,20 +122,20 @@ class TestRenderSettingsSetter(unittest.TestCase):
   def test_set_render_settings_cpu_engine(self):
     """Test the set_render_settings function with the CPU engine."""
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.eevee.use_motion_blur = True
+    scene.render.engine = self.rss.eevee_engine_identifier()
+    scene.render.use_motion_blur = True
     self.rss.set_render_settings("cpu", False, 128, False, "EEVEE")
-    self.assertEqual(scene.render.engine, "BLENDER_EEVEE_NEXT")
+    self.assertEqual(scene.render.engine, self.rss.eevee_engine_identifier())
     self.assertEqual(scene.eevee.taa_render_samples, 128)
     self.assertEqual(scene.cycles.device, "CPU")
-    self.assertFalse(scene.eevee.use_motion_blur)
+    self.assertFalse(scene.render.use_motion_blur)
 
   @unittest.skipIf(not check_gpu(), "GPU is not supported on this machine.")
   def test_set_render_settings_gpu_engine(self):
     """Test the set_render_settings function with the GPU engine."""
     scene = bpy.context.scene
-    scene.render.engine = "BLENDER_EEVEE_NEXT"
-    scene.eevee.use_motion_blur = True
+    scene.render.engine = self.rss.eevee_engine_identifier()
+    scene.render.use_motion_blur = True
     bpy.context.preferences.addons["cycles"].preferences.compute_device_type = "OPTIX"
     self.rss.set_render_settings("gpu", False, 128, False, "CYCLES")
     self.assertEqual(scene.render.engine, "CYCLES")

@@ -279,8 +279,10 @@ def set_text_alignment(table_widget: QTableWidget, row: int) -> None:
 def color_row_background(table_widget: QTableWidget, row_index: int, base_color: QColor) -> None:
   """Color the background of a row."""
 
-  # Taking the background color of the camera tableitem as reference.
-  previous_color = table_widget.item(row_index, 2).background()
+  # Taking the background color of the camera tableitem as reference. The item is missing while a
+  # row is still being built up, in which case there is no previous color to preserve.
+  reference_item = table_widget.item(row_index, 2)
+  previous_color = reference_item.background() if reference_item else None
 
   color = base_color
   if previous_color == QColor(COLORS["red"]):

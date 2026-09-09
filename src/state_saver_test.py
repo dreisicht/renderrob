@@ -9,6 +9,10 @@ import state_saver
 from protos import state_pb2
 from utils_rr import table_utils
 
+# Test fixtures live next to the repository root, so resolve them relative to this file rather
+# than to the current working directory.
+BASIC_STATE_FILE = str(Path(__file__).parent.parent / "test" / "basic_state.rrp")
+
 
 class TestStateSaver(unittest.TestCase):
   """Test the state_saver module."""
@@ -40,7 +44,7 @@ class TestStateSaver(unittest.TestCase):
   def test_state_to_table(self) -> None:
     """Test the state_to_table method."""
     state_saver_instance = state_saver.StateSaver()
-    state_saver_instance.state.ParseFromString(Path("test/basic_state.rrp").read_bytes())
+    state_saver_instance.state.ParseFromString(Path(BASIC_STATE_FILE).read_bytes())
 
     table = self.main_window.table
     state_saver_instance.state_to_table(table)
@@ -67,11 +71,10 @@ class TestStateSaver(unittest.TestCase):
 
   def test_table_to_state(self) -> None:
     """Test the table_to_state method."""
-    self.main_window.open_file("test/basic_state.rrp")
+    self.main_window.open_file(BASIC_STATE_FILE)
     state_saver_instance = state_saver.StateSaver()
     state_saver_instance.parent_widget = self.main_window
     state_saver_instance.table_to_state(self.main_window.table)
     reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
-    with open("test/basic_state.rrp", "rb") as rrp_file:
-      reference_state.ParseFromString(rrp_file.read())
+    reference_state.ParseFromString(Path(BASIC_STATE_FILE).read_bytes())
     self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)

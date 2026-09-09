@@ -1,5 +1,6 @@
 """Unit tests for main module."""
 import unittest
+from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
 
@@ -7,6 +8,10 @@ import main
 from utils_rr import table_utils
 
 # pylint: disable=protected-access
+
+# Test fixtures live next to the repository root, so resolve them relative to this file rather
+# than to the current working directory.
+SAVE_FILE = str(Path(__file__).parent.parent / "test" / "test_save_file.rrp")
 
 
 class TestMainWindow(unittest.TestCase):
@@ -30,9 +35,8 @@ class TestMainWindow(unittest.TestCase):
 
   def test_add_filepath_to_cache(self):
     """Test the add_filepath_to_cache function."""
-    self.main_window.add_filepath_to_cache("test/test_save_file.rrp")
-    self.assertTrue(
-        "test/test_save_file.rrp" in self.main_window.cache.recent_files)
+    self.main_window.add_filepath_to_cache(SAVE_FILE)
+    self.assertIn(SAVE_FILE, self.main_window.cache.recent_files)
 
   def test_new_file(self):
     """Test the new_file function."""
@@ -40,7 +44,7 @@ class TestMainWindow(unittest.TestCase):
 
   def test_open_file(self):
     """Test the open_file function."""
-    filepath = "test/test_save_file.rrp"
+    filepath = SAVE_FILE
     self.main_window.open_file(filepath)
     self.assertTrue(filepath in self.main_window.cache.current_file)
     self.assertEqual(self.main_window.cache.current_file, filepath)

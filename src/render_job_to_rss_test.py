@@ -44,7 +44,7 @@ class TestRenderJobToRss(unittest.TestCase):
                 f"import sys ; sys.path.append('{cwd}') ; "
                 "from utils_bpy import render_settings_setter ;"
                 " rss = render_settings_setter.RenderSettingsSetter("
-                "'Scene', ['View Layer']) ; rss.activate_addons([]) ; rss.set_camera('Camera') ; rss"
+                "'Scene', ['View Layer']) ; rss.set_camera('Camera') ; rss"
                 ".set_render_settings(render_device='gpu', border=False, samples=128, motion_blur="
                 "True, engine='cycles') ; rss.set_denoising_settings(denoise=True) ;"
                 " rss.set_output_settings(frame_step=1, xres=1920, yres=1080, percres=100, "

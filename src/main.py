@@ -710,6 +710,8 @@ class MainWindow(QWidget):
       self.active_render_job,
     )
     for i, job in enumerate(self.state_saver.state.render_jobs):
+      if i >= self.table.rowCount():
+        break
       if job in self.green_jobs:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["green"]))
       elif job in self.yellow_jobs:
@@ -728,14 +730,11 @@ class MainWindow(QWidget):
       else:
         table_utils.color_row_background(self.table, i, QColor(table_utils.COLORS["grey_light"]))
 
-    # Check for duplicates.
-    for row_index in range(self.table.rowCount()):
-      if (
-        list(self.state_saver.state.render_jobs).count(
-          self.state_saver.state.render_jobs[row_index],
-        )
-        > 1
-      ):
+    # Check for duplicates. The table can hold more rows than the state holds jobs while a row is
+    # still being built up, so only walk the rows that have a job behind them.
+    render_jobs = list(self.state_saver.state.render_jobs)
+    for row_index in range(min(self.table.rowCount(), len(render_jobs))):
+      if render_jobs.count(render_jobs[row_index]) > 1:
         table_utils.color_row_background(
           self.table,
           row_index,
@@ -744,11 +743,11 @@ class MainWindow(QWidget):
 
       # Set the background color of the blend path.
       blend_path_item = self.table.item(row_index, 1)
+      if not blend_path_item:
+        continue
       blend_path = Path(blend_path_item.text())
-      if (
-        not blend_path.exists()
-        and not (self.state_saver.state.settings.blender_files_path / blend_path).exists()
-      ):
+      blender_files_path = Path(self.state_saver.state.settings.blender_files_path)
+      if not blend_path.exists() and not (blender_files_path / blend_path).exists():
         blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
 
   ########## TABLE OPS ############

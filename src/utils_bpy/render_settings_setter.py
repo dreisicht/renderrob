@@ -10,7 +10,7 @@ from utils_common import print_utils, rr_c_image
 class RenderSettingsSetter:
   """Class to set the render settings in Blender."""
 
-  def __init__(self, scene: str = None, view_layers: list[str] = None) -> None:
+  def __init__(self, scene: str | None = None, view_layers: list[str] | None = None) -> None:
     """Initialize the render settings setter and set the settings."""
     rr_c_image.draw_image()
 
@@ -19,26 +19,22 @@ class RenderSettingsSetter:
     self.current_scene_data = None
     self.view_layer_data = None
     self.current_scene_render = None
-    if scene and scene not in bpy.data.scenes:
-      print_utils.print_warning(
-        "I couldn't find the scene you specified. I'm rendering the last used scene."
-      )
     self.set_scene(scene)
     if view_layers != [""]:
       self.set_view_layers(view_layers)
 
-  def set_scene(self, scene_name: str) -> None:
+  def set_scene(self, scene_name: str | None) -> None:
     """Set the scene to be rendered."""
-    if scene_name or scene_name != "":
-      if scene_name not in bpy.data.scenes:
-        print_utils.print_warning(f"Scene {scene_name} not found!")
-      else:
+    if scene_name:
+      if scene_name in bpy.data.scenes:
         bpy.context.window.scene = bpy.data.scenes[scene_name]
-      if not scene_name and len(bpy.data.scenes) > 1:
-        print_utils.print_warning(
-          "There are more than one scenes, but you didn't tell me which scene to render! So I am"
-          " rendering the last used scene.",
-        )
+      else:
+        print_utils.print_warning(f"Scene {scene_name} not found!")
+    elif len(bpy.data.scenes) > 1:
+      print_utils.print_warning(
+        "There are more than one scenes, but you didn't tell me which scene to render! So I am"
+        " rendering the last used scene.",
+      )
     self.current_scene_data = bpy.context.scene
     self.current_scene_render = self.current_scene_data.render
 
@@ -108,6 +104,16 @@ class RenderSettingsSetter:
     except KeyError:
       print_utils.print_error(f"I didn't find the camera called {camera_name}.")
 
+  def eevee_engine_identifier(self) -> str:
+    """Return the EEVEE engine identifier of the Blender version we're running in.
+
+    Blender 4.2 renamed "BLENDER_EEVEE_NEXT" back to "BLENDER_EEVEE". Render Rob drives whichever
+    Blender the user configured, so ask the file which identifier it accepts.
+    """
+    engine_property = self.current_scene_render.bl_rna.properties["engine"]
+    identifiers = [item.identifier for item in engine_property.enum_items]
+    return "BLENDER_EEVEE_NEXT" if "BLENDER_EEVEE_NEXT" in identifiers else "BLENDER_EEVEE"
+
   def set_render_settings(
     self, render_device: str, border: bool, samples: str, motion_blur: bool, engine: str
   ) -> None:
@@ -118,7 +124,7 @@ class RenderSettingsSetter:
     if engine.lower() == "eevee":
       if samples:
         self.current_scene_data.eevee.taa_render_samples = int(samples)
-      self.current_scene_render.engine = "BLENDER_EEVEE_NEXT"
+      self.current_scene_render.engine = self.eevee_engine_identifier()
     elif engine.lower() == "cycles":
       self.current_scene_render.engine = "CYCLES"
       if samples:

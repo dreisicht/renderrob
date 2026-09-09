@@ -27,7 +27,7 @@ class ShotNameBuilder:
   def __init__(
     self,
     render_job: state_pb2.render_job,  # pylint: disable=no-member
-    output_path: str,
+    output_path: str | Path,
     is_replay_mode: bool = False,
   ) -> None:
     """Initialize the shot name builder.
@@ -110,9 +110,11 @@ class ShotNameBuilder:
     # Update full_frame_path with iteration number.
     return full_frame_path.replace("v$$", f"v{str(shot_iter_num).zfill(2)}")
 
-  def get_full_frame_path(self, output_path: str, shotname: str) -> str:
+  def get_full_frame_path(self, output_path: str | Path, shotname: str) -> str:
     """Build the path to the frames including the file name and directory."""
-    if not output_path:
+    if output_path:
+      output_path = Path(str(output_path).replace("\\", "/"))
+    else:
       output_path = Path(self.render_job.file.replace("\\", "/")).parent
 
     frame_name = f"{shotname}-f####.{ui_utils.FILE_FORMATS_ACTUAL[self.render_job.file_format]}"
