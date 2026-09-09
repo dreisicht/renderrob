@@ -48,12 +48,11 @@ jobs:
           python-version: "3.13"
           enable-cache: true
 
+      # Qt's own dependencies, whose Debian package names have shifted across Ubuntu releases.
+      # The action tracks that so the workflow does not have to.
       - name: Install Qt's system libraries
         if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libegl1 libgl1 libxkbcommon0 libdbus-1-3 libglib2.0-0
+        uses: tlambert03/setup-qt-libs@v1
 
       - name: Install dependencies
         run: uv sync --group dev

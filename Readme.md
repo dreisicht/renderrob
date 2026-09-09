@@ -70,10 +70,11 @@ so no system install is required):
 sh src/protos/build_proto.sh
 ```
 
-Run the app:
+Run the app (from `src`, because it resolves `icon/` and `ui/` against the working
+directory):
 
 ```
-uv run src/main.py
+cd src && uv run python main.py
 ```
 
 Run the tests and the linter:

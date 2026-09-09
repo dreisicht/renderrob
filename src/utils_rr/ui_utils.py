@@ -84,7 +84,7 @@ def load_stylesheet(colors: dict[str, int]) -> str:
     return ""
   substitutions = {name: f"#{value:06x}" for name, value in colors.items()}
   # Qt needs forward slashes in url() even on Windows.
-  substitutions["icons_dir"] = (stylesheet_path.parent / "icons").as_posix()
+  substitutions["icons_dir"] = (stylesheet_path.parent / "icons").resolve().as_posix()
   return Template(stylesheet_path.read_text(encoding="utf-8")).substitute(substitutions)
 
 
