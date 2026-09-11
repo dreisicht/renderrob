@@ -8,7 +8,7 @@ from pathlib import Path
 from string import Template
 from typing import Any
 
-from PySide6.QtCore import QDir, QFile, QMetaObject, Qt
+from PySide6.QtCore import QDir, QFile, QMetaObject, QPoint, Qt
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import (
   QCheckBox,
@@ -186,11 +186,28 @@ def add_checkbox(table: QTableWidget, row: int, col: int, *, checked: bool = Fal
   table.setCellWidget(row, col, widget)
 
 
+def forward_context_menu(table: QTableWidget, widget: QWidget, position: QPoint) -> None:
+  """Hand a cell widget's right-click on to the table it sits in.
+
+  The table emits customContextMenuRequested with a position relative to its viewport, so the
+  forwarded one has to arrive in the same coordinates for the handler to find the right cell.
+  """
+  table.customContextMenuRequested.emit(
+    table.viewport().mapFromGlobal(widget.mapToGlobal(position)),
+  )
+
+
 def add_dropdown(table: QTableWidget, row: int, col: int, items: list[str]) -> None:
   """Add a dropdown to the given table at the given row and column."""
   dropdown = QComboBox()
   dropdown.addItems(items)
   dropdown.currentIndexChanged.connect(TABLE_CHANGED_FUNCTION)
+  # A QComboBox accepts the context menu event instead of leaving it to its parent the way a plain
+  # widget does, so the dropdown columns would be dead to right-clicks. Forward it by hand.
+  dropdown.setContextMenuPolicy(Qt.CustomContextMenu)
+  dropdown.customContextMenuRequested.connect(
+    lambda position, widget=dropdown: forward_context_menu(table, widget, position),
+  )
   add_background_item(table, row, col)
   table.setCellWidget(row, col, dropdown)
 

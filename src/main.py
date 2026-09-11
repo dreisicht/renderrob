@@ -11,12 +11,13 @@ sys.path.append(Path(__file__).parent.parent.as_posix())
 sys.path.append(Path(__file__).parent.parent.as_posix())
 
 
-from PySide6.QtCore import QCoreApplication, QProcess, Qt
+from PySide6.QtCore import QCoreApplication, QModelIndex, QPoint, QProcess, Qt
 from PySide6.QtGui import (
   QAction,
   QCloseEvent,
   QColor,
   QIcon,
+  QKeySequence,
   QPalette,
   QTextCharFormat,
   QTextCursor,
@@ -24,6 +25,7 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
   QApplication,
   QFileDialog,
+  QMenu,
   QMessageBox,
   QStackedLayout,
   QTableWidgetItem,
@@ -42,6 +44,23 @@ from utils_rr.dropwidget import DropWidget
 MAX_NUMBER_OF_RECENT_FILES = 5
 
 UI_FILE_NAME = "window.ui"
+
+# The rows' context menu mirrors the button column beside the table: every entry names a button in
+# window.ui, and None stands for a separator. Reading the label, icon, shortcut and enabled state
+# off the button itself keeps the two menus in step without a second list to maintain.
+ROW_CONTEXT_MENU_BUTTONS = (
+  "blender_button",
+  "sync_button",
+  "play_button",
+  "open_button",
+  None,
+  "add_button",
+  "duplicate_button",
+  "delete_button",
+  None,
+  "up_button",
+  "down_button",
+)
 
 # Qt reports the color scheme as an enum whose values are Unknown/Light/Dark.
 LIGHT_COLOR_SCHEME = 1
@@ -242,6 +261,15 @@ class MainWindow(QWidget):
     )
     self.window.actionUndo.triggered.connect(self.undo)
     self.window.sync_button.clicked.connect(self.load_settings_from_blender)
+
+    self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+    self.table.customContextMenuRequested.connect(self.show_row_context_menu)
+    # A header is a sibling of the table's viewport rather than a part of it, so its right-clicks
+    # would arrive in the table's own coordinates and resolve to the wrong row. There is nothing
+    # row-specific to offer on a header anyway, so let them pass without a menu.
+    self.table.horizontalHeader().setContextMenuPolicy(Qt.PreventContextMenu)
+    self.table.verticalHeader().setContextMenuPolicy(Qt.PreventContextMenu)
+
     ui_utils.TABLE_CHANGED_FUNCTION = self.before_and_after_table_change
 
   ######## CACHE UTILS ##########
@@ -789,6 +817,49 @@ class MainWindow(QWidget):
         blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
 
   ########## TABLE OPS ############
+  def build_row_context_menu(self, index: QModelIndex) -> QMenu:
+    """Build the context menu for the cell the user right-clicked."""
+    menu = QMenu(self.table)
+    for button_name in ROW_CONTEXT_MENU_BUTTONS:
+      if button_name is None:
+        menu.addSeparator()
+        continue
+      button = getattr(self.window, button_name)
+      # Qt hides an action's own shortcut in a context menu, so spell it out in the label: a menu
+      # draws whatever follows the tab in its shortcut column.
+      shortcut = button.shortcut().toString(QKeySequence.NativeText)
+      label = f"{button.toolTip()}\t{shortcut}" if shortcut else button.toolTip()
+      action = menu.addAction(button.icon(), label)
+      # The button is the one that knows whether its operator can run right now - Render and Stop
+      # take turns being disabled while a render is going.
+      action.setEnabled(button.isEnabled())
+      action.triggered.connect(button.click)
+
+    # A cell holding a checkbox or a dropdown carries an item only so the row color has something
+    # to paint; copying or pasting one reads and writes text nothing looks at.
+    if index.column() in ui_utils.TEXT_COLUMNS or index.column() in ui_utils.NUMBER_COLUMNS:
+      menu.addSeparator()
+      menu.addAction(self.window.actionCopy_cell)
+      menu.addAction(self.window.actionPaste_cell)
+    return menu
+
+  def show_row_context_menu(self, position: QPoint) -> None:
+    """Show the row context menu where the user right-clicked in the table.
+
+    The position comes in relative to the table's viewport, which is what indexAt reads and what
+    the menu has to be placed against.
+    """
+    index = self.table.indexAt(position)
+    if not index.isValid():
+      return
+    # Every operator behind the buttons works on the current cell, so a right-click has to move it
+    # the way a left-click does. A click on a checkbox or a dropdown never reaches the table, so
+    # the cell those cover would otherwise stay unselected.
+    self.table.setCurrentCell(index.row(), index.column())
+    menu = self.build_row_context_menu(index)
+    menu.exec(self.table.viewport().mapToGlobal(position))
+    menu.deleteLater()
+
   def copy_from_cell(self) -> None:
     """Copies the content of the active cell into the clipboard."""
     current_row = self.table.currentRow()
