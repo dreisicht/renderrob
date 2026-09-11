@@ -40,21 +40,24 @@ DEFAULT_COLUMN_WIDTHS = {
 }
 
 # The two palettes Render Rob renders with. Keys are shared, so the rest of the code can look a
-# color up by meaning and stay theme-agnostic. Row colors are backgrounds behind normal text, so
-# they stay muted; the console colors are badges behind their own foreground and can be strong.
+# color up by meaning and stay theme-agnostic. Row colors sit behind the table's normal text, so
+# each theme picks the lightness that keeps that text readable; the console colors are badges
+# behind their own foreground and can be stronger.
 COLORS_LIGHT = {
-  # Status colors for table rows.
-  "red": 0xF0BCC6,
-  "yellow": 0xFFE6A3,
-  "green": 0xC9E6D6,
+  # Status colors for table rows: blue while a job renders, green when it succeeded, yellow when it
+  # reported warnings, red when it broke. They carry the whole status readout of the table, so they
+  # stay saturated enough to tell apart at a glance while keeping $text readable on top.
+  "red": 0xE0687F,
+  "yellow": 0xF2C14E,
+  "green": 0x86D2AA,
   "grey_light": 0xFFFFFF,
   "grey_inactive": 0xECEFF1,
-  "blue_grey_lighter": 0xCFE0EC,
+  "blue_grey_lighter": 0x7FB6DB,
   # Brand colors.
   "blue": 0x57A3B4,
   "blue_grey": 0x4F7997,
   "blue_grey_darker": 0x345064,
-  "grey_neutral": 0x99999,
+  "grey_neutral": 0x999999,
   "black_light": 0x22282B,
   "black_dark": 0x1E2529,
   "white": 0xFFFFFF,
@@ -83,13 +86,14 @@ COLORS_LIGHT = {
 }
 
 COLORS_DARK = {
-  # Status colors for table rows.
-  "red": 0x6B2334,
-  "yellow": 0x6B5A24,
-  "green": 0x2F5745,
+  # Status colors for table rows, in the same four hues as the light palette, darkened until the
+  # light $text on top of them is readable.
+  "red": 0x8C2C42,
+  "yellow": 0x7A5F18,
+  "green": 0x2E7355,
   "grey_light": 0x272E33,
   "grey_inactive": 0x23292D,
-  "blue_grey_lighter": 0x35505F,
+  "blue_grey_lighter": 0x2E6488,
   # Brand colors.
   "blue": 0x57A3B4,
   "blue_grey": 0x4F7997,
