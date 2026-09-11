@@ -50,15 +50,21 @@ def normalize_drive_letter(path: str) -> str:
   return path
 
 
-def get_blender_module_path() -> str:
-  """Return the directory Blender has to put on sys.path to import Render Rob's bpy helpers.
+def get_resource_root() -> Path:
+  """Return the directory holding Render Rob's own data: ui/, icon/, utils_bpy/, utils_common/.
 
-  In a py2app bundle those modules are copied next to the executable, under ../Resources. In a
-  source checkout they sit at the top of src/, one level above this file. Returning whichever one
-  actually holds utils_bpy keeps this correct however Render Rob was started, and - unlike asking
-  for the current working directory - independent of where it was started from.
+  Where that is depends on how Render Rob was started. In a py2app bundle they are copied next to
+  the executable, under ../Resources. In a PyInstaller bundle - and in a source checkout - they
+  sit beside this module's package, one level above this file. Checking for utils_bpy rather than
+  asking for the current working directory keeps this correct however Render Rob was started, and
+  independent of where it was started from.
   """
   bundle_resources = Path("../Resources")
   if (bundle_resources / "utils_bpy").is_dir():
-    return normalize_drive_letter(str(bundle_resources.resolve()))
-  return normalize_drive_letter(str(Path(__file__).parent.parent.resolve()))
+    return bundle_resources
+  return Path(__file__).parent.parent
+
+
+def get_blender_module_path() -> str:
+  """Return the directory Blender has to put on sys.path to import Render Rob's bpy helpers."""
+  return normalize_drive_letter(str(get_resource_root().resolve()))

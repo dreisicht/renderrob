@@ -24,6 +24,9 @@ dev = [
     # green branch red on somebody else's release rather than on a change made here.
     "ty==0.0.79",
 ]
+# Only the release workflow and a local `pyinstaller tools/renderrob.spec` need this, so it is
+# kept out of `dev` - nobody running the tests should have to download it.
+build = ["pyinstaller>=6.16.0"]
 
 [build-system]
 requires = ["setuptools>=64", "wheel"]

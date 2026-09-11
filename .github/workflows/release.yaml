@@ -1,0 +1,169 @@
+name: Release
+
+# Publishing a release builds the downloadable bundles and attaches them to it. The manual
+# trigger runs the exact same build and leaves the archives as workflow artifacts, so the
+# packaging can be changed and checked without cutting a release to try it.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  # There is no display on a runner, and the smoke test below really starts the app.
+  QT_QPA_PLATFORM: offscreen
+
+jobs:
+  bundle:
+    name: Bundle (${{ matrix.name }})
+    permissions:
+      # Needed to attach the archives to the release.
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Built on the oldest Ubuntu still offered, because the glibc a bundle is linked
+          # against is the oldest one it will run on. 22.04 is already the floor PySide6's own
+          # manylinux_2_34 wheel sets, so nothing is gained by going older.
+          - name: linux-x86_64
+            os: ubuntu-22.04
+          - name: macos-arm64
+            os: macos-latest
+          # Intel Macs need their own bundle; there are no universal2 builds of the Python this
+          # is frozen with. Uncomment to publish one:
+          # - name: macos-x86_64
+          #   os: macos-15-intel
+          - name: windows-x86_64
+            os: windows-latest
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          # Pinned rather than ">=3.13", because bpy only publishes wheels for specific versions.
+          python-version: "3.13"
+          enable-cache: true
+
+      # Qt's own dependencies, whose Debian package names have shifted across Ubuntu releases.
+      # The action tracks that so the workflow does not have to.
+      - name: Install Qt's system libraries
+        if: runner.os == 'Linux'
+        uses: tlambert03/setup-qt-libs@v1
+
+      - name: Install dependencies
+        # bpy is a ~1 GB download that only ever runs inside the user's own Blender, never inside
+        # Render Rob, and the spec excludes it from the bundle. Skipping it here skips the wait.
+        run: uv sync --group build --no-install-package bpy
+
+      - name: Build the proto bindings
+        run: >
+          uv run python -m grpc_tools.protoc
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
+          src/protos/state.proto src/protos/cache.proto
+
+      - name: Freeze the app
+        run: uv run pyinstaller --noconfirm --clean tools/renderrob.spec
+
+      # A bundle that builds is not a bundle that runs: a missing Qt platform plugin, an
+      # unresolved .ui file or a custom widget QUiLoader cannot find are all silent at build time
+      # and fatal at startup. So start it, and require that it is still alive twenty seconds on.
+      - name: Check that the bundle starts (Linux, macOS)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then
+            app="dist/RenderRob.app/Contents/MacOS/renderrob"
+            # PyInstaller splits a .app into Contents/Frameworks and Contents/Resources and
+            # symlinks between them; Frameworks is the one the frozen modules see themselves in.
+            helpers="dist/RenderRob.app/Contents/Frameworks"
+          else
+            app="dist/renderrob/renderrob"
+            helpers="dist/renderrob/_internal"
+          fi
+          # Blender imports these with its own interpreter, off disk, from the directory
+          # path_utils.get_blender_module_path() hands it. Starting the app does not touch that
+          # path - it would first fail when somebody presses Render, weeks after the release.
+          for helper in utils_bpy/settings_loader.py utils_bpy/render_settings_setter.py \
+                        utils_common/print_utils.py; do
+            if [ ! -f "$helpers/$helper" ]; then
+              echo "::error::$helper is not in $helpers, so Blender cannot import it."
+              exit 1
+            fi
+          done
+          "$app" &
+          pid=$!
+          sleep 20
+          if kill -0 "$pid" 2>/dev/null; then
+            kill "$pid"
+            echo "Render Rob was still running after 20 seconds."
+          else
+            wait "$pid" && status=0 || status=$?
+            echo "::error::Render Rob exited on its own with status $status; the bundle is broken."
+            exit 1
+          fi
+
+      - name: Check that the bundle starts (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          # See the Linux and macOS step: Blender imports these off disk with its own
+          # interpreter, and starting the app never exercises that.
+          foreach ($helper in "utils_bpy\settings_loader.py", "utils_bpy\render_settings_setter.py", "utils_common\print_utils.py") {
+            if (-not (Test-Path "dist\renderrob\_internal\$helper")) {
+              Write-Output "::error::$helper is not in the bundle, so Blender cannot import it."
+              exit 1
+            }
+          }
+          $app = Start-Process -FilePath dist\renderrob\renderrob.exe -PassThru
+          Start-Sleep -Seconds 20
+          if ($app.HasExited) {
+            Write-Output "::error::Render Rob exited on its own with code $($app.ExitCode); the bundle is broken."
+            exit 1
+          }
+          Stop-Process -Id $app.Id
+          Write-Output "Render Rob was still running after 20 seconds."
+
+      - name: Name the archive
+        id: archive
+        shell: bash
+        # The release tag, not src/version.py: the tag is what the download is filed under, and
+        # the two have drifted apart before.
+        run: |
+          # Slashes are legal in a branch name and rejected in an artifact name, so a manual run
+          # from feature/x does not fail at the very last step.
+          version="$(echo "${{ github.event.release.tag_name || github.ref_name }}" | tr '/' '-')"
+          echo "name=renderrob-${version}-${{ matrix.name }}" >> "$GITHUB_OUTPUT"
+
+      - name: Archive the bundle (Linux)
+        if: runner.os == 'Linux'
+        # tar rather than zip, which does not carry the executable bit: from a zip the bundle
+        # arrives unrunnable.
+        run: tar -czf "${{ steps.archive.outputs.name }}.tar.gz" -C dist renderrob
+
+      - name: Archive the bundle (macOS)
+        if: runner.os == 'macOS'
+        # ditto rather than zip, which flattens the symlinks the Qt frameworks inside the .app are
+        # built out of, leaving an app that will not launch.
+        run: ditto -c -k --keepParent dist/RenderRob.app "${{ steps.archive.outputs.name }}.zip"
+
+      - name: Archive the bundle (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist\renderrob -DestinationPath "${{ steps.archive.outputs.name }}.zip"
+
+      # Uploaded as the finished archive, not as the loose bundle: this action zips whatever it is
+      # given, and its zip is what would drop the symlinks and the executable bit.
+      - name: Keep the archive on the run
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.archive.outputs.name }}
+          path: ${{ steps.archive.outputs.name }}.*
+          if-no-files-found: error
+
+      - name: Attach the archive to the release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ steps.archive.outputs.name }}.*

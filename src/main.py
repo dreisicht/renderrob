@@ -131,8 +131,11 @@ class MainWindow(QWidget):
     self.window = ui_utils.load_ui_from_file(UI_FILE_NAME, custom_widgets=[DropWidget])
     self.window.splitter.setSizes((200, 500))
 
-    self.window.setWindowIcon(QIcon("icon/icon-256.png"))
-    self.app.setWindowIcon(QIcon("icon/icon-256.png"))
+    # Resolved against the resource root rather than the working directory, which in a bundle is
+    # wherever the user happened to launch Render Rob from.
+    window_icon = QIcon(str(path_utils.get_resource_root() / "icon" / "icon-256.png"))
+    self.window.setWindowIcon(window_icon)
+    self.app.setWindowIcon(window_icon)
     self.table = self.window.tableWidget
     self.table.verticalHeader().setDefaultSectionSize(TABLE_ROW_HEIGHT)
     self.refresh_recent_files_menu()

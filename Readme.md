@@ -120,10 +120,36 @@ Build, sign, notarize and package the Mac app:
 sh tools/build_mac.sh
 ```
 
+Build the downloadable bundles the way CI does, for the platform you are on:
+
+```
+uv sync --group build
+uv run pyinstaller --noconfirm --clean tools/renderrob.spec
+```
+
+That leaves a `dist/renderrob/` directory on Linux and Windows, and a
+`dist/RenderRob.app` on macOS.
+
+Publishing a GitHub release runs the same build on Linux, macOS and Windows
+(`.github/workflows/release.yaml`) and attaches the three archives to it. The
+workflow can also be started by hand from the Actions tab, which builds and
+smoke-tests the bundles and leaves them as run artifacts instead.
+
+Two things the CI bundles are not:
+
+- **Not signed or notarized.** macOS puts a quarantine flag on anything
+  downloaded from a browser and refuses to open it with "RenderRob is damaged
+  and can't be opened", so the archive has to be cleared first:
+  `xattr -dr com.apple.quarantine /Applications/RenderRob.app`. The signed and
+  notarized Mac release still comes from `tools/build_mac.sh` locally, which
+  needs the signing key.
+- **Not universal on macOS.** The published `.app` is arm64 only. There is a
+  commented-out `macos-15-intel` entry in the workflow matrix for an Intel
+  build.
+
 Note that the `tools/pysidedeploy_*.spec` files are stale: they point at
 `renderrob.py`, which is now `src/main.py`, and hardcode local Python 3.10/3.11
-interpreter paths. Only the py2app path in `tools/build_mac.sh` is current.
-There is no CI build job; building is a local, signing-key-dependent step.
+interpreter paths.
 
 Debugging a notarization run:
 

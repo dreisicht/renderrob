@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
 
 import ui
 from utils_common import print_utils
+from utils_rr import path_utils
 
 TEXT_COLUMNS = [1, 2, 15, 16, 17]
 NUMBER_COLUMNS = [3, 4, 5, 6, 7]
@@ -68,6 +69,9 @@ def resolve_ui_file(file_name: str) -> Path:
     return Path(file_name)
   if (Path("ui") / file_name).exists():
     return Path("ui") / file_name
+  bundled = path_utils.get_resource_root() / "ui" / file_name
+  if bundled.exists():
+    return bundled
   return Path(str(resources.files(ui) / file_name))
 
 
