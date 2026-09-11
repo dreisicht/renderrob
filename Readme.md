@@ -57,6 +57,10 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 
 Python version required due to bpy: **3.13**
 
+Everything below is a recipe in the `justfile` - `just run`, `just protos`,
+`just test`, `just lint`, `just bundle` and friends; `just` on its own lints and
+tests. See `just --list`.
+
 Set up the environment:
 
 ```
@@ -67,7 +71,7 @@ Convert protos (needed once before the first run; protoc comes from the dev grou
 so no system install is required):
 
 ```
-sh src/protos/build_proto.sh
+just protos
 ```
 
 Run the app (from `src`, because it resolves `icon/` and `ui/` against the working
@@ -86,7 +90,7 @@ uv run ruff format --check .
 uv run ty check
 ```
 
-`ty check` needs the generated proto stubs, so run `sh src/protos/build_proto.sh` first.
+`ty check` needs the generated proto stubs, so run `just protos` first.
 
 Install QtDesigner:
 
