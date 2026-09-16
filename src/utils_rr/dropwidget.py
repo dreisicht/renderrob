@@ -15,28 +15,17 @@ class DropWidget(QWidget):
 
   def dropEvent(self, event: QDropEvent) -> None:
     """Add every dropped .blend file as a new row."""
-    if event.mimeData().hasUrls():
-      for url in event.mimeData().urls():
-        file_path = url.toLocalFile()
-        if not url.isLocalFile():
-          continue
-        table = self.parent().tableWidget
-        table_utils.add_file_below(table, file_path)
-        table.itemChanged.emit(table.item(table.rowCount() - 1, 1))
-        event.accept()
-    else:
+    if not event.mimeData().hasUrls():
       event.ignore()
+      return
+    if table_utils.add_dropped_files(self.parent().tableWidget, event.mimeData()):
+      event.accept()
 
   def dragEnterEvent(self, event: QDragEnterEvent) -> None:
     """Accept the drag only if it carries at least one .blend file."""
-    mime_data = event.mimeData()
-    if mime_data.hasUrls():
-      urls = mime_data.urls()
-      for url in urls:
-        file_path = url.toLocalFile()
-        if file_path.endswith(".blend"):
-          event.acceptProposedAction()
-          return
+    if table_utils.carries_blend_file(event.mimeData()):
+      event.acceptProposedAction()
+      return
     event.ignore()
 
   def dragMoveEvent(self, event: QDragMoveEvent) -> None:

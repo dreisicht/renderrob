@@ -219,6 +219,7 @@ explicit = true
 # snake_case without silently unhooking them.
 "src/main.py" = ["N802"]
 "src/utils_rr/dropwidget.py" = ["N802"]
+"src/utils_rr/row_drag_table.py" = ["N802"]
 "src/utils_rr/table_utils.py" = ["N802"]
 # These modules exist to write to the console.
 "src/utils_common/print_utils.py" = ["T201"]

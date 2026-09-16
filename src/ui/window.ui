@@ -269,7 +269,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QTableWidget" name="tableWidget">
+             <widget class="RowDragTableWidget" name="tableWidget">
               <property name="sizeAdjustPolicy">
                <enum>QAbstractScrollArea::AdjustToContents</enum>
               </property>
@@ -723,6 +723,11 @@
    <extends>QWidget</extends>
    <header>dropwidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>RowDragTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header>row_drag_table.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import TYPE_CHECKING
 
-from PySide6.QtCore import QModelIndex, QPersistentModelIndex
+from PySide6.QtCore import QMimeData, QModelIndex, QPersistentModelIndex
 from PySide6.QtGui import QColor, Qt
 from PySide6.QtWidgets import (
   QCheckBox,
@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
   QWidget,
 )
 
+from protos import state_pb2
 from utils_rr import path_utils, ui_utils
 
 if TYPE_CHECKING:
@@ -207,61 +208,85 @@ def make_read_only_selectable(table_widget: QTableWidget) -> None:
 
 
 # @operator
-def move_row_down(
+# The callbacks are what every operator here takes on top of its own arguments; threading them
+# through a holder object would only hide them.
+def move_row(  # noqa: PLR0913, PLR0917
   table_widget: QTableWidget,
+  source_row: int,
+  destination_row: int,
+  state_saver: "StateSaver",
   before_callback_function: TableCallback,
   after_callback_function: TableCallback,
 ) -> None:
-  """Move the currently selected row down."""
+  """Move a row to another place in the table.
+
+  destination_row is where the row ends up once it has been taken out of the table, so moving a
+  row one place down means a destination_row of source_row + 1.
+
+  The move happens on the render jobs rather than on the table: a row carries its checkboxes and
+  its dropdowns as cell widgets, which an item-level move would leave behind.
+  """
+  row_count = table_widget.rowCount()
+  destination_row = min(max(destination_row, 0), row_count - 1)
+  if not 0 <= source_row < row_count or source_row == destination_row:
+    return
+
   table_widget.blockSignals(True)
   before_callback_function()
 
-  row = table_widget.currentRow()
-  column = table_widget.currentColumn()
-  if row < table_widget.rowCount() - 1:
-    combobox_values = list(ui_utils.get_combobox_indexes(table_widget, row))
-    checkbox_values = list(ui_utils.get_checkbox_values(table_widget, row))
-    table_widget.insertRow(row + 2)
-    for i in range(table_widget.columnCount()):
-      table_widget.setItem(row + 2, i, table_widget.takeItem(row, i))
-      table_widget.setCurrentCell(row + 2, column)
-    table_widget.removeRow(row)
-    ui_utils.fill_row(table_widget, row + 1)
-    ui_utils.set_combobox_indexes(table_widget, row + 1, combobox_values)
-    ui_utils.set_checkbox_values(table_widget, row + 1, checkbox_values)
-    set_text_alignment(table_widget, row + 1)
+  # Read before the table is rebuilt, which takes the current cell with it.
+  column = max(table_widget.currentColumn(), 0)
+  state_saver.table_to_state(table_widget)
+  jobs = state_saver.state.render_jobs
+  # Deleting from a repeated field invalidates the message it held, so move a copy of the job.
+  job = state_pb2.render_job()  # pylint: disable=no-member
+  job.CopyFrom(jobs[source_row])
+  del jobs[source_row]
+  jobs.insert(destination_row, job)
+  state_saver.state_to_table(table_widget)
+  # Keep the moved row selected, so that pressing Up or Down again carries on with the same row.
+  table_widget.setCurrentCell(destination_row, column)
 
   after_callback_function()
   table_widget.blockSignals(False)
 
 
 # @operator
+def move_row_down(
+  table_widget: QTableWidget,
+  state_saver: "StateSaver",
+  before_callback_function: TableCallback,
+  after_callback_function: TableCallback,
+) -> None:
+  """Move the currently selected row down."""
+  row = table_widget.currentRow()
+  move_row(
+    table_widget,
+    row,
+    row + 1,
+    state_saver,
+    before_callback_function,
+    after_callback_function,
+  )
+
+
+# @operator
 def move_row_up(
   table_widget: QTableWidget,
+  state_saver: "StateSaver",
   before_callback_function: TableCallback,
   after_callback_function: TableCallback,
 ) -> None:
   """Move the currently selected row up."""
-  table_widget.blockSignals(True)
-  before_callback_function()
-
   row = table_widget.currentRow()
-  column = table_widget.currentColumn()
-  if row > 0:
-    combobox_values = list(ui_utils.get_combobox_indexes(table_widget, row))
-    checkbox_values = list(ui_utils.get_checkbox_values(table_widget, row))
-    table_widget.insertRow(row - 1)
-    for i in range(table_widget.columnCount()):
-      table_widget.setItem(row - 1, i, table_widget.takeItem(row + 1, i))
-      table_widget.setCurrentCell(row - 1, column)
-    table_widget.removeRow(row + 1)
-    ui_utils.fill_row(table_widget, row - 1)
-    ui_utils.set_combobox_indexes(table_widget, row - 1, combobox_values)
-    ui_utils.set_checkbox_values(table_widget, row - 1, checkbox_values)
-    set_text_alignment(table_widget, row - 1)
-
-  after_callback_function()
-  table_widget.blockSignals(False)
+  move_row(
+    table_widget,
+    row,
+    row - 1,
+    state_saver,
+    before_callback_function,
+    after_callback_function,
+  )
 
 
 # @operator
@@ -322,6 +347,29 @@ def remove_active_row(
 
   after_callback_function()
   table_widget.blockSignals(False)
+
+
+def carries_blend_file(mime_data: QMimeData) -> bool:
+  """Whether a drag carries at least one .blend file to add to the table."""
+  return mime_data.hasUrls() and any(
+    url.toLocalFile().endswith(".blend") for url in mime_data.urls()
+  )
+
+
+def add_dropped_files(table_widget: QTableWidget, mime_data: QMimeData) -> bool:
+  """Add every dropped file as a new row, and report whether any of them was one.
+
+  Both the window and the table take these drops: the table covers most of the window, and Qt
+  hands a drag to the innermost widget that accepts drops rather than walking up from there.
+  """
+  added = False
+  for url in mime_data.urls():
+    if not url.isLocalFile():
+      continue
+    add_file_below(table_widget, url.toLocalFile())
+    table_widget.itemChanged.emit(table_widget.item(table_widget.rowCount() - 1, 1))
+    added = True
+  return added
 
 
 # @operator

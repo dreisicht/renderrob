@@ -40,6 +40,7 @@ from render_job_to_rss import render_job_to_render_settings_setter
 from utils_common import print_utils
 from utils_rr import path_utils, placeholder_delegate, table_utils, ui_utils
 from utils_rr.dropwidget import DropWidget
+from utils_rr.row_drag_table import RowDragTableWidget
 
 MAX_NUMBER_OF_RECENT_FILES = 5
 
@@ -147,7 +148,10 @@ class MainWindow(QWidget):
     if self.cache_path.exists():
       self.load_cache()
     self.resize(1800, self.app.primaryScreen().size().height())
-    self.window = ui_utils.load_ui_from_file(UI_FILE_NAME, custom_widgets=[DropWidget])
+    self.window = ui_utils.load_ui_from_file(
+      UI_FILE_NAME,
+      custom_widgets=[DropWidget, RowDragTableWidget],
+    )
     self.window.splitter.setSizes((200, 500))
 
     # Resolved against the resource root rather than the working directory, which in a bundle is
@@ -226,6 +230,7 @@ class MainWindow(QWidget):
     self.window.up_button.clicked.connect(
       lambda: table_utils.move_row_up(
         self.table,
+        self.state_saver,
         self.before_table_change,
         self.after_table_change,
       ),
@@ -233,6 +238,7 @@ class MainWindow(QWidget):
     self.window.down_button.clicked.connect(
       lambda: table_utils.move_row_down(
         self.table,
+        self.state_saver,
         self.before_table_change,
         self.after_table_change,
       ),
@@ -261,6 +267,17 @@ class MainWindow(QWidget):
     )
     self.window.actionUndo.triggered.connect(self.undo)
     self.window.sync_button.clicked.connect(self.load_settings_from_blender)
+
+    self.table.rows_reordered.connect(
+      lambda source_row, destination_row: table_utils.move_row(
+        self.table,
+        source_row,
+        destination_row,
+        self.state_saver,
+        self.before_table_change,
+        self.after_table_change,
+      ),
+    )
 
     self.table.setContextMenuPolicy(Qt.CustomContextMenu)
     self.table.customContextMenuRequested.connect(self.show_row_context_menu)
