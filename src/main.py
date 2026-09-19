@@ -5,6 +5,7 @@ import platform
 import subprocess
 import sys
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 sys.path.append(Path(__file__).parent.parent.as_posix())
@@ -46,9 +47,9 @@ MAX_NUMBER_OF_RECENT_FILES = 5
 
 UI_FILE_NAME = "window.ui"
 
-# The rows' context menu mirrors the button column beside the table: every entry names a button in
+# The table's context menus mirror the button column beside it: every entry names a button in
 # window.ui, and None stands for a separator. Reading the label, icon, shortcut and enabled state
-# off the button itself keeps the two menus in step without a second list to maintain.
+# off the button itself keeps the menus in step with the buttons without a second list to maintain.
 ROW_CONTEXT_MENU_BUTTONS = (
   "blender_button",
   "sync_button",
@@ -62,6 +63,10 @@ ROW_CONTEXT_MENU_BUTTONS = (
   "up_button",
   "down_button",
 )
+
+# Below the last row there is no row to act on, so only the one operator that does not need one is
+# left.
+EMPTY_AREA_CONTEXT_MENU_BUTTONS = ("add_button",)
 
 # Qt reports the color scheme as an enum whose values are Unknown/Light/Dark.
 LIGHT_COLOR_SCHEME = 1
@@ -280,7 +285,7 @@ class MainWindow(QWidget):
     )
 
     self.table.setContextMenuPolicy(Qt.CustomContextMenu)
-    self.table.customContextMenuRequested.connect(self.show_row_context_menu)
+    self.table.customContextMenuRequested.connect(self.show_table_context_menu)
     # A header is a sibling of the table's viewport rather than a part of it, so its right-clicks
     # would arrive in the table's own coordinates and resolve to the wrong row. There is nothing
     # row-specific to offer on a header anyway, so let them pass without a menu.
@@ -834,6 +839,19 @@ class MainWindow(QWidget):
         blend_path_item.setBackground(QColor(table_utils.COLORS["red"]))
 
   ########## TABLE OPS ############
+  def add_button_action(self, menu: QMenu, button_name: str, slot: Callable | None = None) -> None:
+    """Add the action standing for one of the buttons beside the table to a context menu."""
+    button = getattr(self.window, button_name)
+    # Qt hides an action's own shortcut in a context menu, so spell it out in the label: a menu
+    # draws whatever follows the tab in its shortcut column.
+    shortcut = button.shortcut().toString(QKeySequence.NativeText)
+    label = f"{button.toolTip()}\t{shortcut}" if shortcut else button.toolTip()
+    action = menu.addAction(button.icon(), label)
+    # The button is the one that knows whether its operator can run right now - Render and Stop
+    # take turns being disabled while a render is going.
+    action.setEnabled(button.isEnabled())
+    action.triggered.connect(slot or button.click)
+
   def build_row_context_menu(self, index: QModelIndex) -> QMenu:
     """Build the context menu for the cell the user right-clicked."""
     menu = QMenu(self.table)
@@ -841,16 +859,7 @@ class MainWindow(QWidget):
       if button_name is None:
         menu.addSeparator()
         continue
-      button = getattr(self.window, button_name)
-      # Qt hides an action's own shortcut in a context menu, so spell it out in the label: a menu
-      # draws whatever follows the tab in its shortcut column.
-      shortcut = button.shortcut().toString(QKeySequence.NativeText)
-      label = f"{button.toolTip()}\t{shortcut}" if shortcut else button.toolTip()
-      action = menu.addAction(button.icon(), label)
-      # The button is the one that knows whether its operator can run right now - Render and Stop
-      # take turns being disabled while a render is going.
-      action.setEnabled(button.isEnabled())
-      action.triggered.connect(button.click)
+      self.add_button_action(menu, button_name)
 
     # A cell holding a checkbox or a dropdown carries an item only so the row color has something
     # to paint; copying or pasting one reads and writes text nothing looks at.
@@ -860,20 +869,40 @@ class MainWindow(QWidget):
       menu.addAction(self.window.actionPaste_cell)
     return menu
 
-  def show_row_context_menu(self, position: QPoint) -> None:
-    """Show the row context menu where the user right-clicked in the table.
+  def build_empty_area_context_menu(self) -> QMenu:
+    """Build the context menu for the empty space below the last row."""
+    menu = QMenu(self.table)
+    for button_name in EMPTY_AREA_CONTEXT_MENU_BUTTONS:
+      self.add_button_action(menu, button_name, self.append_row)
+    return menu
+
+  def append_row(self) -> None:
+    """Add a row at the end of the table.
+
+    The Add button inserts below the current row, so moving the current cell to the last row first
+    turns it into an append. That is what a click into the empty space below the table asks for,
+    wherever the current cell happens to sit. Moving it here rather than before the menu opens
+    keeps a menu the user dismisses from leaving the selection somewhere else.
+    """
+    if self.table.rowCount():
+      self.table.setCurrentCell(self.table.rowCount() - 1, max(self.table.currentColumn(), 0))
+    self.window.add_button.click()
+
+  def show_table_context_menu(self, position: QPoint) -> None:
+    """Show the context menu where the user right-clicked in the table.
 
     The position comes in relative to the table's viewport, which is what indexAt reads and what
     the menu has to be placed against.
     """
     index = self.table.indexAt(position)
-    if not index.isValid():
-      return
-    # Every operator behind the buttons works on the current cell, so a right-click has to move it
-    # the way a left-click does. A click on a checkbox or a dropdown never reaches the table, so
-    # the cell those cover would otherwise stay unselected.
-    self.table.setCurrentCell(index.row(), index.column())
-    menu = self.build_row_context_menu(index)
+    if index.isValid():
+      # Every operator behind the buttons works on the current cell, so a right-click has to move
+      # it the way a left-click does. A click on a checkbox or a dropdown never reaches the table,
+      # so the cell those cover would otherwise stay unselected.
+      self.table.setCurrentCell(index.row(), index.column())
+      menu = self.build_row_context_menu(index)
+    else:
+      menu = self.build_empty_area_context_menu()
     menu.exec(self.table.viewport().mapToGlobal(position))
     menu.deleteLater()
 

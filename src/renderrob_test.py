@@ -81,6 +81,43 @@ class TestMainWindow(unittest.TestCase):
     self.assertNotIn("Copy cell", labels)
     self.assertNotIn("Paste cell", labels)
 
+  def test_empty_area_context_menu_only_offers_add_row(self):
+    """Below the last row there is no row to act on, so only Add row is left."""
+    menu = self.main_window.build_empty_area_context_menu()
+
+    labels = [action.text() for action in menu.actions() if not action.isSeparator()]
+    self.assertEqual(len(labels), 1)
+    self.assertTrue(labels[0].startswith(self.main_window.window.add_button.toolTip()))
+
+  def test_empty_area_context_menu_leaves_the_current_cell_alone(self):
+    """Opening the menu must not move the selection - the user may dismiss it again."""
+    table_utils.add_row_below(self.main_window.table)
+    self.main_window.table.setCurrentCell(0, 1)
+
+    self.main_window.build_empty_area_context_menu()
+
+    self.assertEqual(self.main_window.table.currentRow(), 0)
+
+  def test_append_row_adds_at_the_end(self):
+    """A right-click below the table asks for a row at the end, not below the current one."""
+    # The row the .ui file ships is only half a row - new_file replaces it with a real one, the
+    # way the running application does before the user ever sees the table.
+    self.main_window.new_file()
+    table = self.main_window.table
+    table_utils.add_row_below(table)
+    table_utils.add_row_below(table)
+    row_count = table.rowCount()
+    for row in range(row_count):
+      table.item(row, 1).setText(f"row{row}.blend")
+    table.setCurrentCell(0, 1)
+
+    self.main_window.append_row()
+
+    self.assertEqual(table.rowCount(), row_count + 1)
+    # The rows that were there keep their order, and the fresh empty one sits below them.
+    texts = [table.item(row, 1).text() for row in range(table.rowCount())]
+    self.assertEqual(texts, [f"row{row}.blend" for row in range(row_count)] + [""])
+
   def test_dropdown_cells_forward_their_right_clicks(self):
     """A QComboBox keeps the context menu event to itself, so the cell has to forward it by hand.
 
@@ -91,7 +128,7 @@ class TestMainWindow(unittest.TestCase):
     table.resize(1400, 400)
     table.show()
     # The real handler opens a menu and waits for it, which would hang the test.
-    table.customContextMenuRequested.disconnect(self.main_window.show_row_context_menu)
+    table.customContextMenuRequested.disconnect(self.main_window.show_table_context_menu)
     positions = []
     table.customContextMenuRequested.connect(positions.append)
 
