@@ -1,0 +1,65 @@
+# https://pre-commit.com - the runner is prek (a project dependency), so no extra install:
+#   uv run prek install        # wire it into .git/hooks
+#   uv run prek run --all-files
+#
+# The Python hooks run out of the project's own environment instead of out of pinned mirror
+# repos. pyproject already pins ruff and ty - ty exactly - so uv.lock stays the single place a
+# version changes, and a commit hook can never disagree with what CI runs.
+
+repos:
+  - repo: local
+    hooks:
+      # ty resolves protos.state_pb2 through the generated stubs, so - exactly as both workflows
+      # do - the bindings have to exist before it runs. They are gitignored, so on a fresh clone
+      # they do not, and protoc on these two files costs hundredths of a second.
+      - id: protos
+        name: build the proto bindings
+        entry: >
+          uv run --group dev python -m grpc_tools.protoc
+          --proto_path=src/protos --python_out=src/protos --pyi_out=src/protos
+          src/protos/state.proto src/protos/cache.proto
+        language: system
+        pass_filenames: false
+        always_run: true
+
+      # --force-exclude, because a hook hands ruff explicit paths, and for explicitly named paths
+      # ruff ignores the exclude list in pyproject unless told not to.
+      - id: ruff-check
+        name: ruff check
+        entry: uv run ruff check --force-exclude --fix
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+
+      # Whole-project, like `just lint`: ty checks what the imports reach, not a file in isolation.
+      - id: ty
+        name: ty check
+        entry: uv run ty check
+        language: system
+        pass_filenames: false
+        always_run: true
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      # Qt Designer owns window.ui, settings.ui and style.qss and rewrites them wholesale on
+      # every save, so anything that reformats them just churns against it.
+      - id: trailing-whitespace
+        exclude: '\.(ui|qss)$'
+      - id: end-of-file-fixer
+        exclude: '\.(ui|qss)$'
+      - id: mixed-line-ending
+      # The workflows, pyproject and the PyInstaller spec are all edited by hand.
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      # Bundles are built on macOS and Windows, whose filesystems would collide two paths that
+      # differ only in case.
+      - id: check-case-conflict

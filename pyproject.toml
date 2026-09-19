@@ -12,6 +12,7 @@ dependencies = [
     "protobuf>=6.33.0",
     "py2appsigner>=0.6.95",
     "pyside6-essentials>=6.10.0",
+    "prek>=0.5.3",
 ]
 
 [dependency-groups]
