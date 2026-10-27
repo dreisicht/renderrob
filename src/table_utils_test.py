@@ -6,7 +6,7 @@ from PySide6.QtCore import QMimeData, QPoint, Qt, QUrl
 from PySide6.QtGui import QDragEnterEvent, QDragMoveEvent, QDropEvent
 from PySide6.QtWidgets import QApplication, QCheckBox
 
-import main
+import test_support
 from utils_rr import row_drag_table, table_utils
 
 # The three rows every reorder test starts from, as (file, engine index, motion blur).
@@ -18,8 +18,7 @@ class TestRowReordering(unittest.TestCase):
 
   def setUp(self) -> None:
     """Build a main window holding three rows that can be told apart."""
-    self.main_window = main.MainWindow()  # pylint:disable=no-member
-    self.main_window.setup()
+    self.main_window = test_support.make_main_window(self)
     # new_file is what leaves the table with one row that has all of its widgets; setup on its own
     # leaves the empty row the .ui file declares.
     self.main_window.new_file()

@@ -301,8 +301,10 @@ class MainWindow(QWidget):
 
   def load_cache(self) -> None:
     """Load the cache from a file."""
-    self.cache.current_file = ""
+    # ParseFromString replaces the whole message, so the reset has to come after it. A session
+    # starts without a file, whatever the previous one had open.
     self.cache.ParseFromString(self.cache_path.read_bytes())
+    self.cache.current_file = ""
 
   def add_filepath_to_cache(self, file_name: str) -> None:
     """Add a filepath to the cache."""

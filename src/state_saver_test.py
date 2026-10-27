@@ -5,14 +5,12 @@ from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
 
-import main
 import state_saver
+import test_support
 from protos import state_pb2
 from utils_rr import table_utils
 
-# Test fixtures live next to the repository root, so resolve them relative to this file rather
-# than to the current working directory.
-BASIC_STATE_FILE = str(Path(__file__).parent.parent / "test" / "basic_state.rrp")
+BASIC_STATE_FILE_NAME = "basic_state.rrp"
 
 
 class TestStateSaver(unittest.TestCase):
@@ -20,8 +18,7 @@ class TestStateSaver(unittest.TestCase):
 
   def setUp(self) -> None:
     """Set up the unit tests."""
-    self.main_window = main.MainWindow()  # pylint:disable=no-member
-    self.main_window.setup()
+    self.main_window = test_support.make_main_window(self)
     table_utils.add_row_below(self.main_window.table)
     return super().setUp()
 
@@ -47,7 +44,8 @@ class TestStateSaver(unittest.TestCase):
   def test_state_to_table(self) -> None:
     """Test the state_to_table method."""
     state_saver_instance = state_saver.StateSaver()
-    state_saver_instance.state.ParseFromString(Path(BASIC_STATE_FILE).read_bytes())
+    basic_state_file = test_support.copy_fixture(self, BASIC_STATE_FILE_NAME)
+    state_saver_instance.state.ParseFromString(Path(basic_state_file).read_bytes())
 
     table = self.main_window.table
     state_saver_instance.state_to_table(table)
@@ -74,10 +72,14 @@ class TestStateSaver(unittest.TestCase):
 
   def test_table_to_state(self) -> None:
     """Test the table_to_state method."""
-    self.main_window.open_file(BASIC_STATE_FILE)
+    basic_state_file = test_support.copy_fixture(self, BASIC_STATE_FILE_NAME)
+    self.main_window.open_file(basic_state_file)
     state_saver_instance = state_saver.StateSaver()
     state_saver_instance.parent_widget = self.main_window
     state_saver_instance.table_to_state(self.main_window.table)
     reference_state = state_pb2.render_rob_state()  # pylint: disable=no-member
-    reference_state.ParseFromString(Path(BASIC_STATE_FILE).read_bytes())
+    reference_state.ParseFromString(Path(basic_state_file).read_bytes())
+    # The round trip on its own would pass for any fixture, so pin down what the fixture holds.
+    self.assertEqual(len(reference_state.render_jobs), 1)
+    self.assertEqual(reference_state.render_jobs[0].file, "test/cube.blend")
     self.assertEqual(state_saver_instance.state.render_jobs, reference_state.render_jobs)

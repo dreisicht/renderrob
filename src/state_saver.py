@@ -30,7 +30,9 @@ def get_text(item: QTableWidgetItem | None, widget: None = None) -> str: ...
 def get_text(item: QTableWidgetItem | QWidget | None, widget: str | None = None) -> str | bool:
   """Get the value of a table cell, as text or - for a checkbox - as a bool."""
   if not item:
-    return ""
+    # A half-built row has no widgets yet. A missing checkbox reads as unchecked, so the value
+    # still fits the bool field it is stored in.
+    return False if widget == "checkbox" else ""
   if widget == "dropdown":
     return item.currentText().replace(" ", "_")
   if widget == "checkbox":
@@ -121,14 +123,20 @@ class StateSaver:
       render_job.y_res = get_text(table.item(i, 6))
       render_job.samples = get_text(table.item(i, 7))
 
+      # A half-built row has no dropdowns yet, and Value("") would raise, so fall back to the
+      # proto default the same way a missing checkbox reads as unchecked.
       file_format_str = get_text(table.cellWidget(i, 8), widget="dropdown")
-      render_job.file_format = state_pb2.file_format.Value(file_format_str)
+      render_job.file_format = state_pb2.file_format.Value(
+        file_format_str or state_pb2.file_format.Name(0)
+      )
 
       engine_str = get_text(table.cellWidget(i, 9), widget="dropdown")
-      render_job.engine = state_pb2.render_engine.Value(engine_str)
+      render_job.engine = state_pb2.render_engine.Value(
+        engine_str or state_pb2.render_engine.Name(0)
+      )
 
       device_str = get_text(table.cellWidget(i, 10), widget="dropdown")
-      render_job.device = state_pb2.device.Value(device_str)
+      render_job.device = state_pb2.device.Value(device_str or state_pb2.device.Name(0))
 
       render_job.motion_blur = get_text(table.cellWidget(i, 11), widget="checkbox")
       render_job.overwrite = get_text(table.cellWidget(i, 12), widget="checkbox")
