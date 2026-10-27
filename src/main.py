@@ -981,5 +981,6 @@ class MainWindow(QWidget):
 
 
 if __name__ == "__main__":
+  path_utils.restore_system_library_path()
   main_window = MainWindow()
   sys.exit(main_window.execute())

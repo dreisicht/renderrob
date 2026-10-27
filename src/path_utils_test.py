@@ -1,7 +1,10 @@
 """Tests for the path utilities."""
 
+import os
 import platform
+import sys
 import unittest
+from unittest import mock
 
 from utils_rr import path_utils
 
@@ -64,3 +67,21 @@ class TestPathUtils(unittest.TestCase):
       "C:/Users/peter/Nextcloud/20_prod/24_shots",
     )
     self.assertEqual(path.replace("\\", "/"), "C:/something/completely/different.blend")
+
+  def test_restore_system_library_path(self) -> None:
+    """Test that a frozen build hands its children the user's own library path."""
+    bundled = {"LD_LIBRARY_PATH": "/bundle/_internal", "LD_LIBRARY_PATH_ORIG": "/opt/lib"}
+    with mock.patch.dict(os.environ, bundled), mock.patch.object(sys, "frozen", True, create=True):
+      path_utils.restore_system_library_path()
+      self.assertEqual(os.environ["LD_LIBRARY_PATH"], "/opt/lib")
+      self.assertNotIn("LD_LIBRARY_PATH_ORIG", os.environ)
+
+    with mock.patch.dict(os.environ, {"LD_LIBRARY_PATH": "/bundle/_internal"}):
+      os.environ.pop("LD_LIBRARY_PATH_ORIG", None)
+      with mock.patch.object(sys, "frozen", True, create=True):
+        path_utils.restore_system_library_path()
+      self.assertNotIn("LD_LIBRARY_PATH", os.environ)
+
+    with mock.patch.dict(os.environ, {"LD_LIBRARY_PATH": "/from/source"}):
+      path_utils.restore_system_library_path()
+      self.assertEqual(os.environ["LD_LIBRARY_PATH"], "/from/source")

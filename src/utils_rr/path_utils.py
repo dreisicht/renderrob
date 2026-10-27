@@ -1,6 +1,7 @@
 """Path utilities."""
 
 import os
+import sys
 from pathlib import Path
 
 
@@ -68,3 +69,21 @@ def get_resource_root() -> Path:
 def get_blender_module_path() -> str:
   """Return the directory Blender has to put on sys.path to import Render Rob's bpy helpers."""
   return normalize_drive_letter(str(get_resource_root().resolve()))
+
+
+def restore_system_library_path() -> None:
+  """Undo the library search path a PyInstaller bundle sets, so that child processes don't see it.
+
+  On Linux the bootloader points LD_LIBRARY_PATH at the bundle's _internal directory. Blender,
+  xdg-open and everything else Render Rob launches inherit that and then load the bundled
+  libstdc++ instead of the system's, which is too old for a distribution build of Blender. The
+  bootloader keeps the user's original value in LD_LIBRARY_PATH_ORIG. Render Rob itself is
+  unaffected by the change: the dynamic loader reads LD_LIBRARY_PATH once, at process start.
+  """
+  if not getattr(sys, "frozen", False):
+    return
+  original = os.environ.pop("LD_LIBRARY_PATH_ORIG", None)
+  if original is None:
+    os.environ.pop("LD_LIBRARY_PATH", None)
+  else:
+    os.environ["LD_LIBRARY_PATH"] = original
