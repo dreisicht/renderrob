@@ -104,6 +104,16 @@ jobs:
             exit 1
           fi
 
+      # Run the installer the Linux bundle ships against a throwaway data directory, so a renamed
+      # icon or a missing file fails here instead of on a user's desktop.
+      - name: Check that the desktop entry installs (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          export XDG_DATA_HOME="$RUNNER_TEMP/xdg-data"
+          sh dist/renderrob/install.sh
+          grep -qx "Exec=\"$PWD/dist/renderrob/renderrob\"" "$XDG_DATA_HOME/applications/renderrob.desktop"
+          test -f "$XDG_DATA_HOME/icons/hicolor/256x256/apps/renderrob.png"
+
       - name: Check that the bundle starts (Windows)
         if: runner.os == 'Windows'
         shell: pwsh

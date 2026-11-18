@@ -15,6 +15,7 @@ Two things here are load-bearing rather than cosmetic:
     This mirrors DATA_FILES in the py2app setup.py.
 """
 
+import shutil
 import sys
 from pathlib import Path
 
@@ -94,6 +95,14 @@ coll = COLLECT(  # noqa: F821
   upx_exclude=[],
   name="renderrob",
 )
+
+# Linux only: a tarball installs nothing, and Wayland launchers take the icon from a .desktop file
+# matching the app ID rather than from the window. Ship the entry and the script that installs it
+# at the bundle root, next to the executable, where users will find them.
+if sys.platform.startswith("linux"):
+  bundle_dir = Path(DISTPATH) / "renderrob"  # noqa: F821  # PyInstaller injects DISTPATH.
+  for name in ["renderrob.desktop", "install.sh"]:
+    shutil.copy2(REPO_ROOT / "tools" / "linux" / name, bundle_dir / name)
 
 # macOS only: wrap the collected directory in the .app that Finder and `open` expect. PyInstaller
 # ignores this on the other platforms.

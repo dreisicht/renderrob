@@ -53,6 +53,12 @@ Render Rob is developed by the biggest effort possible, and every effort has bee
 - Border rendering gets disabled, if high quality is active. Otherwise it remains enabled.
 - You can only render one scene in one job. If you want to render a second scene just duplicate the job.
 
+### Linux
+
+After unpacking the download, run `./install.sh` inside the `renderrob` folder once. It adds Render Rob to your application launcher and gives it its icon in the launcher and taskbar, which on Wayland a window cannot set on its own. Run it again after moving the folder, or run `./install.sh --uninstall` to remove the entry.
+
+When running from source (`uv run renderrob`), the window still reports the app ID `renderrob`, so a `renderrob.desktop` with `Icon=renderrob` in `~/.local/share/applications` gives it the icon too.
+
 ## Developer area
 
 Python version required due to bpy: **3.13**

@@ -1,7 +1,7 @@
 [Desktop Entry]
-Name=RenderRob
-Exec=renderrob.bin
-Icon=icon/icon.png
+Name=Render Rob
+Exec=renderrob
+Icon=renderrob
 Terminal=false
 Type=Application
 Categories=Graphics;3DGraphics;
