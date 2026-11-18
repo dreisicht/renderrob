@@ -1,6 +1,7 @@
 """Module executed in Blender to get the render_job settings."""
 
 import json
+import sys
 from pathlib import Path
 
 import bpy  # pylint: disable=import-error
@@ -8,8 +9,8 @@ import bpy  # pylint: disable=import-error
 from utils_common import print_utils
 
 
-def save_settings() -> None:
-  """Save the render_job settings to the render_job proto."""
+def save_settings(output_path: Path) -> None:
+  """Write the open file's render_job settings to output_path as JSON."""
   render_job = {}
 
   render_job["file"] = bpy.data.filepath
@@ -38,9 +39,9 @@ def save_settings() -> None:
   render_job["view_layers"] = [vl.name for vl in bpy.context.scene.view_layers if vl.use]
   render_job["file_format"] = bpy.context.scene.render.image_settings.file_format.lower()
 
-  Path(".sync.json").write_text(json.dumps(render_job), encoding="utf-8")
+  output_path.write_text(json.dumps(render_job), encoding="utf-8")
 
 
-save_settings()
-raise ValueError(Path(".sync.json").resolve())
+# Render Rob passes the output path after "--", where Blender stops parsing its own arguments.
+save_settings(Path(sys.argv[sys.argv.index("--") + 1]))
 print_utils.print_info("Settings saved.")

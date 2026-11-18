@@ -106,6 +106,9 @@ class MainWindow(QWidget):
     """Initialize the main window."""
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)
     self.app = QApplication(sys.argv)
+    # On Wayland the launcher finds the icon through the app ID -> renderrob.desktop, not through
+    # setWindowIcon, so pin the ID regardless of the name the binary was started under.
+    self.app.setDesktopFileName("renderrob")
     super().__init__()
     self.window = None
     self.table = None
@@ -698,42 +701,69 @@ class MainWindow(QWidget):
     subprocess.Popen([self.state_saver.state.settings.blender_path, filepath])
 
   def load_settings_from_blender(self) -> None:
-    """Opens Blender and syncs the settings."""
-    self.table.blockSignals(True)
-    self.before_table_change()
-
+    """Open the selected job's .blend file in Blender and take the job's settings from it."""
     job_index = self.table.currentRow()
-    job = self.state_saver.state.render_jobs.pop(job_index)
-
-    if not self.state_saver.state.settings.blender_path:
+    if job_index < 0:
+      return
+    blender_path = self.state_saver.state.settings.blender_path
+    if not blender_path:
       error_message = "The Blender path is not set."
       print_utils.print_error_no_exit(error_message)
       QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+      return
+    self.state_saver.table_to_state(self.table)
     filepath = path_utils.get_abs_blend_path(
-      job.file,
+      self.state_saver.state.render_jobs[job_index].file,
       self.state_saver.state.settings.blender_files_path,
     )
     if filepath == "" or not Path(filepath).exists():
       QMessageBox.warning(self, "Warning", "The .blend file does not exist.", QMessageBox.Ok)
       return
 
-    python_command = [
-      "import sys",
-      f"sys.path.append('{path_utils.get_blender_module_path()}')",
-      "from utils_bpy import settings_loader",
-    ]
-    python_command = " ; ".join(python_command)
-    blender_args = ["-b", filepath, "-y", "--factory-startup", "--python-expr", python_command]
-    QApplication.setOverrideCursor(Qt.WaitCursor)
-    subprocess.run([self.state_saver.state.settings.blender_path, *blender_args], check=True)
-    QApplication.restoreOverrideCursor()
-    loaded_job = self.state_saver.load_job_from_json(".sync.json")
-    print_utils.print_info("Settings loaded from Blender.")
-    self.state_saver.state.render_jobs.insert(job_index, loaded_job)
-    self.state_saver.state_to_table(self.table)
+    # Blender writes the settings to an explicit path, handed over after "--", which Blender leaves
+    # alone. A path relative to the working directory lands wherever Render Rob was started from,
+    # which for an installed bundle is often a directory nobody may write to.
+    with tempfile.TemporaryDirectory() as temp_dir:
+      sync_path = Path(temp_dir) / "sync.json"
+      python_command = " ; ".join(
+        [
+          "import sys",
+          f"sys.path.append({str(path_utils.get_blender_module_path())!r})",
+          "from utils_bpy import settings_loader",
+        ]
+      )
+      blender_args = [
+        "-b",
+        filepath,
+        "-y",
+        "--factory-startup",
+        # Without this an exception in the script still ends with exit code 0.
+        "--python-exit-code",
+        "1",
+        "--python-expr",
+        python_command,
+        "--",
+        str(sync_path),
+      ]
+      QApplication.setOverrideCursor(Qt.WaitCursor)
+      try:
+        result = subprocess.run([blender_path, *blender_args], check=False)
+      finally:
+        QApplication.restoreOverrideCursor()
+      if result.returncode != 0 or not sync_path.exists():
+        error_message = "Blender could not read the settings from the file. See the console."
+        print_utils.print_error_no_exit(error_message)
+        QMessageBox.warning(self, "Warning", error_message, QMessageBox.Ok)
+        return
+      loaded_job = self.state_saver.load_job_from_json(str(sync_path))
 
+    self.table.blockSignals(True)
+    self.before_table_change()
+    self.state_saver.state.render_jobs[job_index].CopyFrom(loaded_job)
+    self.state_saver.state_to_table(self.table)
     self.after_table_change(self.table.item(job_index, 1))
     self.table.blockSignals(False)
+    print_utils.print_info("Settings loaded from Blender.")
 
   ######### MAIN WINDOW UTILS ###########
   def _record_finished_job(self, exit_code: int) -> None:

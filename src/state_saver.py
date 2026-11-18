@@ -163,7 +163,11 @@ class StateSaver:
     render_job.y_res = json_state["y_res"]
     render_job.samples = json_state["samples"]
     render_job.device = json_state["device"]
-    render_job.engine = json_state["engine"].replace("blender_eevee_next", "eevee")
+    # Depending on the Blender version, EEVEE is "blender_eevee_next" or "blender_eevee"; the proto
+    # only knows "cycles" and "eevee". Anything else (e.g. workbench) falls back to cycles.
+    render_job.engine = state_pb2.render_engine.Value(
+      "eevee" if "eevee" in json_state["engine"].lower() else "cycles"
+    )
     render_job.motion_blur = json_state["motion_blur"]
     render_job.overwrite = json_state["overwrite"]
     render_job.high_quality = json_state["high_quality"]
