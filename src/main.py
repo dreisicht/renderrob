@@ -980,7 +980,12 @@ class MainWindow(QWidget):
     self.process.start()
 
 
-if __name__ == "__main__":
+def main() -> None:
+  """Start Render Rob. This is the target of the `renderrob` console script."""
   path_utils.restore_system_library_path()
   main_window = MainWindow()
   sys.exit(main_window.execute())
+
+
+if __name__ == "__main__":
+  main()

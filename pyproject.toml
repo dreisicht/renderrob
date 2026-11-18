@@ -15,6 +15,9 @@ dependencies = [
     "prek>=0.5.3",
 ]
 
+[project.scripts]
+renderrob = "main:main"
+
 [dependency-groups]
 # protoc ships inside grpcio-tools, so the proto bindings can be generated from the project's
 # own environment on every platform instead of needing a system protoc install.

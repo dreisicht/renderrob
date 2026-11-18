@@ -5,7 +5,7 @@ from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QFileDialog, QWidget
 
 from protos import state_pb2
-from utils_rr import ui_utils
+from utils_rr import path_utils, ui_utils
 
 
 class SettingsWindow:
@@ -21,7 +21,7 @@ class SettingsWindow:
     self.state = state.settings
     self.window = ui_utils.load_ui_from_file("settings.ui")
     self.window.setWindowTitle("RenderRob Settings")
-    self.window.setWindowIcon(QIcon("icon/icon.ico"))
+    self.window.setWindowIcon(QIcon(str(path_utils.get_resource_root() / "icon" / "icon.ico")))
     # Load state into the settings dialog.
     self.make_settings_window_connections(self.window)
 
