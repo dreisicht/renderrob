@@ -1,7 +1,6 @@
 """Main file to open RenderRob."""
 
 import os
-import platform
 import subprocess
 import sys
 import tempfile
@@ -12,11 +11,12 @@ sys.path.append(Path(__file__).parent.parent.as_posix())
 sys.path.append(Path(__file__).parent.parent.as_posix())
 
 
-from PySide6.QtCore import QCoreApplication, QModelIndex, QPoint, QProcess, Qt
+from PySide6.QtCore import QCoreApplication, QModelIndex, QPoint, QProcess, Qt, QUrl
 from PySide6.QtGui import (
   QAction,
   QCloseEvent,
   QColor,
+  QDesktopServices,
   QIcon,
   QKeySequence,
   QPalette,
@@ -85,6 +85,18 @@ CONSOLE_FOLLOW_THRESHOLD = 1500
 SUCCESS_EXIT_CODES = (0, 1)
 WARNING_EXIT_CODE = 987
 FAILURE_EXIT_CODES = (62097, 11)
+
+
+def open_with_default_app(path: str | Path) -> None:
+  """Open a file or folder with the system's default application, without waiting for it.
+
+  This must not block: it runs on the GUI thread, and while the event loop is stalled nothing
+  drains the running Blender process's output pipe. Once that pipe fills, Blender blocks on its
+  next write and the render stops. subprocess.call(("xdg-open", ...)) used to do exactly that,
+  because xdg-open can wait until the file manager window it started is closed.
+  """
+  if not QDesktopServices.openUrl(QUrl.fromLocalFile(str(path))):
+    QMessageBox.warning(None, "Warning", f"Could not open {path}.", QMessageBox.Ok)
 
 
 class MainWindow(QWidget):
@@ -615,12 +627,7 @@ class MainWindow(QWidget):
       if not Path(filepath).exists():
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
         return
-      if platform.system() == "Darwin":  # macOS
-        subprocess.call(("open", filepath))
-      elif platform.system() == "Windows":  # Windows
-        os.startfile(filepath)  # noqa: S606
-      else:  # Linux variants
-        subprocess.call(("xdg-open", filepath))
+      open_with_default_app(filepath)
     else:
       if not Path(filepath).exists():
         QMessageBox.warning(self, "Warning", "The output does not yet exist.", QMessageBox.Ok)
@@ -674,12 +681,7 @@ class MainWindow(QWidget):
     if not folder_path.exists():
       QMessageBox.warning(self, "Warning", "The output folder does not yet exist.", QMessageBox.Ok)
       return
-    if platform.system() == "Darwin":  # macOS
-      subprocess.call(("open", folder_path))
-    elif platform.system() == "Windows":  # Windows
-      os.startfile(folder_path)  # noqa: S606
-    else:  # Linux variants
-      subprocess.call(("xdg-open", folder_path))
+    open_with_default_app(folder_path)
 
   def open_blender_file(self) -> None:
     """Open the currently selected Blender file."""
