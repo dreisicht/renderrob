@@ -49,6 +49,29 @@ class TestMainWindow(unittest.TestCase):
     self.assertTrue(filepath in self.main_window.cache.current_file)
     self.assertEqual(self.main_window.cache.current_file, filepath)
 
+  def test_column_widths_survive_a_row_move(self):
+    """Moving a row rebuilds the table, which used to reset the widths the user dragged."""
+    table = self.main_window.table
+    table_utils.add_row_below(table)
+    table.setColumnWidth(1, 432)
+    table.setCurrentCell(0, 1)
+    table_utils.move_row_down(
+      table,
+      self.main_window.state_saver,
+      self.main_window.before_table_change,
+      self.main_window.after_table_change,
+    )
+    self.assertEqual(table.columnWidth(1), 432)
+
+  def test_column_widths_survive_a_restart(self):
+    """The widths go into the cache and come back when the next window sets up."""
+    self.main_window.table.setColumnWidth(1, 432)
+    self.main_window.save_cache()
+    self.main_window.cache.ParseFromString(self.main_window.cache_path.read_bytes())
+    self.main_window.table.setColumnWidth(1, 100)
+    table_utils.set_column_widths(self.main_window.table, self.main_window.cache.column_widths)
+    self.assertEqual(self.main_window.table.columnWidth(1), 432)
+
   def test_quit(self):
     """Test the quit function."""
     self.main_window.quit()

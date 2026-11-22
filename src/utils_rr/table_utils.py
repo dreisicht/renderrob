@@ -1,6 +1,6 @@
 """Utility functions for table operations."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import TYPE_CHECKING
 
 from PySide6.QtCore import QMimeData, QModelIndex, QPersistentModelIndex
@@ -384,8 +384,12 @@ def add_file_below(table_widget: QTableWidget, path: str) -> None:
   table_widget.blockSignals(False)
 
 
-def post_process_row(table_widget: QTableWidget, row: int) -> None:
-  """Post-process the table after loading it from a UI file."""
+def setup_header(table_widget: QTableWidget) -> None:
+  """Set up the header once, after the table has been loaded from the UI file.
+
+  This must not run again when rows are rebuilt (moving, duplicating, undoing or opening a file
+  rebuilds the whole table), since it resets the column widths the user dragged into place.
+  """
   header = table_widget.horizontalHeader()
   header.setMinimumHeight(HEADER_HEIGHT)
   header.setMinimumSectionSize(MINIMUM_COLUMN_WIDTH)
@@ -422,6 +426,23 @@ def post_process_row(table_widget: QTableWidget, row: int) -> None:
     header.setSectionResizeMode(column, QHeaderView.Interactive)
     table_widget.setColumnWidth(column, width)
   header.setStretchLastSection(True)
+
+
+def get_column_widths(table_widget: QTableWidget) -> list[int]:
+  """Read the widths of the user-resizable columns, in the order of DEFAULT_COLUMN_WIDTHS."""
+  return [table_widget.columnWidth(column) for column in DEFAULT_COLUMN_WIDTHS]
+
+
+def set_column_widths(table_widget: QTableWidget, widths: Sequence[int]) -> None:
+  """Restore widths read by get_column_widths; a list that does not fit the columns is ignored."""
+  if len(widths) != len(DEFAULT_COLUMN_WIDTHS):
+    return
+  for column, width in zip(DEFAULT_COLUMN_WIDTHS, widths, strict=True):
+    table_widget.setColumnWidth(column, max(width, MINIMUM_COLUMN_WIDTH))
+
+
+def post_process_row(table_widget: QTableWidget, row: int) -> None:
+  """Fill a freshly inserted row with its checkbox and dropdown widgets."""
   ui_utils.fill_row(table_widget, row)
 
 

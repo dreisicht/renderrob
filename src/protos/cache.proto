@@ -5,4 +5,6 @@ package render_rob_cache;
 message RenderRobCache {
     string current_file = 1;
     repeated string recent_files = 2;
+    // Widths of the user-resizable table columns, so they survive a restart.
+    repeated int32 column_widths = 3;
 }

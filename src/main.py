@@ -181,6 +181,8 @@ class MainWindow(QWidget):
     self.app.setWindowIcon(window_icon)
     self.table = self.window.tableWidget
     self.table.verticalHeader().setDefaultSectionSize(TABLE_ROW_HEIGHT)
+    table_utils.setup_header(self.table)
+    table_utils.set_column_widths(self.table, self.cache.column_widths)
     self.refresh_recent_files_menu()
     self.window.progressBar.setValue(0)
     self.window.progressBar.setMinimum(0)
@@ -205,6 +207,7 @@ class MainWindow(QWidget):
   ############### EVENTS ###############
   def closeEvent(self, event: QCloseEvent) -> None:  # pylint: disable=invalid-name
     """Handle the close event."""
+    self.save_cache()
     if self.is_saved:
       event.accept()
       return
@@ -315,6 +318,9 @@ class MainWindow(QWidget):
   ######## CACHE UTILS ##########
   def save_cache(self) -> None:
     """Store the cache to a file."""
+    if self.table:
+      del self.cache.column_widths[:]
+      self.cache.column_widths.extend(table_utils.get_column_widths(self.table))
     self.cache_path.write_bytes(self.cache.SerializeToString())
 
   def load_cache(self) -> None:
