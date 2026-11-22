@@ -266,6 +266,9 @@ class MainWindow(QWidget):
 
     self.window.actionCopy_cell.triggered.connect(self.copy_from_cell)
     self.window.actionPaste_cell.triggered.connect(self.paste_into_cell)
+    self.window.actionClear_console.triggered.connect(self.clear_console)
+    self.window.textBrowser.setContextMenuPolicy(Qt.CustomContextMenu)
+    self.window.textBrowser.customContextMenuRequested.connect(self._show_console_context_menu)
 
     self.window.render_button.clicked.connect(self.start_render)
     self.window.stop_button.clicked.connect(self.stop_render)
@@ -447,6 +450,19 @@ class MainWindow(QWidget):
     return reply == QMessageBox.No
 
   ######### CONSOLE WINDOW ###########
+  def clear_console(self) -> None:
+    """Remove all output from the console."""
+    self.window.textBrowser.clear()
+    self.window.textBrowser.setCurrentCharFormat(QTextCharFormat())
+
+  def _show_console_context_menu(self, position: QPoint) -> None:
+    """Show the standard console context menu with a Clear Console entry added."""
+    menu = self.window.textBrowser.createStandardContextMenu(position)
+    menu.addSeparator()
+    menu.addAction(self.window.actionClear_console)
+    menu.exec(self.window.textBrowser.viewport().mapToGlobal(position))
+    menu.deleteLater()
+
   def _scroll_console_to_end_if_at_bottom(self) -> None:
     """Follow the output, but only while the user has not scrolled up to read something."""
     scroll_bar = self.window.textBrowser.verticalScrollBar()

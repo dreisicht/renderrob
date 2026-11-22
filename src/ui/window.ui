@@ -610,6 +610,8 @@
     <addaction name="actionCopy_cell"/>
     <addaction name="actionPaste_cell"/>
     <addaction name="separator"/>
+    <addaction name="actionClear_console"/>
+    <addaction name="separator"/>
     <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuFile"/>
@@ -714,6 +716,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionClear_console">
+   <property name="text">
+    <string>Clear Console</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
    </property>
   </action>
  </widget>
